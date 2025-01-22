@@ -2,6 +2,9 @@
 
 Listen2Me is an assistive communication application designed for people who are temporarily or permanently unable to speak, such as patients after tracheostomy or those with other conditions affecting speech capabilities.
 
+![Category Overview](docs/sample1.png)
+![Conversation View](docs/sample2.png)
+
 > **Note**: This project is currently in early development and is being developed in our free time. We aim to create a free, open-source tool for people who need this type of assistance. We warmly welcome anyone who would like to contribute to this meaningful project!
 
 ## Overview
