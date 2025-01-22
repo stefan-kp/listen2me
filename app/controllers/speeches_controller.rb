@@ -1,4 +1,10 @@
 class SpeechesController < ApplicationController
+  def initialize
+    @client = ElevenLabs::Client.new(
+      api_key: ENV['ELEVENLABS_API_KEY']
+    )
+  end
+
   def index
     @frequent_sentences = Sentence.includes(:category, :language)
                                 .where(language: Language.find_by(code: I18n.locale))
@@ -29,7 +35,7 @@ class SpeechesController < ApplicationController
           text: sentence.content,
           voice_id: sentence.user.voice_identifier,
           model_id: "eleven_multilingual_v2",
-          api_key: Rails.application.credentials.elevenlabs[:secret]
+          api_key: ENV['ELEVENLABS_API_KEY']
         }
       end
       format.html { redirect_to speeches_path }
@@ -52,7 +58,7 @@ class SpeechesController < ApplicationController
       text: @sentence.content,
       voice_id: @sentence.user.voice_identifier,
       model_id: "eleven_multilingual_v2",
-      api_key: Rails.application.credentials.elevenlabs[:secret]
+      api_key: ENV['ELEVENLABS_API_KEY']
     }
   end
 
