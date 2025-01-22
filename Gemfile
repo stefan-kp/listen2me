@@ -66,7 +66,7 @@ gem 'haml-rails'
 
 gem "heroicon"
 
-gem "tailwindcss-rails", "~> 3.2"
+gem "tailwindcss-rails", "~> 3.3"
 
 gem "langchainrb", "~> 0.19.3"
 
