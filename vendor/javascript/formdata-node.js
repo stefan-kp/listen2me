@@ -1,0 +1,4 @@
+// formdata-node@6.0.3 downloaded from https://ga.jspm.io/npm:formdata-node@6.0.3/lib/browser.cjs
+
+var e={};var r=Object.defineProperty;var a=Object.getOwnPropertyDescriptor;var t=Object.getOwnPropertyNames;var o=Object.prototype.hasOwnProperty;var __export=(e,a)=>{for(var t in a)r(e,t,{get:a[t],enumerable:true})};var __copyProps=(e,l,n,f)=>{if(l&&"object"===typeof l||"function"===typeof l)for(let i of t(l))o.call(e,i)||i===n||r(e,i,{get:()=>l[i],enumerable:!(f=a(l,i))||f.enumerable});return e};var __toCommonJS=e=>__copyProps(r({},"__esModule",{value:true}),e);var l={};__export(l,{Blob:()=>i,File:()=>b,FormData:()=>f});e=__toCommonJS(l);var n=function(){return"undefined"!==typeof globalThis?globalThis:"undefined"!==typeof self?self:window}();var{FormData:f,Blob:i,File:b}=n;0;var u=e;const v=e.Blob,s=e.File,p=e.FormData;export{v as Blob,s as File,p as FormData,u as default};
+

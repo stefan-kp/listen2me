@@ -1,0 +1,14 @@
+.space-y-2
+  - suggestions.each do |suggestion|
+    = form_with url: conversation_messages_path(@conversation), method: :post,
+      data: { controller: "speech form",
+              speech_text_value: suggestion["content"],
+              speech_voice_id_value: current_user.voice_identifier,
+              speech_api_key_value: Rails.application.credentials.elevenlabs[:secret],
+              action: "speech:finished->form#submit",
+              turbo: false } do |f|
+      = f.hidden_field :content, value: suggestion["content"]
+      = f.hidden_field :role, value: "user"
+      = f.button class: "w-full text-left p-2 hover:bg-gray-100 rounded border",
+        data: { action: "click->speech#speak" } do
+        = suggestion["content"] 

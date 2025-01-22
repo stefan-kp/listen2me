@@ -1,0 +1,6 @@
+= turbo_stream.append "messages" do
+  = render @message 
+
+- if @suggestions.present?
+  = turbo_stream.update "suggestions" do
+    = render "messages/suggestions", suggestions: @suggestions 

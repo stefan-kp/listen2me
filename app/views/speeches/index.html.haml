@@ -1,0 +1,41 @@
+.container.mx-auto.p-4.max-w-4xl
+  .mb-12
+    = render 'conversation_form'
+
+  .mb-12
+    %h2.text-xl.font-medium.mb-6= t('.categories')
+    .grid.grid-cols-4.sm:grid-cols-6.md:grid-cols-8.gap-4
+      - Category.all.each do |category|
+        = link_to category_speech_path(category), 
+          class: "group hover:scale-105 transition-transform duration-200" do
+          .bg-white.rounded-lg.shadow-sm.hover:shadow.p-4.text-center
+            .h-8.flex.items-center.justify-center.mb-2
+              = heroicon(category.icon_name, options: { class: "h-6 w-6 text-gray-600 group-hover:text-blue-500" }, variant: :solid)
+            .text-sm.font-medium.text-gray-700.group-hover:text-blue-500= category.name
+            .text-xs.text-gray-500
+              = t('speeches.usage_count', count: category.usage_count)
+
+  .mb-12
+    %h2.text-xl.font-medium.mb-6= t('.frequently_used')
+    .bg-white.rounded-lg.shadow-sm.divide-y
+      - @frequent_sentences.each do |sentence|
+        .group.flex.items-center.gap-2.hover:bg-gray-50
+          = form_with url: conversations_path, method: :post,
+            class: "flex-1",
+            data: { controller: "speech form",
+                   speech_text_value: sentence.content,
+                   speech_voice_id_value: current_user.voice_identifier,
+                   speech_api_key_value: Rails.application.credentials.elevenlabs[:secret],
+                   action: "speech:finished->form#submit" } do |f|
+            = f.hidden_field :sentence_id, value: sentence.id
+            = f.button class: "w-full text-left p-4",
+              data: { action: "click->speech#speak" } do
+              .flex.justify-between.items-center
+                = sentence.content
+                .text-xs.text-gray-500
+                  = t('speeches.usage_count', count: sentence.usage_count)
+          = button_to speech_path(sentence),
+            method: :delete,
+            class: "p-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity",
+            data: { turbo_confirm: t('.confirm_delete') } do
+            = heroicon("trash", options: { class: "h-4 w-4" }, variant: :solid) 

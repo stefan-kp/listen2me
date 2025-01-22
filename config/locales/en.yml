@@ -1,0 +1,157 @@
+# Files in the config/locales directory are used for internationalization and
+# are automatically loaded by Rails. If you want to use locales other than
+# English, add the necessary files in this directory.
+#
+# To use the locales, use `I18n.t`:
+#
+#     I18n.t "hello"
+#
+# In views, this is aliased to just `t`:
+#
+#     <%= t("hello") %>
+#
+# To use a different locale, set it with `I18n.locale`:
+#
+#     I18n.locale = :es
+#
+# This would use the information in config/locales/es.yml.
+#
+# To learn more about the API, please read the Rails Internationalization guide
+# at https://guides.rubyonrails.org/i18n.html.
+#
+# Be aware that YAML interprets the following case-insensitive strings as
+# booleans: `true`, `false`, `on`, `off`, `yes`, `no`. Therefore, these strings
+# must be quoted to be interpreted as strings. For example:
+#
+#     en:
+#       "yes": yup
+#       enabled: "ON"
+
+en:
+  speeches:
+    text_form: &text_form_en
+      own_text: "Custom Text"
+      enter_text: "Enter your text..."
+      speak: "Speak"
+      select_category: "Select category"
+    conversation_form: &conversation_form_en
+      <<: *text_form_en
+    index:
+      <<: *text_form_en
+      categories: "Categories"
+      frequently_used: "Frequently Used"
+      confirm_delete: "Are you sure you want to delete this sentence?"
+    category:
+      <<: *text_form_en
+      back: "Back"
+    usage_count:
+      one: "%{count} use"
+      other: "%{count} uses"
+    destroy:
+      sentence_deleted: "Sentence was deleted"
+  languages:
+    german: "German"
+    english: "English"
+  suggestions:
+    system_prompt: |
+      You are a language assistant communicating with a patient who is unable to speak. Your task is to provide meaningful suggestions for communication word-finding. The output should be in JSON format to adapt the response suggestions.
+
+      # Details
+
+      - The patient can type responses that you will process
+      - As a language assistant, you should provide context-related suggestions for possible answers
+      - When the patient talks about a topic, like food, make appropriate suggestions (e.g., "I would like a pizza" or "I would like some bread")
+      - The response suggestions should always be in the same JSON format: an array with a list of messages, each containing a "content" attribute
+      - I will give you both the patient's responses/questions and the messages of a third person in the room. These have the role "Patient". And I will give you the messages of a third person in the room. These have the role "Visitor".
+      - The last message of the patient/visitor is always at the end of the conversation. This gives you the important information for the suggestions. The previous messages are important for the context.
+      - I will give you also a description of the patient (user_description), which contains important context information
+      - I will give you also the category of the sentence (category), which contains important context information
+      # Steps
+
+      1. Process the patient's input
+      2. Identify the context of communication (e.g., topics like food, drinks, activities)
+      3. Create context-related response suggestions
+      4. Structure the suggestions in JSON format
+
+      # Output Format
+
+      The output must be in JSON format and always an array with at least 4 objects:
+
+      ```json
+      {
+        "response": [
+          {
+              "content": "[Suggestion1]"
+          },
+          {
+              "content": "[Suggestion2]"
+          }
+      ]
+      ```
+
+      # Examples
+
+      ## Example 1
+
+      ### Input
+      Patient enters "I'm hungry"
+
+      ### Output
+      ```json
+      [
+          {
+              "content": "I would like a pizza"
+          },
+          {
+              "content": "I would like some bread"
+          }
+      ]
+      ```
+
+      ## Example 2
+
+      ### Input
+      Patient says "I want something to drink"
+
+      ### Output
+      ```json
+      [
+          {
+              "content": "I would like a glass of water"
+          },
+          {
+              "content": "I would like some juice"
+          }
+      ]
+      ```
+
+      # Notes
+
+      - Ensure relevance and appropriateness of suggestions in relation to the given context
+      - The JSON output structure should be strictly maintained
+
+  activerecord:
+    errors:
+      messages:
+        record_invalid: "Validation failed: %{errors}"
+        blank: "can't be blank"
+        taken: "has already been taken"
+      models:
+        sentence:
+          attributes:
+            content:
+              blank: "Text can't be blank"
+            category:
+              blank: "Category must be selected"
+            language:
+              blank: "Language must be selected"
+
+  messages:
+    form:
+      enter_message: "Enter message..."
+      speak: "Speak"
+
+  conversations:
+    show:
+      conversation: "Conversation"
+      back_to_home: "Back to Home"

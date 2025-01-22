@@ -1,0 +1,35 @@
+.container.mx-auto.p-4.max-w-4xl
+  .flex.justify-between.items-center.mb-8
+    .flex.items-center.gap-2
+      = heroicon(@category.icon_name, options: { class: "h-6 w-6 text-gray-600" }, variant: :solid)
+      %h2.text-xl.font-medium= @category.name
+    = link_to root_path,
+      class: "px-4 py-2 bg-white hover:bg-gray-50 rounded-lg shadow-sm flex items-center gap-2 transition-colors" do
+      = heroicon("arrow-left", options: { class: "h-4 w-4" })
+      = t('.back')
+
+  .mb-8
+    = render 'text_form'
+
+  .bg-white.rounded-lg.shadow-sm.divide-y
+    - @sentences.each do |sentence|
+      .group.flex.items-center.gap-2.hover:bg-gray-50
+        = form_with url: conversations_path, method: :post,
+          class: "flex-1",
+          data: { controller: "speech form",
+                 speech_text_value: sentence.content,
+                 speech_voice_id_value: current_user.voice_identifier,
+                 speech_api_key_value: Rails.application.credentials.elevenlabs[:secret],
+                 action: "speech:finished->form#submit" } do |f|
+          = f.hidden_field :sentence_id, value: sentence.id
+          = f.button class: "w-full text-left p-4",
+            data: { action: "click->speech#speak" } do
+            .flex.justify-between.items-center
+              = sentence.content
+              .text-xs.text-gray-500
+                = t('speeches.usage_count', count: sentence.usage_count)
+        = button_to speech_path(sentence),
+          method: :delete,
+          class: "p-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity",
+          data: { turbo_confirm: t('.confirm_delete') } do
+          = heroicon("trash", options: { class: "h-4 w-4" }, variant: :solid) 
