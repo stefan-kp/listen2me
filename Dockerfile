@@ -42,14 +42,14 @@ RUN bundle install && \
 # Copy application code
 COPY . .
 
+# Make entrypoint script executable
+RUN chmod +x /rails/bin/docker-entrypoint
+
 # Precompile bootsnap code for faster boot times
 RUN bundle exec bootsnap precompile app/ lib/
 
 # Precompiling assets for production without requiring secret RAILS_MASTER_KEY
-RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
-
-
-
+RUN SECRET_KEY_BASE_DUMMY=1 SKIP_DB_CHECK=1 ./bin/rails assets:precompile
 
 # Final stage for app image
 FROM base
@@ -57,6 +57,9 @@ FROM base
 # Copy built artifacts: gems, application
 COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --from=build /rails /rails
+
+# Make sure entrypoint is executable in final image
+RUN chmod +x /rails/bin/docker-entrypoint
 
 # Run and own only the runtime files as a non-root user for security
 RUN groupadd --system --gid 1000 rails && \

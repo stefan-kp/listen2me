@@ -2,11 +2,21 @@ class SuggestionService
   attr_reader :last_message
   def initialize(conversation)
     @conversation = conversation
-    @llm = Langchain::LLM::OpenAI.new(
-      api_key: ENV['OPENAI_API_KEY'],
+    klass = case @conversation.user.llm_provider
+            when "openai"
+              Langchain::LLM::OpenAI
+            when "anthropic"
+              Langchain::LLM::Anthropic
+            when "gemini"
+              Langchain::LLM::GoogleGemini
+            else
+              raise "Unknown LLM provider: #{@conversation.user.llm_provider}"
+            end
+    @llm = klass.new(
+      api_key: @conversation.user.llm_api_key,
       default_options: { 
         temperature: 0.7,
-        chat_model: "gpt-4o"
+        chat_model: @conversation.user.llm_model
       }
     )
   end

@@ -23,5 +23,8 @@ module Listen2me
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    # Use ENV variables instead of credentials
+    config.require_master_key = false
   end
 end

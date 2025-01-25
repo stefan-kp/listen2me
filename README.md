@@ -7,88 +7,48 @@ Listen2Me is an assistive communication application designed for people who are 
 
 > **Note**: This project is currently in early development and is being developed in our free time. We aim to create a free, open-source tool for people who need this type of assistance. We warmly welcome anyone who would like to contribute to this meaningful project!
 
-## Overview
+## Quick Start with Docker
 
-The application provides a multi-modal communication system that combines:
-- Pre-defined phrases organized by categories
-- Text-to-speech capabilities
-- Speech recognition for caregivers
-- AI-powered conversation suggestions
-- Multi-language support (English and German)
+### Prerequisites
+- Docker Desktop installed ([Download here](https://www.docker.com/products/docker-desktop/))
+- Git installed ([Download here](https://git-scm.com/downloads))
 
-## Features
+### Installation Steps
 
-### Category-Based Communication
-- Quick access to common phrases organized by categories (Basic Needs, Food, Health, etc.)
-- Visual icons for intuitive navigation
-- Usage tracking to prioritize frequently used phrases
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/stefan-kp/listen2me.git
+   cd listen2me
+   ```
 
-### Speech Synthesis
-- High-quality text-to-speech using ElevenLabs API
-- Natural-sounding voice output
-- Support for multiple languages
+   Optional: If not using Docker, copy the database config:
+   ```bash
+   cp config/database.yml.example config/database.yml
+   ```
 
-### Interactive Conversations
-- Two-way communication support
-- Speech recognition for caregiver responses
-- Real-time transcription of spoken words
+2. Start the application:
+   ```bash
+   docker compose up
+   ```
 
-### AI-Powered Suggestions
-- Context-aware response suggestions using GPT-4
-- Dynamic adaptation to conversation flow
-- Personalized suggestions based on user profile and conversation history
+3. Access the application:
+   - Open your browser and go to http://localhost:80
+   - Create a new account
+   - IMPORTAN Add your API keys in the settings:
+     - ElevenLabs API key for text-to-speech
+     - Choose your preferred LLM provider (OpenAI, Anthropic, or Gemini) and add the API key
 
-## Technical Details
+That's it! The application will automatically:
+- Set up the database
+- Install all dependencies
+- Start the development server
+- Initialize required data
 
-### Requirements
-- Ruby 3.2+
-- Rails 7.1+
-- PostgreSQL
-- ElevenLabs API key for speech synthesis
-- OpenAI API key for conversation suggestions
+> **Note**: The application uses Docker and PostgreSQL. The database configuration 
+> is handled automatically through environment variables in docker-compose.yml - 
+> no manual database configuration is needed.
 
-### Key Technologies
-- Rails 8.0 for the backend
-- Stimulus.js for frontend interactivity
-- Turbo for real-time updates
-- Tailwind CSS for styling
-- LangChain for AI integration
-- Web Speech API for speech recognition
-
-### Setup
-1. Clone the repository
-2. Install dependencies: `bundle install`
-3. Setup database: `rails db:setup`
-4. Add your API keys to credentials
-5. Start the server: `rails s`
-
-## Contributing
-
-We welcome contributions! Please feel free to submit pull requests or open issues for any improvements or bug fixes.
-
-We are actively seeking contributors who want to help make this tool better for people who need it. Whether you're a developer, designer, healthcare professional, or someone with experience in assistive technologies, your input is valuable.
-
-### Ways to Contribute
-- Code contributions
-- UI/UX improvements
-- Accessibility enhancements
-- Documentation
-- Testing and feedback
-- Translations
-- Feature suggestions
-
-Our goal is to keep this tool free and accessible to everyone who needs it. Together, we can make communication easier for people facing speech challenges.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE.md file for details.
-
-## Acknowledgments
-
-- ElevenLabs for providing the text-to-speech capabilities
-- OpenAI for powering the conversation suggestions
-- All contributors and supporters of the project
-
-## Contact
-
-For questions or support, please open an issue in the GitHub repository.
+### Stopping the Application
+```bash
+docker compose down
+```

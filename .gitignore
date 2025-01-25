@@ -25,9 +25,9 @@
 !/tmp/storage/
 !/tmp/storage/.keep
 
-# Ignore master key for decrypting credentials
+# Ignore master key for decrypting credentials and more.
 /config/master.key
-/config/credentials.yml.enc
+/config/credentials/*.key
 
 # Environment variables
 .env
@@ -58,3 +58,6 @@ spec/examples.txt
 # Ignore local development files
 .ruby-version
 .ruby-gemset
+
+# Keep development credentials for open source
+!/config/credentials/development.key
