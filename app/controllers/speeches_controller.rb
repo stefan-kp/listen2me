@@ -1,9 +1,5 @@
 class SpeechesController < ApplicationController
-  def initialize
-    @client = ElevenLabs::Client.new(
-      api_key: ENV['ELEVENLABS_API_KEY']
-    )
-  end
+  
 
   def index
     @frequent_sentences = Sentence.includes(:category, :language)
@@ -33,9 +29,9 @@ class SpeechesController < ApplicationController
       format.json do
         render json: {
           text: sentence.content,
-          voice_id: sentence.user.voice_identifier,
+          voice_id: sentence.user.elevenlabs_voice_id,
           model_id: "eleven_multilingual_v2",
-          api_key: ENV['ELEVENLABS_API_KEY']
+          api_key: sentence.user.elevenlabs_api_key
         }
       end
       format.html { redirect_to speeches_path }
@@ -45,7 +41,7 @@ class SpeechesController < ApplicationController
   def category
     @category = Category.find(params[:id])
     @sentences = @category.sentences
-                         .where(language: Language.find_by(code: 'de'))
+                         .where(language: Language.find_by(code: I18n.locale))
                          .order(usage_count: :desc)
   end
 
@@ -56,9 +52,9 @@ class SpeechesController < ApplicationController
     
     render json: {
       text: @sentence.content,
-      voice_id: @sentence.user.voice_identifier,
-      model_id: "eleven_multilingual_v2",
-      api_key: ENV['ELEVENLABS_API_KEY']
+      voice_id: @sentence.user.elevenlabs_voice_id,
+      model_id: @sentence.user.llm_model,
+      api_key: @sentence.user.elevenlabs_api_key
     }
   end
 

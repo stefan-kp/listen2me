@@ -1,0 +1,71 @@
+.container.mx-auto.p-4.max-w-2xl
+  .bg-white.shadow.sm:rounded-lg
+    .px-4.py-5.sm:p-6{data: { 
+      controller: "tabs", 
+      has_api_key: (current_user.elevenlabs_api_key.present?).to_s
+    }}
+      %h3.text-lg.font-medium.leading-6.text-gray-900= t('.title')
+      
+      .mt-4.border-b.border-gray-200
+        %nav.-mb-px.flex.space-x-8
+          = link_to "#about",
+            class: "whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm",
+            data: { tabs_target: "tab", action: "click->tabs#switch", tab: "about" } do
+            = heroicon("user", options: { class: "h-5 w-5 inline-block mr-2" })
+            = t('.about_me')
+          = link_to "#system",
+            class: "whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm",
+            data: { tabs_target: "tab", action: "click->tabs#switch", tab: "system" } do
+            = heroicon("cog-6-tooth", options: { class: "h-5 w-5 inline-block mr-2" })
+            = t('.system')
+
+      = form_with model: current_user, url: settings_path, class: "mt-5 space-y-6" do |f|
+        .space-y-4{data: { tabs_target: "panel", panel: "about" }}
+          %h4.font-medium.text-gray-700= t('.about_settings')
+          
+          .form-group
+            = f.label :description, class: "block text-sm font-medium text-gray-700"
+            = f.text_area :description,
+              class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm",
+              rows: 4,
+              placeholder: t('.description_placeholder')
+        
+        .space-y-4{data: { tabs_target: "panel", panel: "system" }}
+          .space-y-4
+            %h4.font-medium.text-gray-700= t('.voice_settings')
+            
+            .form-group
+              = f.label :elevenlabs_api_key, class: "block text-sm font-medium text-gray-700"
+              = f.text_field :elevenlabs_api_key,
+                class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm",
+                placeholder: "sk-..."
+                
+            .form-group
+              = f.label :elevenlabs_voice_id, class: "block text-sm font-medium text-gray-700"
+              = f.text_field :elevenlabs_voice_id,
+                class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+          
+          .space-y-4.mt-8
+            %h4.font-medium.text-gray-700= t('.llm_settings')
+            
+            .form-group
+              = f.label :llm_provider, class: "block text-sm font-medium text-gray-700"
+              = f.select :llm_provider, options_for_select([['OpenAI', 'openai'],['Anthropic', 'anthropic'], ['Gemini', 'gemini']], current_user.llm_provider),{}, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                
+            .form-group
+              = f.label :llm_model, class: "block text-sm font-medium text-gray-700"
+              = f.text_field :llm_model,
+                class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                
+            .form-group
+              = f.label :llm_api_key, class: "block text-sm font-medium text-gray-700"
+              = f.text_field :llm_api_key,
+                class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm",
+                placeholder: "sk-..."
+        
+        .mt-8.flex.justify-end
+          = f.submit t('.save'),
+            class: "ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" 
+
+.hidden
+  .border-blue-500.text-blue-600.border-transparent.text-gray-500.hover:text-gray-700.hover:border-gray-300 

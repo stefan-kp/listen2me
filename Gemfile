@@ -71,3 +71,6 @@ gem "tailwindcss-rails", "~> 3.2"
 gem "langchainrb", "~> 0.19.3"
 
 gem 'dotenv-rails', groups: [:development, :test]
+
+gem 'devise'
+gem 'devise-i18n'

@@ -38,7 +38,7 @@ de:
 
       - Der Patient kann Antworten selbst eintippen, die dann von dir verarbeitet werden
       - Als Sprachassistent sollst du kontextbezogene Vorschläge für mögliche Antworten geben
-      - Wenn der Patient über ein Thema, wie z.B. Essen, spricht, mache passende Vorschläge (z.B. „Ich möchte eine Pizza" oder „Ich möchte ein Brot")
+      - Wenn der Patient über ein Thema, wie z.B. Essen, spricht, mache passende Vorschläge (z.B. "Ich möchte eine Pizza" oder "Ich möchte ein Brot")
       - Die Antwortvorschläge sollten immer im gleichen JSON-Format sein: ein Array mit einer Liste von Nachrichten, die jeweils ein "content"-Attribut enthalten
       - Ich übergebe dir sowohl die Antworten bzw. Fragen des Patienten. Diese haben die Rolle "Patient". Und ich übergebe dir die Nachrichten eines etwaigen Dritten in dem Raum. Diese haben die Rolle "Visitor".
       - Die letzte Nachricht des Patienten bzw, des Visitors ist immer am Ende der Konversation. Dieser gibt die wichtige Informationen für die Vorschläge. Die vorherigen Nachrichten sind für den Kontext wichtig.
@@ -73,7 +73,7 @@ de:
       ## Beispiel 1
 
       ### Eingabe
-      Der Patient gibt „Ich habe Hunger" ein.
+      Der Patient gibt "Ich habe Hunger" ein.
 
       ### Ausgabe
       ```json
@@ -111,4 +111,8 @@ de:
   messages:
     form:
       enter_message: "Nachricht eingeben..."
-      speak: "Sprechen" 
+      speak: "Sprechen"
+  shared:
+    user_menu:
+      settings: "Einstellungen"
+      sign_out: "Abmelden" 

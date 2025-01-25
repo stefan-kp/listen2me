@@ -36,7 +36,7 @@ namespace :import do
     # Create default user if none exists
     User.create!(
       first_name: 'Christoph',
-      last_name: 'Nothegger',
+      last_name: '-',
       voice_identifier: 'Christoph'
     ) if User.count == 0
 

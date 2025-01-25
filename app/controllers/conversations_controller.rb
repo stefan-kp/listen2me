@@ -8,9 +8,9 @@ class ConversationsController < ApplicationController
   def create
     # Erst den Satz erstellen, wenn content übergeben wurde
     sentence = if params[:sentence_id].present?
-      Sentence.find(params[:sentence_id])
+      current_user.sentences.find(params[:sentence_id])
     else
-      category = Category.find(params[:category_id])
+      category = current_user.categories.find(params[:category_id])
       Sentence.find_or_create_by!(
         content: params[:content],
         language: Language.find_by!(code: I18n.locale),
@@ -36,7 +36,7 @@ class ConversationsController < ApplicationController
   end
   
   def suggestions
-    @conversation = Conversation.find(params[:id])
+    @conversation = current_user.conversations.find(params[:id])
     @suggestions = SuggestionService.new(@conversation).generate_suggestions
     
     respond_to do |format|

@@ -18,8 +18,8 @@
           class: "flex-1",
           data: { controller: "speech form",
                  speech_text_value: sentence.content,
-                 speech_voice_id_value: current_user.voice_identifier,
-                 speech_api_key_value: Rails.application.credentials.elevenlabs[:secret],
+                 speech_voice_id_value: current_user.elevenlabs_voice_id,
+                 speech_api_key_value: current_user.elevenlabs_api_key,
                  action: "speech:finished->form#submit" } do |f|
           = f.hidden_field :sentence_id, value: sentence.id
           = f.button class: "w-full text-left p-4",

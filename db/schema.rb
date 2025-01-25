@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_01_15_202242) do
+ActiveRecord::Schema[8.0].define(version: 2025_01_25_082835) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -20,6 +20,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_15_202242) do
     t.integer "usage_count", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
   end
 
   create_table "conversations", force: :cascade do |t|
@@ -65,12 +66,24 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_15_202242) do
   create_table "users", force: :cascade do |t|
     t.string "first_name"
     t.string "last_name"
-    t.string "voice_identifier"
+    t.string "elevenlabs_voice_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "description"
+    t.string "email", default: "", null: false
+    t.string "encrypted_password", default: "", null: false
+    t.string "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
+    t.string "elevenlabs_api_key"
+    t.string "llm_model", default: "gpt-4o"
+    t.string "llm_provider", default: "openai"
+    t.string "llm_api_key"
+    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "categories", "users"
   add_foreign_key "conversations", "sentences", column: "initial_sentence_id"
   add_foreign_key "conversations", "users"
   add_foreign_key "messages", "conversations"
