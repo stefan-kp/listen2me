@@ -12,6 +12,8 @@ de:
       categories: "Kategorien"
       frequently_used: "Häufig verwendet"
       confirm_delete: "Möchten Sie diesen Satz wirklich löschen?"
+      frequent_sentences: "Häufig verwendete Sätze"
+      frequent_sentences_description: "Liste der am häufigsten verwendeten Sätze"
     category:
       <<: *text_form_de
       back: "Zurück"
@@ -20,6 +22,10 @@ de:
       other: "%{count} Verwendungen"
     destroy:
       sentence_deleted: "Satz wurde gelöscht"
+    create:
+      speak_sentence: "Spreche den Satz: %{text}"
+    speak:
+      speaking_sentence: "Spielt den Satz ab: %{text}"
   languages:
     german: "Deutsch"
     english: "Englisch"
@@ -30,6 +36,14 @@ de:
       recognized_text: "Erkannter Text"
       waiting_for_speech: "Warte auf Spracheingabe..."
       suggestions: "Vorschläge"
+    index:
+      title: "Meine Konversationen"
+      new_conversation: "Neue Konversation"
+      messages_count:
+        one: "%{count} Nachricht"
+        other: "%{count} Nachrichten"
+      created_at: "Erstellt am %{date}"
+      no_conversations: "Keine Konversationen vorhanden"
   suggestions:
     system_prompt: |
       Du bist ein Sprachassistent, der mit einem Patienten kommuniziert, der nicht mehr in der Lage ist, selbst zu sprechen. Deine Aufgabe ist es, sinnvolle Vorschläge für die Wortfindung der Kommunikation zu liefern. Die Ausgabe erfolgt im JSON-Format, um die Antwortenvorschläge anzupassen.
@@ -115,4 +129,31 @@ de:
   shared:
     user_menu:
       settings: "Einstellungen"
-      sign_out: "Abmelden" 
+      sign_out: "Abmelden"
+    header:
+      main_navigation: "Hauptnavigation"
+      home: "Startseite"
+      speeches: "Sprachausgabe"
+      conversations: "Konversationen"
+      sign_in: "Anmelden"
+  layouts:
+    application:
+      skip_to_main: "Zum Hauptinhalt springen"
+  accessibility:
+    keyboard_shortcuts:
+      title: "Tastatur-Shortcuts"
+      main_content: "Alt + 1: Zum Hauptinhalt"
+      search: "Alt + S: Zur Suche"
+      new_text: "Alt + N: Neuen Text eingeben"
+  settings:
+    show:
+      title: "Einstellungen"
+      about_me: "Über mich"
+      system: "System"
+      about_settings: "Persönliche Einstellungen"
+      description_placeholder: "Erzählen Sie uns von sich, Ihren Vorlieben und wichtigen Informationen, die während der Gespräche berücksichtigt werden sollen..."
+      voice_settings: "Spracheinstellungen"
+      llm_settings: "KI-Einstellungen"
+      save: "Änderungen speichern"
+    update:
+      updated: "Einstellungen erfolgreich aktualisiert" 

@@ -26,5 +26,8 @@ module Listen2me
 
     # Use ENV variables instead of credentials
     config.require_master_key = false
+
+    # Only keep the asset configuration we need
+    config.assets.css_compressor = nil
   end
 end

@@ -6,6 +6,10 @@ class SpeechesController < ApplicationController
                                 .where(language: Language.find_by(code: I18n.locale))
                                 .order(usage_count: :desc)
                                 .limit(10)
+    
+    # Fügen Sie einen Titel für Screen Reader hinzu
+    @page_title = t('.frequent_sentences')
+    @page_description = t('.frequent_sentences_description')
   end
 
   def create
@@ -31,7 +35,8 @@ class SpeechesController < ApplicationController
           text: sentence.content,
           voice_id: sentence.user.elevenlabs_voice_id,
           model_id: "eleven_multilingual_v2",
-          api_key: sentence.user.elevenlabs_api_key
+          api_key: sentence.user.elevenlabs_api_key,
+          aria_label: t('.speak_sentence', text: sentence.content)
         }
       end
       format.html { redirect_to speeches_path }
@@ -54,7 +59,8 @@ class SpeechesController < ApplicationController
       text: @sentence.content,
       voice_id: @sentence.user.elevenlabs_voice_id,
       model_id: @sentence.user.llm_model,
-      api_key: @sentence.user.elevenlabs_api_key
+      api_key: @sentence.user.elevenlabs_api_key,
+      aria_label: t('.speaking_sentence', text: @sentence.content)
     }
   end
 

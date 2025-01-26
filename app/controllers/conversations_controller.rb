@@ -48,4 +48,10 @@ class ConversationsController < ApplicationController
       end
     end
   end
+
+  def index
+    @conversations = current_user.conversations
+                               .includes(:messages, initial_sentence: :category)
+                               .order(created_at: :desc)
+  end
 end 

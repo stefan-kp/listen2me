@@ -1,0 +1,29 @@
+%header.main-header{role: "banner"}
+  %nav.main-nav{role: "navigation", "aria-label": t('.main_navigation')}
+    .nav-content
+      = link_to root_path, class: "logo", "aria-label": t('.home') do
+        = image_tag "logo.png", alt: "Listen2Me Logo", class: "logo-image"
+        %span.logo-text.sr-only Listen2Me
+      
+      .nav-center
+        - if user_signed_in?
+          = link_to speeches_path, 
+            class: "nav-button", 
+            "aria-label": t('.speeches') do
+            = heroicon "speaker-wave"
+            %span= t('.speeches')
+            
+          = link_to conversations_path, 
+            class: "nav-button", 
+            "aria-label": t('.conversations') do
+            = heroicon "chat-bubble-left-right"
+            %span= t('.conversations')
+      
+      .nav-right
+        - if user_signed_in?
+          = render 'shared/user_menu'
+        - else
+          = link_to t('.sign_in'), 
+            new_user_session_path, 
+            class: "nav-button"
+        = render 'shared/language_switcher' 

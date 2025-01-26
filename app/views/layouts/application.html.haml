@@ -1,5 +1,5 @@
-!!!
-%html
+!!! 5
+%html{lang: I18n.locale}
   %head
     %title Listen2Me
     %meta{name: "viewport", content: "width=device-width,initial-scale=1"}
@@ -10,7 +10,11 @@
     = javascript_importmap_tags
 
   %body.relative
-    = render 'shared/flash_messages'
-    = render 'shared/language_switcher'
-    %main
+    .skip-nav
+      = link_to t('.skip_to_main'), '#main-content', class: 'skip-link'
+    
+    = render 'shared/header'
+    
+    %main#main-content{tabindex: -1}
+      = render 'shared/flash_messages'
       = yield 

@@ -4,7 +4,6 @@ export default class extends Controller {
   static targets = ["menu"]
 
   connect() {
-    // Close dropdown when clicking outside
     document.addEventListener('click', this.closeOnClickOutside.bind(this))
   }
 
@@ -14,12 +13,17 @@ export default class extends Controller {
 
   toggle(event) {
     event.stopPropagation()
-    this.menuTarget.classList.toggle('hidden')
+    this.menuTarget.classList.toggle("hidden")
+    
+    const button = this.element.querySelector("button")
+    const isExpanded = !this.menuTarget.classList.contains("hidden")
+    button.setAttribute("aria-expanded", isExpanded)
   }
 
   closeOnClickOutside(event) {
     if (!this.element.contains(event.target)) {
       this.menuTarget.classList.add('hidden')
+      this.element.querySelector("button").setAttribute("aria-expanded", "false")
     }
   }
 } 

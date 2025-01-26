@@ -1,8 +1,7 @@
-.absolute.top-4.right-4.flex.items-center.gap-4
-  .flex.items-center.gap-2
-    = link_to url_for(locale: :de), class: "#{I18n.locale == :de ? 'opacity-100' : 'opacity-50'} hover:opacity-100 transition-opacity" do
-      %img.w-8.h-6.rounded.shadow-sm{src: asset_path('flags/de.svg'), alt: t('languages.german')}
-    = link_to url_for(locale: :en), class: "#{I18n.locale == :en ? 'opacity-100' : 'opacity-50'} hover:opacity-100 transition-opacity" do
-      %img.w-8.h-6.rounded.shadow-sm{src: asset_path('flags/gb.svg'), alt: t('languages.english')}
-  
-  = render 'shared/user_menu' 
+.language-switcher
+  = link_to url_for(locale: :de), 
+    class: "language-link #{I18n.locale == :de ? 'active' : ''}" do
+    = image_tag "flags/de.svg", alt: "Deutsch", class: "flag-icon"
+  = link_to url_for(locale: :en), 
+    class: "language-link #{I18n.locale == :en ? 'active' : ''}" do
+    = image_tag "flags/gb.svg", alt: "English", class: "flag-icon" 

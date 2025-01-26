@@ -30,23 +30,28 @@
 en:
   speeches:
     text_form: &text_form_en
-      own_text: "Custom Text"
-      enter_text: "Enter your text..."
+      own_text: "Own text"
+      enter_text: "Enter your own text..."
       speak: "Speak"
       select_category: "Select category"
     conversation_form: &conversation_form_en
       <<: *text_form_en
     index:
-      <<: *text_form_en
+      frequent_sentences: "Frequently used sentences"
+      frequent_sentences_description: "List of most frequently used sentences"
       categories: "Categories"
-      frequently_used: "Frequently Used"
-      confirm_delete: "Are you sure you want to delete this sentence?"
+      frequently_used: "Frequently used"
+      confirm_delete: "Do you really want to delete this sentence?"
     category:
       <<: *text_form_en
       back: "Back"
     usage_count:
       one: "%{count} use"
       other: "%{count} uses"
+    create:
+      speak_sentence: "Speaking the sentence: %{text}"
+    speak:
+      speaking_sentence: "Playing the sentence: %{text}"
     destroy:
       sentence_deleted: "Sentence was deleted"
   languages:
@@ -161,6 +166,14 @@ en:
     show:
       conversation: "Conversation"
       back_to_home: "Back to Home"
+    index:
+      title: "My Conversations"
+      new_conversation: "New Conversation"
+      messages_count:
+        one: "%{count} message"
+        other: "%{count} messages"
+      created_at: "Created on %{date}"
+      no_conversations: "No conversations yet"
 
   settings:
     show:
@@ -179,3 +192,20 @@ en:
     user_menu:
       settings: "Settings"
       sign_out: "Sign Out"
+    header:
+      main_navigation: "Main navigation"
+      home: "Home"
+      speeches: "Speech output"
+      conversations: "Conversations"
+      sign_in: "Sign in"
+
+  layouts:
+    application:
+      skip_to_main: "Skip to main content"
+
+  accessibility:
+    keyboard_shortcuts:
+      title: "Keyboard Shortcuts"
+      main_content: "Alt + 1: Jump to main content"
+      search: "Alt + S: Jump to search"
+      new_text: "Alt + N: Enter new text"

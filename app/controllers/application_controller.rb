@@ -26,7 +26,7 @@ class ApplicationController < ActionController::Base
 
 
   def current_elevenlabs_api_key  
-    ENV.fetch('ELEVENLABS_API_KEY', nil)
+    user_signed_in? ? current_user.elevenlabs_api_key : nil
   end
 
   helper_method :current_elevenlabs_api_key

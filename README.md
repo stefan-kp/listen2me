@@ -21,7 +21,7 @@ Listen2Me is an assistive communication application designed for people who are 
    cd listen2me
    ```
 
-   Optional: If not using Docker, copy the database config:
+   copy the database config:
    ```bash
    cp config/database.yml.example config/database.yml
    ```
@@ -34,7 +34,7 @@ Listen2Me is an assistive communication application designed for people who are 
 3. Access the application:
    - Open your browser and go to http://localhost:80
    - Create a new account
-   - IMPORTAN Add your API keys in the settings:
+   - IMPORTANT Add your API keys in the settings:
      - ElevenLabs API key for text-to-speech
      - Choose your preferred LLM provider (OpenAI, Anthropic, or Gemini) and add the API key
 

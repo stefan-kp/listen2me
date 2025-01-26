@@ -1,0 +1,7 @@
+.sentence-item
+  = button_tag type: 'button',
+    class: 'speak-button',
+    data: { sentence_id: sentence.id },
+    aria: { label: t('.speak_sentence', text: sentence.content) },
+    tabindex: 0 do
+    = sentence.content 
