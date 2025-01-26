@@ -1,15 +1,15 @@
 class MessagesController < ApplicationController
   def create
     @conversation = Conversation.find(params[:conversation_id])
-    
+
     @message = @conversation.messages.create!(
       content: params[:content],
       role: params[:role]
     )
-    
+
     # Suggestions nach dem Erstellen der Message generieren
     @suggestions = SuggestionService.new(@conversation).generate_suggestions
-    
+
     respond_to do |format|
       format.turbo_stream do
         render turbo_stream: [
@@ -21,4 +21,4 @@ class MessagesController < ApplicationController
       format.json { render json: { success: true } }
     end
   end
-end 
+end

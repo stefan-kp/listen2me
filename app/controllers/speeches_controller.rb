@@ -1,15 +1,13 @@
 class SpeechesController < ApplicationController
-  
-
   def index
     @frequent_sentences = Sentence.includes(:category, :language)
                                 .where(language: Language.find_by(code: I18n.locale))
                                 .order(usage_count: :desc)
                                 .limit(10)
-    
+
     # Fügen Sie einen Titel für Screen Reader hinzu
-    @page_title = t('.frequent_sentences')
-    @page_description = t('.frequent_sentences_description')
+    @page_title = t(".frequent_sentences")
+    @page_description = t(".frequent_sentences_description")
   end
 
   def create
@@ -21,14 +19,14 @@ class SpeechesController < ApplicationController
       content: text,
       language: Language.find_by!(code: I18n.locale),
       user: current_user,
-      category_id: params[:category_id] || Category.find_by!(name: 'General').id
+      category_id: params[:category_id] || Category.find_by!(name: "General").id
     ) do |s|
       s.usage_count = 0
     end
 
     sentence.increment!(:usage_count)
     sentence.category&.increment!(:usage_count)
-    
+
     respond_to do |format|
       format.json do
         render json: {
@@ -36,7 +34,7 @@ class SpeechesController < ApplicationController
           voice_id: sentence.user.elevenlabs_voice_id,
           model_id: "eleven_multilingual_v2",
           api_key: sentence.user.elevenlabs_api_key,
-          aria_label: t('.speak_sentence', text: sentence.content)
+          aria_label: t(".speak_sentence", text: sentence.content)
         }
       end
       format.html { redirect_to speeches_path }
@@ -54,13 +52,13 @@ class SpeechesController < ApplicationController
     @sentence = Sentence.find(params[:id])
     @sentence.increment!(:usage_count)
     @sentence.category&.increment!(:usage_count)
-    
+
     render json: {
       text: @sentence.content,
       voice_id: @sentence.user.elevenlabs_voice_id,
       model_id: @sentence.user.llm_model,
       api_key: @sentence.user.elevenlabs_api_key,
-      aria_label: t('.speaking_sentence', text: @sentence.content)
+      aria_label: t(".speaking_sentence", text: @sentence.content)
     }
   end
 
@@ -68,6 +66,6 @@ class SpeechesController < ApplicationController
     @sentence = Sentence.find(params[:id])
     @sentence.destroy
 
-    redirect_to speeches_path, notice: t('.sentence_deleted')
+    redirect_to speeches_path, notice: t(".sentence_deleted")
   end
-end 
+end

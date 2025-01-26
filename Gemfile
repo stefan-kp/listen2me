@@ -61,8 +61,8 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
-gem 'ruby-openai'
-gem 'haml-rails'
+gem "ruby-openai"
+gem "haml-rails"
 
 gem "heroicon"
 
@@ -71,7 +71,7 @@ gem "thruster"
 
 gem "langchainrb", "~> 0.19.3"
 
-gem 'dotenv-rails', groups: [:development, :test]
+gem "dotenv-rails", groups: [ :development, :test ]
 
-gem 'devise'
-gem 'devise-i18n'
+gem "devise"
+gem "devise-i18n"

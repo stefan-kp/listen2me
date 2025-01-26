@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "elevenlabs": "^1.50.2"
+    "elevenlabs": "^1.50.2",
+    "yarn": "^1.22.22"
   }
 }

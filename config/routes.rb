@@ -13,9 +13,9 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "posts#index"
 
-  scope "(:locale)", locale: /#{I18n.available_locales.join("|")}/ do
+  scope "(:locale)", locale: /#{I18n.available_locales.join('|')}/ do
     root "speeches#index"
-    
+
     resources :speeches do
       member do
         get :speak
@@ -27,9 +27,9 @@ Rails.application.routes.draw do
       member do
         get :suggestions
       end
-      resources :messages, only: [:create]
+      resources :messages, only: [ :create ]
     end
 
-    resource :settings, only: [:show, :update]
+    resource :settings, only: %i[show update]
   end
 end

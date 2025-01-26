@@ -4,7 +4,7 @@ class ConversationsController < ApplicationController
     @messages = @conversation.messages.order(created_at: :asc)
     @suggestions = SuggestionService.new(@conversation).generate_suggestions
   end
-  
+
   def create
     # Erst den Satz erstellen, wenn content übergeben wurde
     sentence = if params[:sentence_id].present?
@@ -20,29 +20,29 @@ class ConversationsController < ApplicationController
         s.usage_count = 0
       end
     end
-    
+
     @conversation = Conversation.create!(
       user: current_user,
       initial_sentence: sentence
     )
-    
+
     # Erste Nachricht erstellen mit dem initial_sentence
     @conversation.messages.create!(
       content: sentence.content,
       role: :user
     )
-    
+
     redirect_to @conversation
   end
-  
+
   def suggestions
     @conversation = current_user.conversations.find(params[:id])
     @suggestions = SuggestionService.new(@conversation).generate_suggestions
-    
+
     respond_to do |format|
       format.turbo_stream do
-        render turbo_stream: turbo_stream.update("suggestions", 
-          partial: "messages/suggestions", 
+        render turbo_stream: turbo_stream.update("suggestions",
+          partial: "messages/suggestions",
           locals: { suggestions: @suggestions }
         )
       end
@@ -54,4 +54,4 @@ class ConversationsController < ApplicationController
                                .includes(:messages, initial_sentence: :category)
                                .order(created_at: :desc)
   end
-end 
+end

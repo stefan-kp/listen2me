@@ -4,7 +4,7 @@ class SettingsController < ApplicationController
 
   def update
     if current_user.update(settings_params)
-      redirect_to root_path, notice: t('.updated')
+      redirect_to root_path, notice: t(".updated")
     else
       render :show, status: :unprocessable_entity
     end
@@ -22,4 +22,4 @@ class SettingsController < ApplicationController
       :description
     )
   end
-end 
+end

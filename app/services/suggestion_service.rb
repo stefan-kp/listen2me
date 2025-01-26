@@ -3,18 +3,18 @@ class SuggestionService
   def initialize(conversation)
     @conversation = conversation
     klass = case @conversation.user.llm_provider
-            when "openai"
+    when "openai"
               Langchain::LLM::OpenAI
-            when "anthropic"
+    when "anthropic"
               Langchain::LLM::Anthropic
-            when "gemini"
+    when "gemini"
               Langchain::LLM::GoogleGemini
-            else
+    else
               raise "Unknown LLM provider: #{@conversation.user.llm_provider}"
-            end
+    end
     @llm = klass.new(
       api_key: @conversation.user.llm_api_key,
-      default_options: { 
+      default_options: {
         temperature: 0.7,
         chat_model: @conversation.user.llm_model
       }
@@ -23,7 +23,7 @@ class SuggestionService
 
   def generate_suggestions
     messages = format_conversation_history
-    
+
     response = @llm.chat(messages: messages, response_format: { type: "json_object" })
     parse_suggestions(response.completion)
   rescue => e
@@ -35,11 +35,11 @@ class SuggestionService
 
   def format_conversation_history
     # System message to explain what we want
-    messages = [{
+    messages = [ {
       role: "system",
-      content: I18n.t('suggestions.system_prompt')
-    }]
-    user_message = {context: [], last_message: nil, category: @conversation.initial_sentence.category&.name, user_description: @conversation.user.description }
+      content: I18n.t("suggestions.system_prompt")
+    } ]
+    user_message = { context: [], last_message: nil, category: @conversation.initial_sentence.category&.name, user_description: @conversation.user.description }
     # Add conversation history
     @conversation.messages.order(created_at: :asc).each_with_index do |message, index|
       unless index == @conversation.messages.count - 1
@@ -48,7 +48,7 @@ class SuggestionService
           content: message.content
         }
       else
-        user_message[:last_message] = message 
+        user_message[:last_message] = message
       end
     end
     if user_message.empty?
@@ -60,14 +60,14 @@ class SuggestionService
 
   def parse_suggestions(completion)
     # Parse the completion which should be in array format
-    
+
     JSON.parse(completion).with_indifferent_access[:response]
   rescue
     begin
       eval(completion)
     rescue
       # Fallback if parsing fails
-      completion.split("\n").map { |s| s.gsub(/^\d+\.\s*/, '') }
+      completion.split("\n").map { |s| s.gsub(/^\d+\.\s*/, "") }
     end
   end
-end 
+end

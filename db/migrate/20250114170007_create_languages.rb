@@ -18,4 +18,4 @@ class CreateLanguages < ActiveRecord::Migration[7.1]
       end
     end
   end
-end 
+end

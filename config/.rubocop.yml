@@ -1,0 +1,23 @@
+require:
+  - rubocop-rails
+
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 3.2
+  Exclude:
+    - 'db/schema.rb'
+    - 'bin/**/*'
+    - 'vendor/**/*'
+    - 'node_modules/**/*'
+
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+Layout/TrailingWhitespace:
+  Enabled: true
+
+Layout/TrailingEmptyLines:
+  EnforcedStyle: final_newline
+
+Layout/SpaceInsideArrayLiteralBrackets:
+  EnforcedStyle: space 
