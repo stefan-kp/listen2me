@@ -34,29 +34,58 @@ en:
       enter_text: "Enter your own text..."
       speak: "Speak"
       select_category: "Select category"
-    conversation_form: &conversation_form_en
+      text_form_label: "Speech output form"
+      enter_text_aria: "Enter text to be spoken"
+      select_category_aria: "Select category for the text"
+      speak_button_aria: "Speak the entered text"
+
+    conversation_form:
       <<: *text_form_en
+      new_conversation_form: "Start new conversation"
+
     index:
-      frequent_sentences: "Frequently used sentences"
-      frequent_sentences_description: "List of most frequently used sentences"
+      <<: *text_form_en
       categories: "Categories"
       frequently_used: "Frequently used"
+      page_title: "Speech Output"
+      categories_list: "List of available categories"
+      category_link: "Go to category %{name} with %{count} uses"
+      frequent_sentences_list: "List of frequently used sentences"
+      frequent_sentences: "Frequently used sentences"
+      frequent_sentences_description: "List of most frequently used sentences"
       confirm_delete: "Do you really want to delete this sentence?"
+
     category:
       <<: *text_form_en
       back: "Back"
+      back_to_categories: "Back to categories overview"
+      category_sentences: "Sentences in category %{category}"
+      sentences_list: "List of sentences in this category"
+      no_sentences: "No sentences available in this category"
+
     usage_count:
       one: "%{count} use"
       other: "%{count} uses"
+
     create:
       speak_sentence: "Speaking the sentence: %{text}"
+
     speak:
       speaking_sentence: "Playing the sentence: %{text}"
+
     destroy:
       sentence_deleted: "Sentence was deleted"
+
+    sentence:
+      usage_count: "Usage count"
+      category_label: "Category: %{name}"
+      delete_sentence: "Delete sentence: %{text}"
+      speak_sentence: "Speak sentence: %{text}"
+
   languages:
     german: "German"
     english: "English"
+
   suggestions:
     system_prompt: |
       You are a language assistant communicating with a patient who is unable to speak. Your task is to provide meaningful suggestions for communication word-finding. The output should be in JSON format to adapt the response suggestions.
@@ -157,6 +186,7 @@ en:
         email: "Email"
         password: "Password"
         password_confirmation: "Password Confirmation"
+
   messages:
     form:
       enter_message: "Enter message..."
@@ -166,6 +196,13 @@ en:
     show:
       conversation: "Conversation"
       back_to_home: "Back to Home"
+      messages_list: "Conversation messages"
+      no_messages: "No messages in this conversation yet"
+      message_form: "New message form"
+      suggestions: "AI suggestions for responses"
+      toggle_recording: "Toggle voice recording"
+      recording_active: "Recording in progress"
+      recording_inactive: "Recording stopped"
     index:
       title: "My Conversations"
       new_conversation: "New Conversation"
@@ -174,6 +211,12 @@ en:
         other: "%{count} messages"
       created_at: "Created on %{date}"
       no_conversations: "No conversations yet"
+      conversations_list: "List of conversations"
+      conversation_link: "Go to conversation: %{text}"
+      initial_sentence: "Initial sentence"
+      message_count: "Number of messages"
+      creation_date: "Creation date"
+      category: "Category"
 
   settings:
     show:
@@ -201,7 +244,10 @@ en:
 
   layouts:
     application:
+      app_description: "Listen2Me - A communication aid for people with speech impairments"
       skip_to_main: "Skip to main content"
+      skip_to_main_aria: "Skip navigation and go directly to main content"
+      keyboard_shortcuts: "Keyboard shortcuts and accessibility aids"
 
   accessibility:
     keyboard_shortcuts:

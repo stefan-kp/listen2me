@@ -1,41 +1,26 @@
-.container.mx-auto.p-4.max-w-4xl
-  .mb-12
-    = render 'conversation_form'
+.max-w-7xl.mx-auto.px-4.sm:px-6.lg:px-8.py-8{"aria-labelledby": "page-title"}
+  %h1#page-title.sr-only= t('.page_title')
 
-  .mb-12
-    %h2.text-xl.font-medium.mb-6= t('.categories')
-    .grid.grid-cols-4.sm:grid-cols-6.md:grid-cols-8.gap-4
-      - Category.all.each do |category|
-        = link_to category_speech_path(category), 
-          class: "group hover:scale-105 transition-transform duration-200" do
-          .bg-white.rounded-lg.shadow-sm.hover:shadow.p-4.text-center
-            .h-8.flex.items-center.justify-center.mb-2
-              = heroicon(category.icon_name, options: { class: "h-6 w-6 text-gray-600 group-hover:text-blue-500" }, variant: :solid)
-            .text-sm.font-medium.text-gray-700.group-hover:text-blue-500= category.name
-            .text-xs.text-gray-500
-              = t('speeches.usage_count', count: category.usage_count)
+  .mb-8
+    = render 'text_form'
 
-  .mb-12
-    %h2.text-xl.font-medium.mb-6= t('.frequently_used')
-    .bg-white.rounded-lg.shadow-sm.divide-y
-      - @frequent_sentences.each do |sentence|
-        .group.flex.items-center.gap-2.hover:bg-gray-50
-          = form_with url: conversations_path, method: :post,
-            class: "flex-1",
-            data: { controller: "speech form",
-                   speech_text_value: sentence.content,
-                   speech_voice_id_value: current_user.elevenlabs_voice_id,
-                   speech_api_key_value: current_user.elevenlabs_api_key,
-                   action: "speech:finished->form#submit" } do |f|
-            = f.hidden_field :sentence_id, value: sentence.id
-            = f.button class: "w-full text-left p-4",
-              data: { action: "click->speech#speak" } do
-              .flex.justify-between.items-center
-                = sentence.content
-                .text-xs.text-gray-500
-                  = t('speeches.usage_count', count: sentence.usage_count)
-          = button_to speech_path(sentence),
-            method: :delete,
-            class: "p-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity",
-            data: { turbo_confirm: t('.confirm_delete') } do
-            = heroicon("trash", options: { class: "h-4 w-4" }, variant: :solid) 
+  .grid.grid-cols-1.gap-8.lg:grid-cols-3
+    %section.lg:col-span-2{"aria-labelledby": "categories-title"}
+      %h2#categories-title.text-lg.font-medium.text-gray-900.mb-4= t('.categories')
+      .grid.grid-cols-2.sm:grid-cols-3.md:grid-cols-4.gap-4{role: "list", "aria-label": t('.categories_list')}
+        - Category.all.each do |category|
+          = link_to category_speech_path(category), 
+            class: "flex flex-col items-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow",
+            role: "listitem",
+            "aria-label": t('.category_link', name: category.name, count: category.usage_count) do
+            = heroicon category.icon_name, options: { class: "h-8 w-8 text-gray-500 mb-2", "aria-hidden": "true" }
+            %span.text-sm.font-medium.text-center= category.name
+            %span.text-xs.text-gray-500= t('speeches.usage_count', count: category.usage_count)
+
+    %section.lg:col-span-1{"aria-labelledby": "frequent-title"}
+      %h2#frequent-title.text-lg.font-medium.text-gray-900.mb-4= t('.frequently_used')
+      .bg-white.shadow.sm:rounded-lg.divide-y.divide-gray-200{role: "list", "aria-label": t('.frequent_sentences')}
+        = render partial: 'sentence', collection: @frequent_sentences
+
+  - content_for :keyboard_shortcuts do
+    = render 'shared/keyboard_help' 

@@ -1,30 +1,36 @@
-.max-w-7xl.mx-auto.px-4.sm:px-6.lg:px-8.py-8
+.max-w-7xl.mx-auto.px-4.sm:px-6.lg:px-8.py-8{"aria-labelledby": "conversations-title"}
   .flex.items-center.justify-between.mb-8
-    %h1.text-2xl.font-bold.text-gray-900= t('.title')
-    = link_to new_conversation_path, class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500", role: "button" do
-      = heroicon "plus", options: { class: "h-5 w-5 mr-2" }
+    %h1#conversations-title.text-2xl.font-bold.text-gray-900= t('.title')
+    = link_to new_conversation_path, 
+      class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500", 
+      role: "button",
+      "aria-label": t('.new_conversation') do
+      = heroicon "plus", options: { class: "h-5 w-5 mr-2", "aria-hidden": "true" }
       = t('.new_conversation')
 
   .bg-white.shadow.overflow-hidden.sm:rounded-lg
-    %ul.divide-y.divide-gray-200{role: "list"}
+    %ul.divide-y.divide-gray-200{role: "list", "aria-label": t('.conversations_list')}
       - if @conversations.any?
         - @conversations.each do |conversation|
           %li
-            = link_to conversation_path(conversation), class: "block hover:bg-gray-50 transition-colors", role: "listitem" do
+            = link_to conversation_path(conversation), 
+              class: "block hover:bg-gray-50 transition-colors", 
+              role: "listitem",
+              "aria-label": t('.conversation_link', text: conversation.initial_sentence&.content) do
               .px-4.py-4.sm:px-6
                 .flex.items-center.justify-between
                   .flex.min-w-0.gap-x-4
                     .min-w-0.flex-auto
-                      %p.text-sm.font-semibold.text-gray-900.truncate
+                      %p.text-sm.font-semibold.text-gray-900.truncate{"aria-label": t('.initial_sentence')}
                         = conversation.initial_sentence&.content
                       .mt-1.flex.items-center.gap-x-2.text-xs.text-gray-500
-                        %p= t('.messages_count', count: conversation.messages.count)
-                        %p= t('.created_at', date: l(conversation.created_at, format: :short))
+                        %p{"aria-label": t('.message_count')}= t('.messages_count', count: conversation.messages.count)
+                        %p{"aria-label": t('.creation_date')}= t('.created_at', date: l(conversation.created_at, format: :short))
                         - if conversation.initial_sentence.present?
-                          %span.inline-flex.items-center.rounded-md.bg-blue-50.px-2.py-1.text-xs.font-medium.text-blue-700.ring-1.ring-inset{ class:'ring-blue-700/10' }
+                          %span.inline-flex.items-center.rounded-md.bg-blue-50.px-2.py-1.text-xs.font-medium.text-blue-700.ring-1.ring-inset.ring-blue-700/10{"aria-label": t('.category')}
                             = conversation.initial_sentence.category.name
                   .shrink-0.self-start
-                    = heroicon "chevron-right", options: { class: "h-5 w-5 text-gray-400" }
+                    = heroicon "chevron-right", options: { class: "h-5 w-5 text-gray-400", "aria-hidden": "true" }
       - else
-        %li.px-4.py-5.sm:px-6.text-center.text-gray-500
+        %li.px-4.py-5.sm:px-6.text-center.text-gray-500{"aria-label": t('.no_conversations')}
           = t('.no_conversations') 

@@ -5,8 +5,15 @@ de:
       enter_text: "Eigenen Text eingeben..."
       speak: "Sprechen"
       select_category: "Kategorie auswählen"
-    conversation_form: &conversation_form_de
+      text_form_label: "Formular für Sprachausgabe"
+      enter_text_aria: "Text eingeben, der gesprochen werden soll"
+      select_category_aria: "Kategorie für den Text auswählen"
+      speak_button_aria: "Eingegebenen Text vorlesen lassen"
+
+    conversation_form:
       <<: *text_form_de
+      new_conversation_form: "Neues Gespräch starten"
+
     index:
       <<: *text_form_de
       categories: "Kategorien"
@@ -14,21 +21,42 @@ de:
       confirm_delete: "Möchten Sie diesen Satz wirklich löschen?"
       frequent_sentences: "Häufig verwendete Sätze"
       frequent_sentences_description: "Liste der am häufigsten verwendeten Sätze"
+      page_title: "Sprachausgabe"
+      categories_list: "Liste der verfügbaren Kategorien"
+      category_link: "Zur Kategorie %{name} mit %{count} Verwendungen"
+      frequent_sentences_list: "Liste der häufig verwendeten Sätze"
+
     category:
       <<: *text_form_de
       back: "Zurück"
+      back_to_categories: "Zurück zur Kategorieübersicht"
+      category_sentences: "Sätze in der Kategorie %{category}"
+      sentences_list: "Liste der Sätze in dieser Kategorie"
+      no_sentences: "Keine Sätze in dieser Kategorie vorhanden"
+
     usage_count:
       one: "%{count} Verwendung"
       other: "%{count} Verwendungen"
+
     destroy:
       sentence_deleted: "Satz wurde gelöscht"
+
     create:
       speak_sentence: "Spreche den Satz: %{text}"
+
     speak:
       speaking_sentence: "Spielt den Satz ab: %{text}"
+
+    sentence:
+      usage_count: "Nutzungshäufigkeit"
+      category_label: "Kategorie: %{name}"
+      delete_sentence: "Satz löschen: %{text}"
+      speak_sentence: "Satz vorlesen: %{text}"
+
   languages:
     german: "Deutsch"
     english: "Englisch"
+
   conversations:
     show:
       conversation: "Konversation"
@@ -36,6 +64,13 @@ de:
       recognized_text: "Erkannter Text"
       waiting_for_speech: "Warte auf Spracheingabe..."
       suggestions: "Vorschläge"
+      messages_list: "Konversationsnachrichten"
+      no_messages: "Noch keine Nachrichten in dieser Konversation"
+      message_form: "Formular für neue Nachricht"
+      toggle_recording: "Sprachaufnahme starten/stoppen"
+      recording_active: "Aufnahme läuft"
+      recording_inactive: "Aufnahme gestoppt"
+
     index:
       title: "Meine Konversationen"
       new_conversation: "Neue Konversation"
@@ -44,6 +79,13 @@ de:
         other: "%{count} Nachrichten"
       created_at: "Erstellt am %{date}"
       no_conversations: "Keine Konversationen vorhanden"
+      conversations_list: "Liste der Konversationen"
+      conversation_link: "Zur Konversation: %{text}"
+      initial_sentence: "Anfangssatz"
+      message_count: "Anzahl der Nachrichten"
+      creation_date: "Erstellungsdatum"
+      category: "Kategorie"
+
   suggestions:
     system_prompt: |
       Du bist ein Sprachassistent, der mit einem Patienten kommuniziert, der nicht mehr in der Lage ist, selbst zu sprechen. Deine Aufgabe ist es, sinnvolle Vorschläge für die Wortfindung der Kommunikation zu liefern. Die Ausgabe erfolgt im JSON-Format, um die Antwortenvorschläge anzupassen.
@@ -122,29 +164,38 @@ de:
 
       - Achte auf die Relevanz und Angemessenheit der Vorschläge in Bezug auf den gegebenen Kontext
       - Die Struktur der JSON-Ausgabe sollte strikt beibehalten werden 
+
   messages:
     form:
       enter_message: "Nachricht eingeben..."
       speak: "Sprechen"
+
   shared:
     user_menu:
       settings: "Einstellungen"
       sign_out: "Abmelden"
+
     header:
       main_navigation: "Hauptnavigation"
       home: "Startseite"
       speeches: "Sprachausgabe"
       conversations: "Konversationen"
       sign_in: "Anmelden"
+
   layouts:
     application:
+      app_description: "Listen2Me - Eine Kommunikationshilfe für Menschen mit Spracheinschränkungen"
       skip_to_main: "Zum Hauptinhalt springen"
+      skip_to_main_aria: "Überspringen Sie die Navigation und gehen Sie direkt zum Hauptinhalt"
+      keyboard_shortcuts: "Tastaturkürzel und Bedienungshilfen"
+
   accessibility:
     keyboard_shortcuts:
       title: "Tastatur-Shortcuts"
       main_content: "Alt + 1: Zum Hauptinhalt"
       search: "Alt + S: Zur Suche"
       new_text: "Alt + N: Neuen Text eingeben"
+
   settings:
     show:
       title: "Einstellungen"
@@ -155,5 +206,6 @@ de:
       voice_settings: "Spracheinstellungen"
       llm_settings: "KI-Einstellungen"
       save: "Änderungen speichern"
+
     update:
       updated: "Einstellungen erfolgreich aktualisiert" 

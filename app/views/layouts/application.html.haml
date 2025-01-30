@@ -1,8 +1,9 @@
 !!! 5
 %html{lang: I18n.locale}
   %head
-    %title Listen2Me
+    %title= content_for?(:title) ? "#{yield(:title)} - Listen2Me" : "Listen2Me"
     %meta{name: "viewport", content: "width=device-width,initial-scale=1"}
+    %meta{name: "description", content: t('.app_description')}
     = csrf_meta_tags
     = csp_meta_tag
     = stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload"
@@ -11,10 +12,22 @@
 
   %body.relative
     .skip-nav
-      = link_to t('.skip_to_main'), '#main-content', class: 'skip-link'
+      = link_to t('.skip_to_main'), '#main-content', 
+        class: 'skip-link',
+        "aria-label": t('.skip_to_main_aria')
     
     = render 'shared/header'
     
-    %main#main-content{tabindex: -1}
-      = render 'shared/flash_messages'
-      = yield 
+    %main#main-content{tabindex: -1, role: "main"}
+      - if notice.present?
+        .flash-message{"aria-live": "polite", role: "alert"}
+          = notice
+      - if alert.present?
+        .flash-message.flash-error{"aria-live": "assertive", role: "alert"}
+          = alert
+          
+      = yield
+      
+    - if content_for?(:keyboard_shortcuts)
+      %footer{role: "contentinfo", "aria-label": t('.keyboard_shortcuts')}
+        = yield(:keyboard_shortcuts) 

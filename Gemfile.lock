@@ -445,7 +445,7 @@ DEPENDENCIES
   rails (~> 8.0.1)
   rubocop-rails-omakase
   ruby-openai
-  selenium-webdriver (= 4.28.0)
+  selenium-webdriver
   solid_cable
   solid_cache
   solid_queue

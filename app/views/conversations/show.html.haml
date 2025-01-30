@@ -1,33 +1,61 @@
-.container.mx-auto.p-4.max-w-4xl
-  .flex.justify-between.items-center.mb-8
-    %h2.text-xl.font-medium= t('.conversation')
-    = link_to root_path,
-      class: "px-4 py-2 bg-white hover:bg-gray-50 rounded-lg shadow-sm flex items-center gap-2 transition-colors" do
-      = heroicon("arrow-left", options: { class: "h-4 w-4" })
+.max-w-7xl.mx-auto.px-4.sm:px-6.lg:px-8.py-8{"aria-labelledby": "conversation-title"}
+  .flex.items-center.justify-between.mb-8
+    %h1#conversation-title.text-2xl.font-bold.text-gray-900= t('.conversation')
+    = link_to speeches_path, 
+      class: "inline-flex items-center text-gray-600 hover:text-gray-900", 
+      role: "button",
+      "aria-label": t('.back_to_home') do
+      = heroicon "arrow-left", options: { class: "h-5 w-5 mr-2", "aria-hidden": "true" }
       = t('.back_to_home')
-      
-  .bg-white.rounded-lg.shadow-sm.mb-8
-    = turbo_frame_tag "messages" do
-      .divide-y
-        = render @messages
-          
+
+  .bg-white.shadow.sm:rounded-lg.mb-8
+    .px-4.py-5.sm:p-6
+      %div{"aria-live": "polite", "aria-atomic": "true"}
+        #messages.space-y-4{role: "log", "aria-label": t('.messages_list')}
+          = render @messages
+        
+        - if @messages.empty?
+          %p.text-center.text-gray-500{"aria-label": t('.no_messages')}
+            = t('.no_messages')
+
+      = form_with model: [@conversation, Message.new], 
+        class: "mt-6",
+        "aria-label": t('.message_form') do |f|
+        .flex.gap-4
+          = f.text_field :content, 
+            class: "block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6",
+            placeholder: t('messages.form.enter_message'),
+            "aria-label": t('messages.form.enter_message')
+          = f.submit t('messages.form.speak'),
+            class: "rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600",
+            role: "button",
+            "aria-label": t('messages.form.speak')
+
+  .bg-white.shadow.sm:rounded-lg
+    .px-4.py-5.sm:p-6
+      %h2.text-lg.font-medium.text-gray-900.mb-4{"aria-label": t('.suggestions')}
+        = t('.suggestions')
+      #suggestions.space-y-2{"aria-live": "polite", role: "list"}
+        = render "messages/suggestions", suggestions: @suggestions
+
   %div{data: { controller: "audio-recorder",
                audio_recorder_conversation_id_value: @conversation.id }}
     .fixed.bottom-4.right-4.w-80.space-y-4
-      .bg-white.rounded-lg.shadow-lg.p-4
-        .text-sm.font-medium.text-gray-700.mb-2= t('.recognized_text')
+      .bg-white.rounded-lg.shadow-lg.p-4{"aria-labelledby": "speech-recognition-title"}
+        %h3#speech-recognition-title.text-sm.font-medium.text-gray-700.mb-2= t('.recognized_text')
         %div{data: { audio_recorder_target: "recognizedText" },
-             class: "text-gray-600 min-h-[3rem]"}
+             class: "text-gray-600 min-h-[3rem]",
+             "aria-live": "polite",
+             role: "status"}
           %em.text-gray-400= t('.waiting_for_speech')
         
         .mt-4.flex.justify-center
-          .p-2.bg-gray-100.rounded-full.shadow-sm.hover:bg-gray-200.transition-colors
-            %div{data: { audio_recorder_target: "indicator" }}
-              = heroicon("microphone", options: { class: "h-6 w-6" }, variant: :solid)
-
-  .mt-auto.space-y-4
-    = render 'messages/form'
-    
-    #suggestions
-      .text-sm.font-medium.text-gray-700.mb-2= t('.suggestions')
-      = render "messages/suggestions", suggestions: @suggestions 
+          %button.p-2.bg-gray-100.rounded-full.shadow-sm.hover:bg-gray-200.transition-colors{
+            "aria-label": t('.toggle_recording'),
+            role: "switch",
+            "aria-checked": "false",
+            data: { audio_recorder_target: "recordButton",
+                   action: "click->audio-recorder#toggleRecording" }}
+            %div{data: { audio_recorder_target: "indicator" },
+                 "aria-hidden": "true"}
+              = heroicon("microphone", options: { class: "h-6 w-6" }, variant: :solid) 

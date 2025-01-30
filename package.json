@@ -1,6 +1,18 @@
 {
+  "name": "listen2me",
+  "private": true,
+  "scripts": {
+    "lint": "eslint app/javascript/**/*.js",
+    "lint:fix": "eslint app/javascript/**/*.js --fix"
+  },
   "dependencies": {
-    "elevenlabs": "^1.50.2",
-    "yarn": "^1.22.22"
+    "@hotwired/stimulus": "^3.2.2",
+    "@hotwired/turbo-rails": "^8.0.0-beta.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "prettier": "^3.2.4"
   }
 }
