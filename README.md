@@ -2,6 +2,35 @@
 
 Listen2Me is an assistive communication application designed for people who are temporarily or permanently unable to speak, such as patients after tracheostomy or those with other conditions affecting speech capabilities.
 
+## Features
+
+- Text-to-Speech functionality
+- Sentence categorization and management
+- Quick access to frequently used sentences
+- Multilingual interface (English/German)
+- Conversation mode with AI-powered response suggestions
+- Responsive design for desktop and mobile devices
+
+## Speech Output
+
+The application supports two types of speech output:
+
+### 1. Browser Speech (Default)
+- Uses the built-in Web Speech API
+- No additional configuration required
+- Available in all modern browsers
+- Quality depends on browser and installed voices
+- Automatically used when ElevenLabs is not configured
+
+### 2. ElevenLabs Integration (Optional)
+- High-quality, natural-sounding voices
+- Multilingual support
+- Requires:
+  - ElevenLabs API key
+  - Voice ID
+- Configure through the settings page
+- Automatic fallback to browser speech if not configured or on errors
+
 ![Category Overview](docs/sample1.png)
 ![Conversation View](docs/sample2.png)
 
