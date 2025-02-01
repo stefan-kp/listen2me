@@ -24,48 +24,49 @@
           %h4.font-medium.text-gray-700= t('.about_settings')
           
           .form-group
-            = f.label :description, class: "block text-sm font-medium text-gray-700"
+            = f.label :description, class: "form-label"
             = f.text_area :description,
-              class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm",
+              class: "form-textarea",
               rows: 4,
               placeholder: t('.description_placeholder')
         
         .space-y-4{data: { tabs_target: "panel", panel: "system" }}
           .space-y-4
             %h4.font-medium.text-gray-700= t('.voice_settings')
+            %p.mt-1.text-sm.text-gray-500= t('.voice_settings_description')
             
             .form-group
-              = f.label :elevenlabs_api_key, class: "block text-sm font-medium text-gray-700"
-              = f.text_field :elevenlabs_api_key,
-                class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm",
-                placeholder: "sk-..."
-                
-            .form-group
-              = f.label :elevenlabs_voice_id, class: "block text-sm font-medium text-gray-700"
+              = f.label :elevenlabs_voice_id, class: "form-label"
               = f.text_field :elevenlabs_voice_id,
-                class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                class: "form-input"
+
+            .form-group
+              = f.label :elevenlabs_api_key, class: "form-label"
+              = f.text_field :elevenlabs_api_key,
+                class: "form-input",
+                placeholder: "sk-..."
           
           .space-y-4.mt-8
             %h4.font-medium.text-gray-700= t('.llm_settings')
             
             .form-group
-              = f.label :llm_provider, class: "block text-sm font-medium text-gray-700"
-              = f.select :llm_provider, options_for_select([['OpenAI', 'openai'],['Anthropic', 'anthropic'], ['Gemini', 'gemini']], current_user.llm_provider),{}, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              = f.label :llm_provider, class: "form-label"
+              = f.select :llm_provider, options_for_select([['OpenAI', 'openai'],['Anthropic', 'anthropic'], ['Gemini', 'gemini']], current_user.llm_provider),{},class: "form-select"
                 
             .form-group
-              = f.label :llm_model, class: "block text-sm font-medium text-gray-700"
+              = f.label :llm_model, class: "form-label"
               = f.text_field :llm_model,
-                class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                class: "form-input"
                 
             .form-group
-              = f.label :llm_api_key, class: "block text-sm font-medium text-gray-700"
+              = f.label :llm_api_key, class: "form-label"
               = f.text_field :llm_api_key,
-                class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm",
+                class: "form-input",
                 placeholder: "sk-..."
         
         .mt-8.flex.justify-end
           = f.submit t('.save'),
-            class: "ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" 
+            class: "ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
 
 .hidden
   .border-blue-500.text-blue-600.border-transparent.text-gray-500.hover:text-gray-700.hover:border-gray-300 

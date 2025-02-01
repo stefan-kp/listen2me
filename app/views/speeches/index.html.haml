@@ -6,12 +6,19 @@
 
   .grid.grid-cols-1.gap-8.lg:grid-cols-3
     %section.lg:col-span-2{"aria-labelledby": "categories-title"}
-      %h2#categories-title.text-lg.font-medium.text-gray-900.mb-4= t('.categories')
-      .grid.grid-cols-2.sm:grid-cols-3.md:grid-cols-4.gap-4{role: "list", "aria-label": t('.categories_list')}
-        - Category.all.each do |category|
-          = link_to category_speech_path(category), 
-            class: "flex flex-col items-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow",
-            role: "listitem",
+      .flex.items-center.justify-between.mb-4
+        %h2#categories-title.text-lg.font-medium.text-gray-900
+          = link_to categories_path,
+            class: "group inline-flex items-center gap-2 text-gray-900 hover:text-indigo-600 transition-colors",
+            "aria-label": t('.manage_categories') do
+            = t('.categories')
+            = heroicon "cog-6-tooth", options: { class: "h-5 w-5 text-gray-400 group-hover:text-indigo-600 transition-colors" }
+
+      .grid.grid-cols-2.gap-4.sm:grid-cols-3.lg:grid-cols-4
+        - @categories.each do |category|
+          = link_to category_speech_path(category),
+            class: "flex flex-col items-center p-4 bg-white shadow sm:rounded-lg hover:shadow-md transition-shadow",
+            role: "button",
             "aria-label": t('.category_link', name: category.name, count: category.usage_count) do
             = heroicon category.icon_name, options: { class: "h-8 w-8 text-gray-500 mb-2", "aria-hidden": "true" }
             %span.text-sm.font-medium.text-center= category.name

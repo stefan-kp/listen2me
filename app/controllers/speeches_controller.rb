@@ -4,7 +4,7 @@ class SpeechesController < ApplicationController
                                 .where(language: Language.find_by(code: I18n.locale))
                                 .order(usage_count: :desc)
                                 .limit(10)
-
+    @categories = Category.where(user: current_user)
     # Fügen Sie einen Titel für Screen Reader hinzu
     @page_title = t(".frequent_sentences")
     @page_description = t(".frequent_sentences_description")

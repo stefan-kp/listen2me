@@ -31,5 +31,9 @@ Rails.application.routes.draw do
     end
 
     resource :settings, only: %i[show update]
+
+    resources :categories, except: [:show] do
+      delete :destroy, on: :member
+    end
   end
 end

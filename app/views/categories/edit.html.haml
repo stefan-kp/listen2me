@@ -1,0 +1,12 @@
+.max-w-7xl.mx-auto.px-4.sm:px-6.lg:px-8.py-8{"aria-labelledby": "page-title"}
+  .flex.items-center.mb-8
+    = link_to categories_path, 
+      class: "text-gray-600 hover:text-gray-900 mr-4", 
+      role: "button",
+      "aria-label": t('.back_to_categories') do
+      = heroicon "arrow-left", options: { class: "h-5 w-5", "aria-hidden": "true" }
+    %h1#page-title.text-2xl.font-bold.text-gray-900= t('.title')
+
+  .bg-white.shadow.sm:rounded-lg
+    .px-4.py-5.sm:p-6
+      = render 'form', category: @category 

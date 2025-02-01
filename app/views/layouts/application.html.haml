@@ -17,15 +17,9 @@
         "aria-label": t('.skip_to_main_aria')
     
     = render 'shared/header'
+    = render 'shared/flash_messages'
     
     %main#main-content{tabindex: -1, role: "main"}
-      - if notice.present?
-        .flash-message{"aria-live": "polite", role: "alert"}
-          = notice
-      - if alert.present?
-        .flash-message.flash-error{"aria-live": "assertive", role: "alert"}
-          = alert
-          
       = yield
       
     - if content_for?(:keyboard_shortcuts)

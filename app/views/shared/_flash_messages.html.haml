@@ -1,18 +1,27 @@
 - flash.each do |type, message|
-  .fixed.inset-x-0.top-4.flex.items-center.justify-center.z-50
-    .max-w-sm.w-full.bg-white.shadow-lg.rounded-lg.pointer-events-auto.ring-1.ring-black.ring-opacity-5.overflow-hidden{
-      data: { controller: "flash", flash_target: "message" }}
-      .p-4
-        .flex.items-start
-          .flex-shrink-0
-            - if type == "notice"
-              = heroicon("check-circle", options: { class: "h-6 w-6 text-green-400" })
-            - else
-              = heroicon("exclamation-circle", options: { class: "h-6 w-6 text-red-400" })
-          .ml-3.w-0.flex-1.pt-0.5
-            %p.text-sm.font-medium.text-gray-900= message
-          .ml-4.flex-shrink-0.flex
-            %button.bg-white.rounded-md.inline-flex.text-gray-400.hover:text-gray-500.focus:outline-none{
-              data: { action: "click->flash#close" }}
-              %span.sr-only Close
-              = heroicon("x-mark", options: { class: "h-5 w-5" }) 
+  - flash_class = type == "notice" ? "bg-green-50 border-green-400" : "bg-red-50 border-red-400"
+  - text_class = type == "notice" ? "text-green-800" : "text-red-800"
+  - icon_class = type == "notice" ? "text-green-400" : "text-red-400"
+  - icon_name = type == "notice" ? "check-circle" : "exclamation-circle"
+  - message_type = type == "notice" ? t('.success_message') : t('.error_message')
+  
+  .flash-message.fixed.inset-x-0.top-4.flex.justify-center{
+    class: 'z-[100]',
+    data: { controller: "flash" },
+    role: "alert",
+    "aria-live": type == "notice" ? "polite" : "assertive",
+    "aria-label": "#{message_type}: #{message}"}
+    .w-96.transform.transition-all.duration-300.ease-out{
+      data: { flash_target: "message" }}
+      .rounded-lg.border.p-4.shadow-md{class: flash_class}
+        .flex.items-start.gap-3
+          .flex-shrink-0{"aria-hidden": "true"}
+            = heroicon icon_name, options: { class: "h-5 w-5 #{icon_class}" }
+          .flex-1.pt-0.5
+            %p.text-sm.font-medium{class: text_class}= message
+          .ml-4.flex-shrink-0
+            %button.rounded-md.p-1.transition-colors{
+              class: "#{text_class} hover:bg-opacity-10 hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-#{type == 'notice' ? 'green' : 'red'}-500",
+              data: { action: "click->flash#close" },
+              "aria-label": t('.close_message')}
+              = heroicon "x-mark", options: { class: "h-5 w-5", "aria-hidden": "true" } 

@@ -27,7 +27,7 @@
                         %p{"aria-label": t('.message_count')}= t('.messages_count', count: conversation.messages.count)
                         %p{"aria-label": t('.creation_date')}= t('.created_at', date: l(conversation.created_at, format: :short))
                         - if conversation.initial_sentence.present?
-                          %span.inline-flex.items-center.rounded-md.bg-blue-50.px-2.py-1.text-xs.font-medium.text-blue-700.ring-1.ring-inset.ring-blue-700/10{"aria-label": t('.category')}
+                          %span.inline-flex.items-center.rounded-md.bg-blue-50.px-2.py-1.text-xs.font-medium.text-blue-700.ring-1.ring-inset{ "class": "ring-blue-700/10","aria-label": t('.category')}
                             = conversation.initial_sentence.category.name
                   .shrink-0.self-start
                     = heroicon "chevron-right", options: { class: "h-5 w-5 text-gray-400", "aria-hidden": "true" }

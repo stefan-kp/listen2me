@@ -46,6 +46,7 @@ en:
     index:
       <<: *text_form_en
       categories: "Categories"
+      manage_categories: "Manage categories"
       frequently_used: "Frequently used"
       page_title: "Speech Output"
       categories_list: "List of available categories"
@@ -226,6 +227,7 @@ en:
       about_settings: "About Me Settings"
       description_placeholder: "Tell us about yourself, your preferences, and any important information that should be considered during conversations..."
       voice_settings: "Voice Settings"
+      voice_settings_description: "The ElevenLabs integration is optional. If no API credentials are entered, the browser's speech synthesis will be used automatically. However, ElevenLabs offers more natural speech quality."
       llm_settings: "AI Settings"
       save: "Save Changes"
     update:
@@ -241,6 +243,10 @@ en:
       speeches: "Speech output"
       conversations: "Conversations"
       sign_in: "Sign in"
+    flash_messages:
+      close_message: "Close message"
+      success_message: "Success message"
+      error_message: "Error message"
 
   layouts:
     application:
@@ -255,3 +261,20 @@ en:
       main_content: "Alt + 1: Jump to main content"
       search: "Alt + S: Jump to search"
       new_text: "Alt + N: Enter new text"
+
+  categories:
+    new:
+      title: "Create New Category"
+      back_to_categories: "Back to Categories"
+    edit:
+      title: "Edit Category"
+      back_to_categories: "Back to Categories"
+    form:
+      name: "Name"
+      name_placeholder: "Enter category name..."
+      icon_name: "Icon"
+      submit:
+        create: "Create Category"
+        update: "Save Changes"
+    common:
+      cancel: "Cancel"

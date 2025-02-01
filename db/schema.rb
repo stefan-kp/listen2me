@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_01_25_082835) do
+ActiveRecord::Schema[8.0].define(version: 2025_02_01_091606) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -25,7 +25,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_25_082835) do
 
   create_table "conversations", force: :cascade do |t|
     t.bigint "user_id", null: false
-    t.bigint "initial_sentence_id", null: false
+    t.bigint "initial_sentence_id"
     t.boolean "active"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -84,7 +84,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_25_082835) do
   end
 
   add_foreign_key "categories", "users"
-  add_foreign_key "conversations", "sentences", column: "initial_sentence_id"
+  add_foreign_key "conversations", "sentences", column: "initial_sentence_id", on_delete: :nullify
   add_foreign_key "conversations", "users"
   add_foreign_key "messages", "conversations"
   add_foreign_key "sentences", "categories"

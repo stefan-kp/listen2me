@@ -1,0 +1,37 @@
+.max-w-7xl.mx-auto.px-4.sm:px-6.lg:px-8.py-8{"aria-labelledby": "categories-title"}
+  .flex.items-center.justify-between.mb-8
+    %h1#categories-title.text-2xl.font-bold.text-gray-900= t('.title')
+    = link_to new_category_path, 
+      class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500",
+      role: "button",
+      "aria-label": t('.new_category') do
+      = heroicon "plus", options: { class: "h-5 w-5 mr-2", "aria-hidden": "true" }
+      = t('.new_category')
+
+  .bg-white.shadow.sm:rounded-lg
+    %ul.divide-y.divide-gray-200{role: "list", "aria-label": t('.categories_list')}
+      - if @categories.any?
+        - @categories.each do |category|
+          %li.group.relative.flex.items-center.justify-between.p-4.hover:bg-gray-50{role: "listitem"}
+            .flex.items-center.gap-4
+              = heroicon category.icon_name, options: { class: "h-8 w-8 text-gray-500", "aria-hidden": "true" }
+              .flex.flex-col
+                %p.text-sm.font-medium.text-gray-900= category.name
+                %p.text-sm.text-gray-500
+                  = t('.sentences_count', count: category.sentences.count)
+            
+            .flex.gap-2.opacity-0.group-hover:opacity-100.transition-opacity
+              = link_to edit_category_path(category),
+                class: "p-2 text-gray-400 hover:text-indigo-600 transition-colors",
+                "aria-label": t('.edit_category', name: category.name) do
+                = heroicon "pencil-square", options: { class: "h-5 w-5", "aria-hidden": "true" }
+              
+              = button_to category_path(category),
+                method: :delete,
+                class: "p-2 text-gray-400 hover:text-red-600 transition-colors",
+                form: { data: { turbo_confirm: t('.confirm_delete', name: category.name, count: category.sentences.count) } },
+                "aria-label": t('.delete_category', name: category.name) do
+                = heroicon "trash", options: { class: "h-5 w-5", "aria-hidden": "true" }
+      - else
+        %li.px-4.py-5.sm:px-6.text-center.text-gray-500{"aria-label": t('.no_categories')}
+          = t('.no_categories') 

@@ -1,49 +1,38 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["text"]
+  static targets = ["text", "speakButton"]
   static values = {
-    text: String,
     voiceId: String,
-    apiKey: String
+    apiKey: String,
+    text: String
   }
 
   connect() {
     console.log("Speech controller connected")
   }
   
-  async speak(event = null) {
-    if (event) event.preventDefault()
+  async speak(event) {
+    event.preventDefault()
     
-    // Text entweder aus dem Value oder aus dem Target nehmen
-    let text
-    if (this.hasTextValue) {
-      text = this.textValue
-    } else if (this.hasTextTarget) {
-      text = this.textTarget.value
+    const textToSpeak = this.textValue || this.textTarget.value
+    
+    if (this.hasApiKey) {
+      await this.speakWithElevenLabs(textToSpeak)
     } else {
-      console.error("No text source found")
-      return
+      await this.speakWithBrowser(textToSpeak)
     }
     
-    const trimmedText = text?.trim()
-    
-    if (!trimmedText || !this.voiceIdValue || !this.apiKeyValue) {
-      console.error("Missing required values:", {
-        text: trimmedText,
-        voiceId: this.voiceIdValue,
-        apiKey: this.apiKeyValue
-      })
-      return
-    }
-    
-    // Spracherkennung pausieren
-    this.dispatch("pauseRecording")
-    
-    console.log("Speaking text:", trimmedText)
-    
+    this.dispatch('finished')
+  }
+
+  get hasApiKey() {
+    return this.apiKeyValue && this.apiKeyValue.length > 0 && this.voiceIdValue && this.voiceIdValue.length > 0
+  }
+
+  async speakWithElevenLabs(text) {
     try {
-      const audioResponse = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${this.voiceIdValue}/stream`, {
+      const response = await fetch('https://api.elevenlabs.io/v1/text-to-speech/' + this.voiceIdValue, {
         method: 'POST',
         headers: {
           'Accept': 'audio/mpeg',
@@ -51,37 +40,54 @@ export default class extends Controller {
           'xi-api-key': this.apiKeyValue
         },
         body: JSON.stringify({
-          text: trimmedText,
-          model_id: "eleven_multilingual_v2",
+          text: text,
+          model_id: 'eleven_multilingual_v2',
           voice_settings: {
             stability: 0.5,
-            similarity_boost: 1
+            similarity_boost: 0.5
           }
         })
       })
 
-      if (!audioResponse.ok) {
-        throw new Error(`ElevenLabs API error: ${audioResponse.status}`)
-      }
-
-      const audioBlob = await audioResponse.blob()
+      const audioBlob = await response.blob()
       const audioUrl = URL.createObjectURL(audioBlob)
       const audio = new Audio(audioUrl)
-      
       await audio.play()
-      
-      audio.onended = () => {
-        URL.revokeObjectURL(audioUrl)
-        // Event auslösen, dass Audio fertig ist
-        this.dispatch('finished')
-        // Spracherkennung wieder starten
-        this.dispatch("resumeRecording")
-      }
     } catch (error) {
-      console.error("Fehler bei der Sprachausgabe:", error)
-      // Bei Fehler auch die Spracherkennung wieder starten
-      this.dispatch("resumeRecording")
+      console.error('ElevenLabs API error:', error)
+      // Fallback to browser speech if ElevenLabs fails
+      await this.speakWithBrowser(text)
     }
+  }
+
+  async speakWithBrowser(text) {
+    if (!window.speechSynthesis) {
+      console.error('Browser speech synthesis not supported')
+      return
+    }
+
+    // Cancel any ongoing speech
+    window.speechSynthesis.cancel()
+
+    const utterance = new SpeechSynthesisUtterance(text)
+    
+    // Set language based on the current page locale
+    utterance.lang = document.documentElement.lang || 'de-DE'
+    
+    // Get available voices and try to find a matching one
+    const voices = window.speechSynthesis.getVoices()
+    const voice = voices.find(v => v.lang.startsWith(utterance.lang) && !v.localService) || 
+                 voices.find(v => v.lang.startsWith(utterance.lang)) ||
+                 voices[0]
+    
+    if (voice) {
+      utterance.voice = voice
+    }
+
+    return new Promise((resolve) => {
+      utterance.onend = () => resolve()
+      window.speechSynthesis.speak(utterance)
+    })
   }
 
   async speakAndSubmit(event) {
