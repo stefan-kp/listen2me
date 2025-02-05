@@ -1,0 +1,13 @@
+.group.relative.flex.items-center.justify-between.p-4.hover:bg-gray-50{id: dom_id(category)}
+  .flex.items-center.gap-4
+    = heroicon category.icon_name, options: { class: "h-6 w-6 text-gray-500" }
+    %p.text-sm.text-gray-900= category.name
+  .flex.items-center.gap-2
+    = link_to edit_category_path(category),
+      class: "text-gray-400 hover:text-gray-500" do
+      = heroicon "pencil", options: { class: "h-5 w-5", "aria-hidden": "true" }
+    = button_to category_path(category),
+      method: :delete,
+      class: "text-gray-400 hover:text-red-600",
+      data: { turbo_confirm: t('.confirm_delete', name: category.name) } do
+      = heroicon "trash", options: { class: "h-5 w-5", "aria-hidden": "true" } 
