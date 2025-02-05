@@ -107,18 +107,6 @@ export default class extends Controller {
       const responseText = await response.text()
       Turbo.renderStreamMessage(responseText)
       
-      // Suggestions neu laden
-      const suggestionsResponse = await fetch(`/conversations/${this.conversationIdValue}/suggestions`, {
-        headers: {
-          "Accept": "text/vnd.turbo-stream.html"
-        }
-      })
-      
-      if (suggestionsResponse.ok) {
-        const suggestionsText = await suggestionsResponse.text()
-        Turbo.renderStreamMessage(suggestionsText)
-      }
-      
     } catch (error) {
       console.error("Error sending text:", error)
     }

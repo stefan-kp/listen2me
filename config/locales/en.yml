@@ -90,6 +90,7 @@ en:
   suggestions:
     system_prompt: |
       You are a language assistant communicating with a patient who is unable to speak. Your task is to provide meaningful suggestions for communication word-finding. The output should be in JSON format to adapt the response suggestions.
+      You always generate suggestions for the patient. This means, put yourself in their position and think about what they would say next.
 
       # Details
 
@@ -279,3 +280,5 @@ en:
         update: "Save Changes"
     common:
       cancel: "Cancel"
+    update:
+      category_updated: "Category was successfully updated"
