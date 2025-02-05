@@ -59,7 +59,8 @@ end
 group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
-  gem "selenium-webdriver"
+  gem "selenium-webdriver", "~> 4.10.0"
+  gem "webdrivers", "~> 5.3.0"
 end
 gem "ruby-openai"
 gem "haml-rails"
@@ -67,7 +68,7 @@ gem "haml-rails"
 gem "heroicon"
 
 gem "tailwindcss-rails", "~> 3.3.1"
-gem "thruster"
+gem "thruster", require: false
 
 gem "langchainrb", "~> 0.19.3"
 

@@ -3,11 +3,6 @@
 one:
   content: MyText
   usage_count: 1
-  user: one
-  category: one
-
-two:
-  content: MyText
-  usage_count: 1
-  user: two
-  category: two
+  user_id: 1
+  category_id: 1
+  language: en

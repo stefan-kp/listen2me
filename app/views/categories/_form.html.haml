@@ -11,12 +11,12 @@
       = f.label :icon_name, t('.icon_name'), class: "block text-sm font-medium text-gray-700 mb-2"
       .max-h-64.overflow-y-auto.rounded-lg.border.border-gray-200.p-4
         .grid.grid-cols-4.gap-4{data: { controller: "icon-selector" }}
-          - Category::ICONS.each do |icon|
+          - Category::ICONS.each do |icon_name|
             .icon-option
-              = f.radio_button :icon_name, icon, class: "sr-only peer", required: true, data: { action: "change->icon-selector#select" }
-              = f.label "icon_name_#{icon}", class: "flex flex-col items-center p-2 rounded-lg border cursor-pointer hover:bg-gray-50 peer-checked:border-indigo-600 peer-checked:bg-indigo-50" do
-                = heroicon icon, options: { class: "h-8 w-8 text-gray-500 peer-checked:text-indigo-600" }
-                %span.mt-1.text-xs.text-gray-500.truncate.w-full.text-center= icon.titleize
+              = f.radio_button :icon_name, icon_name, class: "sr-only peer", required: true, id: "category_icon_name_#{icon_name}"
+              = f.label "icon_name_#{icon_name}", class: "flex flex-col items-center p-2 rounded-lg border cursor-pointer hover:bg-gray-50 peer-checked:border-indigo-600 peer-checked:bg-indigo-50" do
+                = heroicon icon_name, options: { class: "h-8 w-8 text-gray-500 peer-checked:text-indigo-600" }
+                %span.mt-1.text-xs.text-gray-500.truncate.w-full.text-center= icon_name.titleize
 
   .flex.justify-end.gap-3.pt-4.border-t
     = link_to t('categories.common.cancel'), categories_path,
