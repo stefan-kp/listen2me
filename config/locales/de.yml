@@ -169,7 +169,8 @@ de:
   messages:
     form:
       enter_message: "Nachricht eingeben..."
-      speak: "Sprechen"
+      speak: "Vorlesen"
+      send: "Senden"
 
   shared:
     user_menu:

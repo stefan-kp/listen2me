@@ -7,8 +7,8 @@
               speech_api_key_value: current_elevenlabs_api_key,
               action: "speech:finished->form#submit",
               turbo: false } do |f|
-      = f.hidden_field :content, value: suggestion["content"]
+      = f.hidden_field :content, value: suggestion["content"], "aria-label": suggestion["content"], data: { speech_target: "input" }
       = f.hidden_field :role, value: "user"
       = f.button class: "w-full text-left p-2 hover:bg-gray-100 rounded border",
-        data: { action: "click->speech#speak" } do
+        data: { action: "click->speech#speakAndSubmit" } do
         = suggestion["content"] 

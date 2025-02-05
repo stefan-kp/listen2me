@@ -1,7 +1,7 @@
 .max-w-7xl.mx-auto.px-4.sm:px-6.lg:px-8.py-8{"aria-labelledby": "page-title"}
   %h1#page-title.sr-only= t('.page_title')
 
-  .mb-8
+  = turbo_frame_tag "text_form" do
     = render 'text_form'
 
   .grid.grid-cols-1.gap-8.lg:grid-cols-3
@@ -26,7 +26,7 @@
 
     %section.lg:col-span-1{"aria-labelledby": "frequent-title"}
       %h2#frequent-title.text-lg.font-medium.text-gray-900.mb-4= t('.frequently_used')
-      .bg-white.shadow.sm:rounded-lg.divide-y.divide-gray-200{role: "list", "aria-label": t('.frequent_sentences')}
+      #frequent_sentences.bg-white.shadow.sm:rounded-lg.divide-y.divide-gray-200{role: "list", "aria-label": t('.frequent_sentences')}
         = render partial: 'sentence', collection: @frequent_sentences
 
   - content_for :keyboard_shortcuts do

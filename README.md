@@ -52,7 +52,7 @@ The application supports two types of speech output:
 
    copy the database config:
    ```bash
-   cp config/database.yml.example config/database.yml
+   cp config/database.yml.sample config/database.yml
    ```
 
 2. Start the application:

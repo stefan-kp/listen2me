@@ -1,11 +1,11 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["text", "speakButton"]
+  static targets = ["input"]
   static values = {
     voiceId: String,
     apiKey: String,
-    text: String
+    mode: String  // 'submit' oder 'speak'
   }
 
   connect() {
@@ -13,17 +13,29 @@ export default class extends Controller {
   }
   
   async speak(event) {
-    event.preventDefault()
-    
-    const textToSpeak = this.textValue || this.textTarget.value
+    if (event) event.preventDefault()
+    const text = this.inputTarget.value
     
     if (this.hasApiKey) {
-      await this.speakWithElevenLabs(textToSpeak)
+      await this.speakWithElevenLabs(text)
     } else {
-      await this.speakWithBrowser(textToSpeak)
+      await this.speakWithBrowser(text)
     }
+  }
+
+  async speakAndSubmit(event) {
+    if (event) event.preventDefault()
+    const form = event.target.closest('form')
     
-    this.dispatch('finished')
+    try {
+      // Erst sprechen
+      await this.speak(event)
+      
+      // Dann Formular absenden
+      if (form) form.requestSubmit()
+    } catch (error) {
+      console.error("Error in speakAndSubmit:", error)
+    }
   }
 
   get hasApiKey() {
@@ -88,34 +100,5 @@ export default class extends Controller {
       utterance.onend = () => resolve()
       window.speechSynthesis.speak(utterance)
     })
-  }
-
-  async speakAndSubmit(event) {
-    if (event) event.preventDefault()
-    
-    // Erst sprechen
-    await this.speak()
-    
-    // Dann Message erstellen
-    const response = await fetch(`/conversations/${this.element.closest("[data-audio-recorder-conversation-id-value]").dataset.audioRecorderConversationIdValue}/messages`, {
-      method: 'POST',
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "text/vnd.turbo-stream.html, application/json",
-        "X-CSRF-Token": document.querySelector("[name='csrf-token']").content
-      },
-      body: JSON.stringify({
-        content: this.textValue,
-        role: "user"
-      })
-    })
-    
-    if (!response.ok) {
-      console.error("Error creating message")
-      return
-    }
-    
-    const responseText = await response.text()
-    Turbo.renderStreamMessage(responseText)
   }
 } 

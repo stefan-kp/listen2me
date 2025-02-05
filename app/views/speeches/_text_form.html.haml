@@ -1,12 +1,10 @@
-= form_with url: speeches_path, method: :post, data: { controller: "speech form", speech_voice_id_value: current_user.elevenlabs_voice_id, speech_api_key_value: current_user.elevenlabs_api_key, action: "speech:finished->form#submit" } do |f|
+= form_with url: speeches_path, 
+  method: :post, 
+  class: "mt-4", 
+  data: { turbo_frame: "_top",controller: "speech",speech_voice_id_value: current_user.elevenlabs_voice_id,speech_api_key_value: current_user.elevenlabs_api_key } do |f|
   .form-group
     = f.label :content, t('.own_text'), class: "form-label"
-    = f.text_area :content,
-      class: "form-textarea",
-      rows: 3,
-      placeholder: t('.enter_text'),
-      required: true,
-      "aria-label": t('.enter_text_aria')
+    = f.text_area :content,class: "form-textarea",rows: 3,placeholder: t('.enter_text'),required: true,"aria-label": t('.enter_text_aria'), data: { speech_target: "input" }
 
   .form-group
     = f.label :category_id, t('.select_category'), class: "form-label"
@@ -18,6 +16,6 @@
   .flex.justify-end.mt-4
     = f.button class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500",
       type: "button",
-      data: { action: "click->speech#speak" } do
+      data: { action: "click->speech#speakAndSubmit" } do
       = heroicon "speaker-wave", options: { class: "h-5 w-5 mr-2", "aria-hidden": "true" }
       = t('.speak') 

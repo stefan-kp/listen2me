@@ -14,8 +14,7 @@ class SpeechesController < ApplicationController
     text = params[:content].to_s.strip
     return head :bad_request if text.blank?
 
-    # Finde existierenden Satz oder erstelle einen neuen
-    sentence = Sentence.find_or_create_by!(
+    @sentence = Sentence.find_or_create_by!(
       content: text,
       language: Language.find_by!(code: I18n.locale),
       user: current_user,
@@ -24,21 +23,21 @@ class SpeechesController < ApplicationController
       s.usage_count = 0
     end
 
-    sentence.increment!(:usage_count)
-    sentence.category&.increment!(:usage_count)
+    @sentence.increment!(:usage_count)
+    @sentence.category&.increment!(:usage_count)
 
-    respond_to do |format|
-      format.json do
-        render json: {
-          text: sentence.content,
-          voice_id: sentence.user.elevenlabs_voice_id,
-          model_id: "eleven_multilingual_v2",
-          api_key: sentence.user.elevenlabs_api_key,
-          aria_label: t(".speak_sentence", text: sentence.content)
-        }
-      end
-      format.html { redirect_to speeches_path }
-    end
+    @conversation = Conversation.create!(
+      initial_sentence: @sentence,
+      user: current_user
+    )
+
+    @conversation.messages.create!(
+      content: text,
+      role: 'user'
+    )
+
+    # Einfache Weiterleitung für neue Konversationen
+    redirect_to conversation_path(@conversation)
   end
 
   def category

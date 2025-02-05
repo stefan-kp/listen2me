@@ -192,6 +192,7 @@ en:
     form:
       enter_message: "Enter message..."
       speak: "Speak"
+      send: "Send"
 
   conversations:
     show:

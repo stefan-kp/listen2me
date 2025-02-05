@@ -1,12 +1,10 @@
 class MessagesController < ApplicationController
   def create
     @conversation = Conversation.find(params[:conversation_id])
-
     @message = @conversation.messages.create!(
       content: params[:content],
-      role: params[:role]
+      role: params[:role] || 'user'
     )
-
     # Suggestions nach dem Erstellen der Message generieren
     @suggestions = SuggestionService.new(@conversation).generate_suggestions
 
