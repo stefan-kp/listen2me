@@ -11,7 +11,7 @@ class SettingsController < ApplicationController
   end
 
   def generate_summary
-    service = SuggestionService.new(current_user.conversations.first)
+    service = SuggestionService.new(current_user.conversations.last)
     service.generate_conversation_summary
     redirect_to settings_path, notice: t('.success')
   rescue => e

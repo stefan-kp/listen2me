@@ -88,7 +88,7 @@ class SuggestionService
   end
 
   def prepare_conversation_data
-    @user.conversations.includes(:messages).map do |conversation|
+    @user.conversations.includes(:messages).order(created_at: :desc).limit(50).map do |conversation|
       {
         id: conversation.id,
         messages: conversation.messages.map do |message|
