@@ -9,8 +9,14 @@ export default class extends Controller {
   connect() {
     console.log("Audio recorder connected")
     this.indicatorTarget.classList.remove('text-red-500')
-    this.setupSpeechRecognition()
-    this.startRecording()
+    
+    // Prüfen ob Speech Recognition verfügbar ist
+    if (this.isSpeechRecognitionAvailable()) {
+      this.setupSpeechRecognition()
+      this.startRecording()
+    } else {
+      this.handleUnsupportedBrowser()
+    }
     
     // Event-Listener für Sprachsteuerung
     window.addEventListener("speech:pauseRecording", () => this.stopRecording())
@@ -24,20 +30,53 @@ export default class extends Controller {
     window.removeEventListener("speech:resumeRecording", () => this.startRecording())
   }
   
+  isSpeechRecognitionAvailable() {
+    return 'SpeechRecognition' in window || 
+           'webkitSpeechRecognition' in window ||
+           'mozSpeechRecognition' in window ||
+           'msSpeechRecognition' in window
+  }
+  
+  handleUnsupportedBrowser() {
+    console.warn("Speech Recognition is not supported in this browser")
+    this.recognizedTextTarget.innerHTML = `
+      <em class="text-yellow-600">
+        ${I18n.t('speech_recognition.errors.unsupported')}
+      </em>
+    `
+    const recordButton = this.element.querySelector('[data-audio-recorder-target="recordButton"]')
+    if (recordButton) {
+      recordButton.disabled = true
+      recordButton.classList.add('opacity-50', 'cursor-not-allowed')
+    }
+  }
+  
   setupSpeechRecognition() {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
-    this.recognition = new SpeechRecognition()
-    this.recognition.continuous = true
-    this.recognition.interimResults = true
-    this.recognition.lang = 'de-DE'
-
+    const SpeechRecognition = window.SpeechRecognition || 
+                             window.webkitSpeechRecognition ||
+                             window.mozSpeechRecognition ||
+                             window.msSpeechRecognition
+    
+    try {
+      this.recognition = new SpeechRecognition()
+      this.recognition.continuous = true
+      this.recognition.interimResults = true
+      this.recognition.lang = 'de-DE'
+      
+      this.setupRecognitionHandlers()
+    } catch (error) {
+      console.error("Error setting up speech recognition:", error)
+      this.handleUnsupportedBrowser()
+    }
+  }
+  
+  setupRecognitionHandlers() {
     this.recognition.onresult = (event) => {
       const last = event.results.length - 1
       const text = event.results[last][0].transcript
       
       this.recognizedTextTarget.textContent = text
       
-      // Wenn das Ergebnis final ist, senden wir es an den Server
       if (event.results[last].isFinal) {
         this.sendRecognizedText(text)
       }
@@ -45,11 +84,36 @@ export default class extends Controller {
 
     this.recognition.onerror = (event) => {
       console.error("Speech recognition error:", event.error)
-      if (event.error === 'no-speech') {
-        // Bei "no-speech" einfach weitermachen und nicht als Fehler anzeigen
-        return
+      
+      let errorKey = ''
+      
+      switch(event.error) {
+        case 'no-speech':
+          return
+        case 'network':
+          errorKey = 'network'
+          setTimeout(() => this.startRecording(), 1000)
+          break
+        case 'not-allowed':
+        case 'permission-denied':
+          errorKey = 'not_allowed'
+          this.handleUnsupportedBrowser()
+          break
+        case 'audio-capture':
+          errorKey = 'audio_capture'
+          this.handleUnsupportedBrowser()
+          break
+        case 'aborted':
+          if (this.stopping) return
+          errorKey = 'aborted'
+          break
+        default:
+          errorKey = 'default'
       }
-      this.recognizedTextTarget.innerHTML = '<em class="text-red-500">Fehler bei der Spracherkennung</em>'
+      
+      this.recognizedTextTarget.innerHTML = `
+        <em class="text-red-500">${I18n.t(`speech_recognition.errors.${errorKey}`)}</em>
+      `
     }
 
     this.recognition.onend = () => {

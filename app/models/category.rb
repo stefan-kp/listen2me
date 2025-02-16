@@ -10,7 +10,7 @@ class Category < ApplicationRecord
   end
 
   ICONS = %w[
-            heart bell user-group home fire hand-raised star face-smile
+            heart bell user-group home hand-raised star face-smile
             exclamation-circle information-circle question-mark-circle check-circle
             sun moon clock calendar calendar-days
             speaker-wave microphone video-camera phone
