@@ -30,7 +30,9 @@ Rails.application.routes.draw do
       resources :messages, only: [ :create ]
     end
 
-    resource :settings, only: %i[show update]
+    resource :settings, only: %i[show update] do
+      post :generate_summary, on: :collection
+    end
 
     resources :categories, except: [:show] do
       delete :destroy, on: :member

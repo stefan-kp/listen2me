@@ -102,6 +102,7 @@ de:
       - Ich übergebe dir sowohl die Antworten bzw. Fragen des Patienten. Diese haben die Rolle "Patient". Und ich übergebe dir die Nachrichten eines etwaigen Dritten in dem Raum. Diese haben die Rolle "Visitor".
       - Die letzte Nachricht des Patienten bzw, des Visitors ist immer am Ende der Konversation. Dieser gibt die wichtige Informationen für die Vorschläge. Die vorherigen Nachrichten sind für den Kontext wichtig.
       - Ich übergebe dir auch eine Beschreibung des Patienten (user_description), die wichtige Kontextinformationen enthält
+      - Ich übergebe dir auch die Gesprächsanalyse des Patienten (summary) auf basis der bisherigen Gespräche, die wichtige Kontextinformationen enthält
       - Ich übergebe dir auch die Kategorie des Satzes (category), die wichtige Kontextinformationen enthält
       # Steps
 
@@ -216,9 +217,21 @@ de:
       voice_settings_description: "Die ElevenLabs-Integration ist optional. Wenn keine API-Zugangsdaten eingegeben werden, wird automatisch die Sprachausgabe des Browsers verwendet. ElevenLabs bietet jedoch eine natürlichere Sprachqualität."
       llm_settings: "KI-Einstellungen"
       save: "Änderungen speichern"
+      conversation_summary: "Gesprächsanalyse"
+      conversation_summary_explanation: "Die Gesprächsanalyse hilft der KI, Ihre Vorlieben und Kommunikationsmuster besser zu verstehen. Sie analysiert Ihre bisherigen Gespräche, um personalisiertere Vorschläge zu machen. Es wird empfohlen, diese Analyse regelmäßig zu aktualisieren, wenn neue Gespräche hinzukommen."
+      generate_summary: "Analyse erstellen"
+      last_generated: "Zuletzt erstellt: %{time}"
+      no_summary: "Noch keine Gesprächsanalyse erstellt"
+      generating_summary: "Wird erstellt..."
 
     update:
       updated: "Einstellungen erfolgreich aktualisiert"
+
+    generate_summary:
+      success: "Gesprächsanalyse wurde erfolgreich erstellt"
+      error: "Fehler beim Erstellen der Analyse: %{message}"
+      errors:
+        unsupported_provider: "Nicht unterstützter LLM-Anbieter: %{provider}"
 
   categories:
     index:
@@ -268,4 +281,25 @@ de:
       audio_capture: "Kein Mikrofon gefunden"
       aborted: "Spracherkennung wurde unterbrochen"
       default: "Fehler bei der Spracherkennung"
-      unsupported: "Spracherkennung wird in diesem Browser nicht unterstützt. Bitte verwenden Sie Chrome, Edge oder Safari." 
+      unsupported: "Spracherkennung wird in diesem Browser nicht unterstützt. Bitte verwenden Sie Chrome, Edge oder Safari."
+
+  suggestion_service:
+    summary_prompt: |
+      Bitte analysiere diese Gespräche und extrahiere wichtige Informationen über:
+      
+      1. Den Benutzer/Patienten:
+      - Persönliche Vorlieben
+      - Medizinische Bedürfnisse
+      - Tagesabläufe oder Gewohnheiten
+      - Wichtige Beziehungen oder Kontakte
+      - Häufig besprochene Themen
+      
+      2. Die Gesprächspartner/Assistenten:
+      - Verwendete Namen oder Bezeichnungen
+      - Rollen oder Beziehungen zum Benutzer
+      - Kommunikationsmuster
+      
+      Berücksichtige nur Informationen, die explizit in den Gesprächen erwähnt wurden.
+      Wahre die Privatsphäre, indem du sensible medizinische Details ausschließt.
+    errors:
+      unsupported_provider: "Nicht unterstützter LLM-Anbieter: %{provider}" 

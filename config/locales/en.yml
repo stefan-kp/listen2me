@@ -101,6 +101,7 @@ en:
       - I will give you both the patient's responses/questions and the messages of a third person in the room. These have the role "Patient". And I will give you the messages of a third person in the room. These have the role "Visitor".
       - The last message of the patient/visitor is always at the end of the conversation. This gives you the important information for the suggestions. The previous messages are important for the context.
       - I will give you also a description of the patient (user_description), which contains important context information
+      - I will give you also the conversation summary (summary), which contains important context information
       - I will give you also the category of the sentence (category), which contains important context information
       # Steps
 
@@ -233,8 +234,34 @@ en:
       voice_settings_description: "The ElevenLabs integration is optional. If no API credentials are entered, the browser's speech synthesis will be used automatically. However, ElevenLabs offers more natural speech quality."
       llm_settings: "AI Settings"
       save: "Save Changes"
+      conversation_summary: "Conversation Analysis"
+      conversation_summary_explanation: "The conversation analysis helps the AI better understand your preferences and communication patterns. It analyzes your past conversations to provide more personalized suggestions. It's recommended to update this analysis periodically as your conversations grow."
+      generate_summary: "Generate Summary"
+      last_generated: "Last generated: %{time}"
+      no_summary: "No conversation summary generated yet"
+      generating_summary: "Generating..."
     update:
       updated: "Settings updated successfully"
+    generate_summary:
+      prompt:
+        intro: "Please analyze these conversations and extract key information about the participants."
+        user_section: "The user/patient"
+        user_points: |
+          - Personal preferences
+          - Medical conditions or needs
+          - Daily routines or habits
+          - Important relationships or contacts
+          - Frequently discussed topics
+        partners_section: "The conversation partners/assistants"
+        partner_points: |
+          - Names or identifiers used
+          - Roles or relationships to the user
+          - Communication patterns
+        privacy_note: "Only include information that was explicitly mentioned in the conversations. Maintain privacy by excluding sensitive medical details."
+      success: "Conversation summary was successfully generated"
+      error: "Error generating summary: %{message}"
+      errors:
+        unsupported_provider: "Unsupported LLM provider: %{provider}"
 
   shared:
     user_menu:
@@ -292,3 +319,33 @@ en:
       aborted: "Speech recognition was interrupted"
       default: "Error during speech recognition"
       unsupported: "Speech recognition is not supported in this browser. Please use Chrome, Edge or Safari."
+
+  suggestion_service:
+    summary_prompt: |
+      Please analyze these conversations and create a detailed summary in markdown format.
+      Structure the information as follows:
+
+      ## User Profile
+      ### Preferences
+      - [List preferences]
+      
+      ### Daily Routines
+      - [List routines]
+      
+      ### Relationships
+      - [List relationships]
+      
+      ### Frequent Topics
+      - [List topics]
+      
+      ## Conversation Partners
+      ### [Partner Name/Role]
+      - Relationship: [Description]
+      - Communication Style: [Description]
+      - Typical Interactions: [Description]
+
+      Only include information explicitly mentioned in the conversations.
+      Maintain privacy by excluding sensitive medical details.
+      Use markdown formatting for better readability (headers, lists, emphasis).
+    errors:
+      unsupported_provider: "Unsupported LLM provider: %{provider}"

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_01_091606) do
+ActiveRecord::Schema[8.0].define(version: 2025_02_16_135711) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -79,8 +79,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_01_091606) do
     t.string "llm_model", default: "gpt-4o"
     t.string "llm_provider", default: "openai"
     t.string "llm_api_key"
+    t.jsonb "conversation_summary"
+    t.datetime "summary_generated_at"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+    t.index ["summary_generated_at"], name: "index_users_on_summary_generated_at"
   end
 
   add_foreign_key "categories", "users"

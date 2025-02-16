@@ -68,5 +68,26 @@
           = f.submit t('.save'),
             class: "ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
 
+      .mt-8.border-t.pt-8
+        .flex.items-center.justify-between.mb-4
+          %h3.text-lg.font-medium.text-gray-900= t('.conversation_summary')
+          = button_to generate_summary_settings_path,
+            method: :post,
+            class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-75",
+            data: { controller: "loading-button", loading_button_text_value: t('.generating_summary'), turbo_submits_with: "" } do
+            = heroicon "arrow-path", options: { class: "h-5 w-5 mr-2 transition-transform duration-1000", data: { loading_button_target: "icon" }}
+            %span{data: { loading_button_target: "label" }}= t('.generate_summary')
+
+        %p.text-sm.text-gray-500.mb-4= t('.conversation_summary_explanation')
+
+        - if current_user.conversation_summary.present?
+          .prose.prose-sm.mt-4
+            .text-sm.text-gray-500.mb-2
+              = t('.last_generated', time: l(current_user.summary_generated_at, format: :long))
+            .bg-gray-50.rounded-lg.p-4.prose.prose-slate.max-w-none
+              = markdown_to_html(current_user.conversation_summary)
+        - else
+          %p.text-sm.text-gray-500.italic= t('.no_summary')
+
 .hidden
   .border-blue-500.text-blue-600.border-transparent.text-gray-500.hover:text-gray-700.hover:border-gray-300 
