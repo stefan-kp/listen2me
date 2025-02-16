@@ -1,72 +1,104 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["indicator", "recognizedText"]
+  static targets = ["indicator", "recognizedText", "input"]
   static values = { 
     conversationId: String
   }
   
   connect() {
     console.log("Audio recorder connected")
-    this.indicatorTarget.classList.remove('text-red-500')
+    this.isRecording = false
+    this.setupSpeechRecognition()
     
-    // Prüfen ob Speech Recognition verfügbar ist
-    if (this.isSpeechRecognitionAvailable()) {
-      this.setupSpeechRecognition()
-      this.startRecording()
+    // Bind all methods that will be used as event handlers
+    this.handleKeyPress = this.handleKeyPress.bind(this)
+    this.startRecording = this.startRecording.bind(this)
+    this.forceStopRecording = this.forceStopRecording.bind(this)
+    
+    // Add event listeners with bound methods
+    this.inputTarget.addEventListener('keypress', this.handleKeyPress)
+    window.addEventListener('speech:pauseRecording', this.forceStopRecording)
+    window.addEventListener('speech:resumeRecording', this.startRecording)
+
+    // Check stored state and start if enabled (default is true)
+    const shouldRecord = localStorage.getItem('speechRecognitionEnabled') !== 'false'
+    if (shouldRecord) {
+      setTimeout(() => {
+        this.startRecording()
+      }, 500)
     } else {
-      this.handleUnsupportedBrowser()
+      // Update UI to show disabled state
+      this.indicatorTarget.classList.remove('text-red-500')
+      this.indicatorTarget.classList.add('text-gray-400')
     }
-    
-    // Event-Listener für Sprachsteuerung
-    window.addEventListener("speech:pauseRecording", () => this.stopRecording())
-    window.addEventListener("speech:resumeRecording", () => this.startRecording())
   }
   
   disconnect() {
-    this.stopRecording()
-    // Event-Listener entfernen
-    window.removeEventListener("speech:pauseRecording", () => this.stopRecording())
-    window.removeEventListener("speech:resumeRecording", () => this.startRecording())
-  }
-  
-  isSpeechRecognitionAvailable() {
-    return 'SpeechRecognition' in window || 
-           'webkitSpeechRecognition' in window ||
-           'mozSpeechRecognition' in window ||
-           'msSpeechRecognition' in window
-  }
-  
-  handleUnsupportedBrowser() {
-    console.warn("Speech Recognition is not supported in this browser")
-    this.recognizedTextTarget.innerHTML = `
-      <em class="text-yellow-600">
-        ${I18n.t('speech_recognition.errors.unsupported')}
-      </em>
-    `
-    const recordButton = this.element.querySelector('[data-audio-recorder-target="recordButton"]')
-    if (recordButton) {
-      recordButton.disabled = true
-      recordButton.classList.add('opacity-50', 'cursor-not-allowed')
-    }
+    console.log("Audio recorder disconnecting")
+    this.forceStopRecording()
+    
+    // Remove event listeners with the same bound methods
+    this.inputTarget.removeEventListener('keypress', this.handleKeyPress)
+    window.removeEventListener('speech:pauseRecording', this.forceStopRecording)
+    window.removeEventListener('speech:resumeRecording', this.startRecording)
   }
   
   setupSpeechRecognition() {
+    console.log("Setting up speech recognition")
     const SpeechRecognition = window.SpeechRecognition || 
-                             window.webkitSpeechRecognition ||
-                             window.mozSpeechRecognition ||
-                             window.msSpeechRecognition
+                             window.webkitSpeechRecognition
+    
+    if (!SpeechRecognition) {
+      console.warn("Speech Recognition not supported")
+      this.indicatorTarget.classList.add('text-gray-400')
+      return
+    }
+
+    this.recognition = new SpeechRecognition()
+    this.recognition.continuous = true
+    this.recognition.interimResults = true
+    this.recognition.lang = document.documentElement.lang || 'de-DE'
+    
+    this.setupRecognitionHandlers()
+  }
+
+  toggleRecording() {
+    console.log("Toggle recording, current state:", this.isRecording)
+    if (this.isRecording) {
+      this.forceStopRecording()
+      localStorage.setItem('speechRecognitionEnabled', 'false')
+    } else {
+      this.startRecording()
+      localStorage.setItem('speechRecognitionEnabled', 'true')
+    }
+  }
+  
+  startRecording() {
+    if (!this.recognition) return
+    console.log("Starting recording...")
     
     try {
-      this.recognition = new SpeechRecognition()
-      this.recognition.continuous = true
-      this.recognition.interimResults = true
-      this.recognition.lang = 'de-DE'
-      
-      this.setupRecognitionHandlers()
+      this.isRecording = true
+      this.recognition.start()
+      this.indicatorTarget.classList.add('text-red-500')
+      this.indicatorTarget.classList.remove('text-gray-400')
     } catch (error) {
-      console.error("Error setting up speech recognition:", error)
-      this.handleUnsupportedBrowser()
+      console.error("Error starting recognition:", error)
+    }
+  }
+  
+  forceStopRecording() {
+    console.log("Force stopping recording...")
+    if (!this.recognition) return
+    
+    try {
+      this.isRecording = false
+      this.recognition.abort() // Use abort() instead of stop()
+      this.indicatorTarget.classList.remove('text-red-500')
+      this.indicatorTarget.classList.add('text-gray-400')
+    } catch (error) {
+      console.error("Error stopping recognition:", error)
     }
   }
   
@@ -75,7 +107,8 @@ export default class extends Controller {
       const last = event.results.length - 1
       const text = event.results[last][0].transcript
       
-      this.recognizedTextTarget.textContent = text
+      // Update the input field instead of a separate text display
+      this.inputTarget.value = text
       
       if (event.results[last].isFinal) {
         this.sendRecognizedText(text)
@@ -84,95 +117,48 @@ export default class extends Controller {
 
     this.recognition.onerror = (event) => {
       console.error("Speech recognition error:", event.error)
-      
-      let errorKey = ''
-      
-      switch(event.error) {
-        case 'no-speech':
-          return
-        case 'network':
-          errorKey = 'network'
-          setTimeout(() => this.startRecording(), 1000)
-          break
-        case 'not-allowed':
-        case 'permission-denied':
-          errorKey = 'not_allowed'
-          this.handleUnsupportedBrowser()
-          break
-        case 'audio-capture':
-          errorKey = 'audio_capture'
-          this.handleUnsupportedBrowser()
-          break
-        case 'aborted':
-          if (this.stopping) return
-          errorKey = 'aborted'
-          break
-        default:
-          errorKey = 'default'
-      }
-      
-      this.recognizedTextTarget.innerHTML = `
-        <em class="text-red-500">${I18n.t(`speech_recognition.errors.${errorKey}`)}</em>
-      `
-    }
-
-    this.recognition.onend = () => {
-      // Wenn die Erkennung endet, automatisch neu starten
-      if (!this.stopping) {
-        this.startRecording()
+      if (event.error === 'network') {
+        this.stopRecording()
+        setTimeout(() => this.startRecording(), 1000)
       }
     }
   }
   
-  startRecording() {
-    try {
-      this.stopping = false
-      this.recognition.start()
-      console.log("Recording started")
-      this.indicatorTarget.classList.add('text-red-500')
-    } catch (error) {
-      if (error.name === 'InvalidStateError') {
-        // Wenn die Erkennung bereits läuft, ignorieren
-        return
-      }
-      console.error("Error starting recognition:", error)
-    }
-  }
-  
-  stopRecording() {
-    if (this.recognition) {
-      this.stopping = true
-      this.recognition.stop()
-      this.indicatorTarget.classList.remove('text-red-500')
-      console.log("Recording stopped")
-    }
-  }
-  
-  async sendRecognizedText(text) {
+  async sendRecognizedText(text, role = 'assistant') {  // Default to 'assistant' since this is the assistant's input
     try {
       const response = await fetch(`/conversations/${this.conversationIdValue}/messages`, {
         method: 'POST',
         headers: {
           "X-CSRF-Token": document.querySelector("[name='csrf-token']").content,
           "Content-Type": "application/json",
-          "Accept": "text/vnd.turbo-stream.html, application/json",
-          "Turbo-Frame": "messages"
+          "Accept": "text/vnd.turbo-stream.html",
         },
         body: JSON.stringify({
           content: text,
-          role: "assistant"
+          role: role
         })
       })
       
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
       
       const responseText = await response.text()
       Turbo.renderStreamMessage(responseText)
       
+      // Clear input after successful send
+      this.inputTarget.value = ''
+      
     } catch (error) {
       console.error("Error sending text:", error)
+    }
+  }
+
+  handleKeyPress(event) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault()
+      const text = this.inputTarget.value.trim()
+      if (text) {
+        this.sendRecognizedText(text, 'assistant')  // Explicitly set role to 'user' for keyboard input
+      }
     }
   }
 } 

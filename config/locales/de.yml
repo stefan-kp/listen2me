@@ -71,6 +71,7 @@ de:
       toggle_recording: "Sprachaufnahme starten/stoppen"
       recording_active: "Aufnahme läuft"
       recording_inactive: "Aufnahme gestoppt"
+      enter_message: "Nachricht eingeben..."
 
     index:
       title: "Meine Konversationen"
@@ -258,4 +259,13 @@ de:
         create: "Kategorie erstellen"
         update: "Änderungen speichern"
     common:
-      cancel: "Abbrechen" 
+      cancel: "Abbrechen"
+
+  speech_recognition:
+    errors:
+      network: "Netzwerkfehler - Verbindung zum Spracherkennungsdienst fehlgeschlagen"
+      not_allowed: "Mikrofon-Zugriff wurde verweigert"
+      audio_capture: "Kein Mikrofon gefunden"
+      aborted: "Spracherkennung wurde unterbrochen"
+      default: "Fehler bei der Spracherkennung"
+      unsupported: "Spracherkennung wird in diesem Browser nicht unterstützt. Bitte verwenden Sie Chrome, Edge oder Safari." 

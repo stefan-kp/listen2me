@@ -1,67 +1,36 @@
-.max-w-7xl.mx-auto.px-4.sm:px-6.lg:px-8.py-8{"aria-labelledby": "conversation-title"}
-  .flex.items-center.justify-between.mb-8
-    %h1#conversation-title.text-2xl.font-bold.text-gray-900= t('.conversation')
-    = link_to speeches_path, 
-      class: "inline-flex items-center text-gray-600 hover:text-gray-900", 
-      role: "button",
-      "aria-label": t('.back_to_home') do
-      = heroicon "arrow-left", options: { class: "h-5 w-5 mr-2", "aria-hidden": "true" }
-      = t('.back_to_home')
+.max-w-7xl.mx-auto.px-4.sm:px-6.lg:px-8.py-8.flex.flex-col{ class: "h-[calc(100vh-4rem)]" }
+  .flex.items-center.justify-between.mb-4.flex-shrink-0
+    .flex.items-center.gap-4
+      = link_to speeches_path, 
+        class: "text-gray-600 hover:text-gray-900",
+        "aria-label": t('.back_to_home') do
+        = heroicon "arrow-left", options: { class: "h-5 w-5" }
+      %h1.text-2xl.font-bold.text-gray-900= t('.conversation')
 
-  .bg-white.shadow.sm:rounded-lg.mb-8
-    .px-4.py-5.sm:p-6
-      %div{"aria-live": "polite", "aria-atomic": "true"}
-        #messages.space-y-4{role: "log", "aria-label": t('.messages_list')}
-          = render @messages
-        
-        - if @messages.empty?
-          %p.text-center.text-gray-500{"aria-label": t('.no_messages')}
-            = t('.no_messages')
+  .flex-1.flex.flex-col.min-h-0
+    #messages.flex-1.overflow-y-auto.space-y-4.mb-4{
+      role: "log",
+      "aria-label": t('.messages_list'),
+      data: { controller: "scroll-into-view" }}
+      - if @messages.any?
+        = render partial: "messages/message", collection: @messages
+      - else
+        %p.text-center.text-gray-500= t('.no_messages')
 
-      = form_with url: conversation_messages_path(@conversation), 
-        method: :post, 
-        class: "mt-6",
-        data: { controller: "speech",speech_voice_id_value: current_user.elevenlabs_voice_id,speech_api_key_value: current_user.elevenlabs_api_key } do |f|
-        .flex.gap-4
-          = f.text_area :content,
-            class: "form-textarea flex-1",
-            rows: 3,
-            placeholder: t('messages.form.enter_message'),
-            required: true,
-            "aria-label": t('messages.form.enter_message'),
-            data: { speech_target: "input" }
+    .flex-shrink-0.space-y-4.bg-white.pt-4
+      - if @suggestions.present?
+        #suggestions.bg-gray-50.rounded-lg.p-4{"aria-label": t('.suggestions')}
+          = render "messages/suggestions", suggestions: @suggestions
 
-          = f.button class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500",
+      .conversation-container{"data-controller": "audio-recorder", "data-audio-recorder-conversation-id-value": @conversation.id}
+        .flex.items-center.gap-2
+          = text_field_tag :content, nil,
+            class: "flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500",
+            placeholder: t('.enter_message'),
+            "data-audio-recorder-target": "input"
+            
+          %button.p-2.rounded-full.hover:bg-gray-100{
             type: "button",
-            data: { action: "click->speech#speakAndSubmit" } do
-            = heroicon "speaker-wave", options: { class: "h-5 w-5 mr-2", "aria-hidden": "true" }
-            = t('messages.form.speak')
-
-  .bg-white.shadow.sm:rounded-lg
-    .px-4.py-5.sm:p-6
-      %h2.text-lg.font-medium.text-gray-900.mb-4{"aria-label": t('.suggestions')}
-        = t('.suggestions')
-      #suggestions.space-y-2{"aria-live": "polite", role: "list"}
-        = render "messages/suggestions", suggestions: @suggestions
-
-  %div{data: { controller: "audio-recorder",
-               audio_recorder_conversation_id_value: @conversation.id }}
-    .fixed.bottom-4.right-4.w-80.space-y-4
-      .bg-white.rounded-lg.shadow-lg.p-4{"aria-labelledby": "speech-recognition-title"}
-        %h3#speech-recognition-title.text-sm.font-medium.text-gray-700.mb-2= t('.recognized_text')
-        %div{data: { audio_recorder_target: "recognizedText" },
-             class: "text-gray-600 min-h-[3rem]",
-             "aria-live": "polite",
-             role: "status"}
-          %em.text-gray-400= t('.waiting_for_speech')
-        
-        .mt-4.flex.justify-center
-          %button.p-2.bg-gray-100.rounded-full.shadow-sm.hover:bg-gray-200.transition-colors{
-            "aria-label": t('.toggle_recording'),
-            role: "switch",
-            "aria-checked": "false",
-            data: { audio_recorder_target: "recordButton",
-                   action: "click->audio-recorder#toggleRecording" }}
-            %div{data: { audio_recorder_target: "indicator" },
-                 "aria-hidden": "true"}
-              = heroicon("microphone", options: { class: "h-6 w-6" }, variant: :solid) 
+            "data-action": "click->audio-recorder#toggleRecording"}
+            = heroicon "microphone", 
+              options: { class: "h-6 w-6 text-gray-400", "data-audio-recorder-target": "indicator" } 

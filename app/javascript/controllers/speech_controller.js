@@ -1,38 +1,69 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["input"]
+  static targets = ["input", "speakButton"]
   static values = {
     voiceId: String,
     apiKey: String,
-    mode: String  // 'submit' oder 'speak'
+    text: String
   }
 
   connect() {
     console.log("Speech controller connected")
+    // Bind the handler first
+    this.handleSpeechStart = this.handleSpeechStart.bind(this)
+    window.addEventListener('speech:starting', this.handleSpeechStart)
+  }
+
+  disconnect() {
+    console.log("Speech controller disconnecting")
+    window.removeEventListener('speech:starting', this.handleSpeechStart)
+  }
+
+  handleSpeechStart() {
+    window.dispatchEvent(new Event('speech:pauseRecording'))
   }
   
   async speak(event) {
     if (event) event.preventDefault()
-    const text = this.inputTarget.value
     
-    if (this.hasApiKey) {
-      await this.speakWithElevenLabs(text)
-    } else {
-      await this.speakWithBrowser(text)
+    console.log("Speech starting...")
+    // Explicitly stop ALL recording before speaking
+    const recorder = document.querySelector('[data-controller="audio-recorder"]')
+    if (recorder) {
+      const recorderController = this.application.getControllerForElementAndIdentifier(recorder, 'audio-recorder')
+      if (recorderController) {
+        console.log("Found recorder, stopping...")
+        recorderController.forceStopRecording()
+      }
+    }
+    
+    const text = this.inputTarget.value || this.textValue
+    console.log("Speaking text:", text)
+    
+    try {
+      if (this.hasApiKey) {
+        await this.speakWithElevenLabs(text)
+      } else {
+        await this.speakWithBrowser(text)
+      }
+    } catch (error) {
+      console.error("Error in speak:", error)
     }
   }
 
   async speakAndSubmit(event) {
     if (event) event.preventDefault()
-    const form = event.target.closest('form')
+    const form = this.element.closest('form')
     
     try {
       // Erst sprechen
       await this.speak(event)
       
       // Dann Formular absenden
-      if (form) form.requestSubmit()
+      if (form) {
+        form.requestSubmit()
+      }
     } catch (error) {
       console.error("Error in speakAndSubmit:", error)
     }

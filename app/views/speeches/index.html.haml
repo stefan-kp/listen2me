@@ -27,7 +27,4 @@
     %section.lg:col-span-1{"aria-labelledby": "frequent-title"}
       %h2#frequent-title.text-lg.font-medium.text-gray-900.mb-4= t('.frequently_used')
       #frequent_sentences.bg-white.shadow.sm:rounded-lg.divide-y.divide-gray-200{role: "list", "aria-label": t('.frequent_sentences')}
-        = render partial: 'sentence', collection: @frequent_sentences
-
-  - content_for :keyboard_shortcuts do
-    = render 'shared/keyboard_help' 
+        = render partial: 'sentence', collection: @frequent_sentences 

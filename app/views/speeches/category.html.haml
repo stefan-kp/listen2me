@@ -20,7 +20,4 @@
         = render partial: 'sentence', collection: @sentences
       - else
         %p.p-4.text-center.text-gray-500{"aria-label": t('.no_sentences')}
-          = t('.no_sentences')
-
-  - content_for :keyboard_shortcuts do
-    = render 'shared/keyboard_help' 
+          = t('.no_sentences') 

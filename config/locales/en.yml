@@ -206,6 +206,7 @@ en:
       toggle_recording: "Toggle voice recording"
       recording_active: "Recording in progress"
       recording_inactive: "Recording stopped"
+      enter_message: "Enter message..."
     index:
       title: "My Conversations"
       new_conversation: "New Conversation"
@@ -282,3 +283,12 @@ en:
       cancel: "Cancel"
     update:
       category_updated: "Category was successfully updated"
+
+  speech_recognition:
+    errors:
+      network: "Network error - Connection to speech recognition service failed"
+      not_allowed: "Microphone access was denied"
+      audio_capture: "No microphone found"
+      aborted: "Speech recognition was interrupted"
+      default: "Error during speech recognition"
+      unsupported: "Speech recognition is not supported in this browser. Please use Chrome, Edge or Safari."
