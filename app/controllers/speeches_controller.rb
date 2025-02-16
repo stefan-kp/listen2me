@@ -8,6 +8,7 @@ class SpeechesController < ApplicationController
     # Fügen Sie einen Titel für Screen Reader hinzu
     @page_title = t(".frequent_sentences")
     @page_description = t(".frequent_sentences_description")
+    @category = Category.find_by(name: "Basic Needs")
   end
 
   def create

@@ -10,7 +10,7 @@
     = f.label :category_id, t('.select_category'), class: "form-label"
     = f.select :category_id,
       Category.all.map { |c| [c.name, c.id] },
-      { selected: Category.find_by(name: 'General')&.id },
+      { selected: @category.try(:id) },
       { class: "form-select" }
 
   .flex.justify-end.mt-4
