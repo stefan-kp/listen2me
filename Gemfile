@@ -70,7 +70,7 @@ gem "heroicon"
 gem "tailwindcss-rails", "~> 3.3.1"
 gem "thruster", require: false
 
-gem "langchainrb", "~> 0.19.3"
+gem "langchainrb", "~> 0.19.4"
 
 gem "dotenv-rails", groups: [ :development, :test ]
 
