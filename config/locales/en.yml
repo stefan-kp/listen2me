@@ -322,27 +322,28 @@ en:
 
   suggestion_service:
     summary_prompt: |
+      You are a speech assistant communicating with a patient who is unable to speak. Your task is to extract meaningful information about the patient.
+      This information will then be used for the speech assistant's suggestions, so it's important that you extract the information accurately and completely.
+      
       Please analyze these conversations and create a detailed summary in markdown format.
+      The summary should be in the same language as the conversations.
+      
       Structure the information as follows:
 
-      ## User Profile
-      ### Preferences
-      - [List preferences]
-      
-      ### Daily Routines
-      - [List routines]
-      
-      ### Relationships
-      - [List relationships]
-      
-      ### Frequent Topics
-      - [List topics]
-      
-      ## Conversation Partners
-      ### [Partner Name/Role]
-      - Relationship: [Description]
-      - Communication Style: [Description]
-      - Typical Interactions: [Description]
+      1. The User/Patient:
+      - Personal preferences
+      - Medical needs, especially required medications
+      - Daily routines or habits
+      - Important relationships or contacts
+      - Frequently discussed topics
+      - Preferred foods and beverages
+      - Hobbies, preferred activities, shows, books, computer games
+
+      2. The Conversation Partners/Assistants:
+      - Names or identifiers used
+      - Roles or relationships to the user
+      - Communication patterns
+      - Family and friends
 
       Only include information explicitly mentioned in the conversations.
       Maintain privacy by excluding sensitive medical details.

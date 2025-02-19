@@ -285,19 +285,25 @@ de:
 
   suggestion_service:
     summary_prompt: |
+      Du bist ein Sprachassistent, der mit einem Patienten kommuniziert, der nicht mehr in der Lage ist, selbst zu sprechen. Deine Aufgabe ist es, sinnvolle Informationen über den Patienten zu extrahieren.
+      Diese Informationen werden dann für die Vorschläge des Sprachassistenten verwendet, deswegen ist es wichtig, dass du die Informationen genau und vollständig extrahierst.
       Bitte analysiere diese Gespräche und extrahiere wichtige Informationen über:
       
       1. Den Benutzer/Patienten:
       - Persönliche Vorlieben
-      - Medizinische Bedürfnisse
+      - Medizinische Bedürfnisse, insbesondere benötigte Medikamente
       - Tagesabläufe oder Gewohnheiten
       - Wichtige Beziehungen oder Kontakte
       - Häufig besprochene Themen
+      - bevorzugte Nahrungsmittel, Getränke
+      - Hobbies, bevorzugte Aktivitäten, Sendungen, Bücher, Computer-Spiele
+      
       
       2. Die Gesprächspartner/Assistenten:
       - Verwendete Namen oder Bezeichnungen
       - Rollen oder Beziehungen zum Benutzer
       - Kommunikationsmuster
+      - Familien und Freunde
       
       Berücksichtige nur Informationen, die explizit in den Gesprächen erwähnt wurden.
       Wahre die Privatsphäre, indem du sensible medizinische Details ausschließt.
