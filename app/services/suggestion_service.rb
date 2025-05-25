@@ -1,9 +1,27 @@
+# For optimal performance, the Conversation object passed to this service
+# should be preloaded with the following associations:
+#   conversation = Conversation.includes(:messages, :user, initial_sentence: [:category]).find(id)
+#   SuggestionService.new(conversation)
 class SuggestionService
   attr_reader :last_message
   def initialize(conversation)
     @conversation = conversation
     @user = conversation.user
-    klass = case @conversation.user.llm_provider
+    @llm_provider = @user.llm_provider # Store for convenience
+    @api_key = @user.llm_api_key # Get API key from user attribute
+
+    # It's good practice to check if the api_key is present,
+    # especially if it's critical for the service's operation.
+    if @api_key.blank?
+      # You might want to raise an error or handle this case appropriately,
+      # depending on whether an API key is always required.
+      # For example:
+      # raise "API key for #{@llm_provider} is missing for user #{@user.id}"
+      # For now, we'll allow it to proceed, and the LLM library will likely fail.
+      Rails.logger.warn "User #{@user.id} has a blank API key for provider #{@llm_provider}."
+    end
+
+    klass = case @llm_provider
     when "openai"
               Langchain::LLM::OpenAI
     when "anthropic"
@@ -11,13 +29,13 @@ class SuggestionService
     when "gemini"
               Langchain::LLM::GoogleGemini
     else
-              raise "Unknown LLM provider: #{@conversation.user.llm_provider}"
+              raise "Unknown LLM provider: #{@llm_provider}"
     end
     @llm = klass.new(
-      api_key: @conversation.user.llm_api_key,
+      api_key: @api_key, # Use the key from user attribute
       default_options: {
         temperature: 0.7,
-        chat_model: @conversation.user.llm_model
+        chat_model: @user.llm_model # llm_model is still from user preferences
       }
     )
   end
@@ -75,15 +93,29 @@ class SuggestionService
   end
 
   def parse_suggestions(completion)
-    # Parse the completion which should be in array format
-
-    JSON.parse(completion).with_indifferent_access[:response]
-  rescue
     begin
-      eval(completion)
-    rescue
-      # Fallback if parsing fails
-      completion.split("\n").map { |s| s.gsub(/^\d+\.\s*/, "") }
+      # Ensure completion is not blank, as JSON.parse would error on empty string
+      if completion.blank?
+        Rails.logger.warn "LLM completion was blank. Cannot parse suggestions."
+        return []
+      end
+
+      parsed_json = JSON.parse(completion)
+
+      # Check if the expected key "response" exists and is an array
+      if parsed_json.is_a?(Hash) && parsed_json.key?("response") && parsed_json["response"].is_a?(Array)
+        # Optionally, you could also check if elements in the array are strings
+        # e.g., parsed_json["response"].all?(String)
+        return parsed_json["response"]
+      else
+        Rails.logger.error "LLM response JSON does not have the expected structure. Missing 'response' key or it's not an array."
+        Rails.logger.error "Received JSON: #{completion}" # Log the problematic JSON string
+        return []
+      end
+    rescue JSON::ParserError => e
+      Rails.logger.error "Failed to parse LLM response as JSON: #{e.message}"
+      Rails.logger.error "Problematic string: #{completion}" # Log the problematic string
+      return []
     end
   end
 
@@ -141,13 +173,30 @@ class SuggestionService
   end
 
   def create_llm_client
-    case @user.llm_provider
+    # Ensure @api_key is available (now sourced from user.llm_api_key).
+    # A check for blankness was already done in initialize, but an explicit check here
+    # before use by specific clients can be useful if the service's lifecycle is complex.
+    if @api_key.blank?
+      # This situation indicates that the user does not have an API key configured
+      # for the selected provider. The specific client libraries might handle
+      # nil/blank keys differently (some might error, some might try default env vars).
+      # Raising an error here can make debugging easier.
+      raise "User #{@user.id} has a blank API key for provider #{@llm_provider}. Cannot create LLM client."
+    end
+
+    case @llm_provider # Use @llm_provider instance variable
     when 'openai'
-      OpenAI::Client.new(access_token: @user.llm_api_key)
+      OpenAI::Client.new(access_token: @api_key)
     when 'anthropic'
-      Anthropic::Client.new(access_token: @user.llm_api_key)
+      Anthropic::Client.new(access_token: @api_key)
     when 'gemini'
-      Google::Gemini::Client.new(access_token: @user.llm_api_key)
+      # Note: The Google::Gemini::Client might expect the key differently.
+      # Assuming it also accepts `access_token`. Adjust if necessary.
+      Google::Gemini::Client.new(access_token: @api_key)
+    else
+      # This case should ideally not be reached if User model validation for llm_provider is effective
+      # and the case statement in `initialize` is aligned with User::ALLOWED_LLM_PROVIDERS.
+      raise I18n.t('suggestion_service.errors.unsupported_provider', provider: @llm_provider)
     end
   end
 end

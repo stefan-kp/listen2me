@@ -68,7 +68,6 @@ gem "haml-rails"
 gem "heroicon"
 
 gem "tailwindcss-rails", "~> 3.3.1"
-gem "thruster", require: false
 
 gem "langchainrb", "~> 0.19.3"
 
