@@ -1,0 +1,18 @@
+%nav.l2m-bottom-nav{role: "navigation", "aria-label": t(".mobile_navigation", default: "Mobile Hauptnavigation")}
+  = link_to speeches_path,
+    class: ["l2m-bottom-link", ("is-active" if controller_name == "speeches")].compact.join(" "),
+    "aria-current": ("page" if controller_name == "speeches") do
+    = heroicon "speaker-wave", options: { class: "h-6 w-6", "aria-hidden": "true" }
+    %span= t("shared.header.speeches")
+
+  = link_to new_conversation_path,
+    class: ["l2m-bottom-link", ("is-active" if controller_name == "conversations" && action_name != "index")].compact.join(" "),
+    "aria-current": ("page" if controller_name == "conversations" && action_name != "index") do
+    = heroicon "chat-bubble-left-right", options: { class: "h-6 w-6", "aria-hidden": "true" }
+    %span= t("shared.header.conversation_mode", default: "Gespräch")
+
+  = link_to settings_path,
+    class: ["l2m-bottom-link", ("is-active" if controller_name == "settings")].compact.join(" "),
+    "aria-current": ("page" if controller_name == "settings") do
+    = heroicon "cog-6-tooth", options: { class: "h-6 w-6", "aria-hidden": "true" }
+    %span= t("shared.header.settings_short", default: "Einstellungen")

@@ -1,0 +1,150 @@
+- conversation_id = @conversation&.persisted? ? @conversation.id : nil
+- suggestion_locale = I18n.locale.to_s.start_with?("de") ? "de" : "en"
+- default_suggestions = SuggestionService::FALLBACK_SUGGESTIONS.fetch(suggestion_locale).map { |suggestion| suggestion["content"] }
+- normalized_suggestions = Array(@suggestions).filter_map { |suggestion| suggestion.respond_to?(:[]) ? (suggestion["content"] || suggestion[:content]) : suggestion.to_s.presence }.first(3)
+- normalized_suggestions = default_suggestions unless normalized_suggestions.length == 3
+
+.l2m-page.l2m-conversation-page{
+  data: {
+    controller: "conversation audio-recorder",
+    action: "audio-recorder:transcript->conversation#receivePartner",
+    conversation_conversation_id_value: conversation_id,
+    conversation_create_url_value: conversations_path,
+    conversation_message_url_template_value: conversation_messages_path(conversation_id: "__ID__"),
+    conversation_suggestions_url_template_value: suggestions_conversation_path(id: "__ID__"),
+    conversation_show_url_template_value: conversation_path(id: "__ID__"),
+    conversation_fallback_suggestions_value: default_suggestions,
+    conversation_own_label_value: t(".you", default: "Du"),
+    conversation_partner_label_value: t(".partner", default: "Gegenüber"),
+    conversation_direct_action_value: t(".immediate", default: "Sofort"),
+    conversation_draft_action_value: t(".write", default: "Schreiben"),
+    conversation_direct_help_value: t(".direct_help", default: "Ein Tipp spricht die Antwort sofort. Oben kannst du zu „Erst schreiben“ wechseln."),
+    conversation_draft_help_value: t(".draft_help", default: "Ein Tipp übernimmt die Antwort ins Textfeld. Dort kannst du sie ändern und sprechen."),
+    conversation_preparing_status_value: t(".preparing_status", default: "Gespräch wird vorbereitet …"),
+    conversation_active_status_value: t(".active_label", default: "Gespräch aktiv"),
+    conversation_speaking_status_value: t(".speaking_status", default: "Antwort wird gesprochen …"),
+    conversation_suggestions_status_value: t(".suggestions_status", default: "Neue Vorschläge werden vorbereitet …"),
+    conversation_setup_error_value: t(".setup_error", default: "Das Gespräch konnte nicht gestartet werden. Bitte lade die Seite erneut."),
+    conversation_save_error_value: t(".save_error", default: "Der Beitrag konnte nicht gespeichert werden. Du kannst ihn erneut versuchen."),
+    conversation_speech_error_value: t(".speech_error", default: "Die Sprachausgabe ist in diesem Browser nicht verfügbar."),
+    audio_recorder_active_status_value: t(".active_label", default: "Gespräch aktiv"),
+    audio_recorder_ready_status_value: t(".preparing", default: "Gespräch bereit"),
+    audio_recorder_stopped_status_value: t(".listening_stopped", default: "Zuhören pausiert"),
+    audio_recorder_included_detail_value: t(".partner_included", default: "Das Gegenüber wird berücksichtigt."),
+    audio_recorder_unavailable_detail_value: t(".microphone_unavailable", default: "Mikrofon nicht verfügbar. Partnertext kann unten eingegeben werden."),
+    audio_recorder_recognized_detail_value: t(".recognized", default: "Beitrag erkannt."),
+    audio_recorder_listening_prefix_value: t(".listening_prefix", default: "Hört zu:"),
+    audio_recorder_interrupted_detail_value: t(".interrupted", default: "Zuhören wurde unterbrochen. Neuer Versuch …"),
+    audio_recorder_paused_detail_value: t(".paused", default: "Zuhören pausiert während der Sprachausgabe."),
+    audio_recorder_user_paused_detail_value: t(".user_paused", default: "Das Mikrofon ist pausiert."),
+    audio_recorder_pause_label_value: t(".pause_microphone", default: "Mikrofon pausieren"),
+    audio_recorder_resume_label_value: t(".resume_microphone", default: "Mikrofon wieder einschalten")
+  },
+  "aria-labelledby": "conversation-title"}
+  .l2m-conversation-topbar
+    = link_to speeches_path, class: "l2m-back-link" do
+      %span{"aria-hidden": "true"} ←
+      = t(".back", default: "Zurück")
+    %span.l2m-demo-pill= t(".demo_badge", default: "Gesprächs-Demo")
+
+  .l2m-conversation-heading
+    %div
+      %p.l2m-eyebrow= t(".eyebrow", default: "Gesprächsmodus")
+      %h1#conversation-title= t(".headline", default: "Zuhören. Vorschlagen. Du entscheidest.")
+      %p.l2m-lead= t(".lead", default: "In diesem Modus wird das Gegenüber automatisch einbezogen. Du entscheidest, welche Antwort gesprochen wird.")
+    .l2m-listen-card
+      %span.l2m-listen-indicator{data: { audio_recorder_target: "indicator" }, "aria-hidden": "true"}
+      %div
+        %span= t(".active_label", default: "Gespräch aktiv")
+        %strong{
+          role: "status",
+          "aria-live": "polite",
+          "aria-atomic": "true",
+          data: { audio_recorder_target: "status" }}
+          = t(".preparing", default: "Gespräch bereit")
+        %small{
+          "aria-live": "off",
+          data: { audio_recorder_target: "detail" }}
+          = t(".partner_included", default: "Das Gegenüber wird berücksichtigt.")
+        %span.sr-only{
+          role: "status",
+          "aria-live": "polite",
+          "aria-atomic": "true",
+          data: { conversation_target: "status" }}
+          = t(".active", default: "Aktiv")
+      %button.l2m-listen-toggle{
+        type: "button",
+        "aria-pressed": "false",
+        data: {
+          action: "click->audio-recorder#toggle",
+          audio_recorder_target: "toggle"
+        }}
+        = t(".pause_microphone", default: "Mikrofon pausieren")
+
+  %p.l2m-inline-error{hidden: true, role: "alert", data: { conversation_target: "error" }}
+
+  .l2m-conversation-workspace
+    %section.l2m-transcript-card{"aria-labelledby": "transcript-title"}
+      .l2m-card-heading
+        %div
+          %p.l2m-section-kicker= t(".conversation", default: "Gespräch")
+          %h2#transcript-title= t(".live_history", default: "Live-Verlauf")
+        = heroicon "microphone", options: { class: "h-6 w-6", "aria-hidden": "true" }
+
+      #messages.l2m-transcript{
+        role: "log",
+        "aria-live": "polite",
+        "aria-label": t(".messages_list", default: "Gesprächsbeiträge"),
+        data: { conversation_target: "messages" }}
+        - if @messages.present?
+          = render partial: "messages/message", collection: @messages
+        - else
+          %p.l2m-empty-state= t(".waiting", default: "Das Gespräch ist bereit. Sprich mit deinem Gegenüber oder nutze das Demo-Eingabefeld.")
+
+      %details.l2m-partner-fallback{data: { audio_recorder_target: "manualFallback" }}
+        %summary= t(".manual_partner", default: "Beitrag des Gegenübers eingeben")
+        %form{data: { action: "submit->conversation#receivePartner" }}
+          %label{for: "partner-message"}= t(".partner_label", default: "Was hat das Gegenüber gesagt?")
+          .l2m-inline-composer
+            %input#partner-message{
+              type: "text",
+              maxlength: 240,
+              placeholder: t(".partner_placeholder", default: "Zum Beispiel: Möchtest du etwas trinken?"),
+              data: { conversation_target: "partnerInput" }}
+            %button.l2m-button.l2m-button-secondary{type: "submit"}= t(".add", default: "Übernehmen")
+      %p.l2m-privacy-note= t(".storage_note", default: "Beiträge werden in diesem Demo-Konto gespeichert. Mit eingerichteter KI können Gesprächsinhalte an den gewählten Anbieter gesendet werden.")
+
+    %aside.l2m-suggestion-card{"aria-labelledby": "suggestion-title"}
+      .l2m-card-heading
+        %div
+          %p.l2m-section-kicker= t(".reply_suggestions", default: "Antwortvorschläge")
+          %h2#suggestion-title= t(".what_reply", default: "Was möchtest du antworten?")
+        %span.l2m-spark{"aria-hidden": "true"} ✦
+      %p.l2m-suggestion-help{data: { conversation_target: "suggestionHelp" }}
+      #suggestions.l2m-suggestion-list{
+        data: { conversation_target: "suggestions" },
+        "aria-live": "polite"}
+        - normalized_suggestions.each do |suggestion|
+          %button.l2m-suggestion-button{
+            type: "button",
+            data: {
+              action: "click->conversation#useSuggestion",
+              conversation_text_param: suggestion
+            }}
+            %span= suggestion
+            %small= t(".immediate", default: "Sofort")
+
+      %form.l2m-conversation-composer{data: { action: "submit->conversation#speakOwn" }}
+        %label{for: "conversation-message"}= t(".your_answer", default: "Deine Antwort")
+        %textarea#conversation-message{
+          rows: 3,
+          maxlength: 240,
+          placeholder: t(".answer_placeholder", default: "Vorschlag wählen oder selbst schreiben …"),
+          data: { conversation_target: "input" }}
+        %button.l2m-speak-button.l2m-speak-button-wide{type: "submit"}
+          %span.l2m-speak-wave{"aria-hidden": "true"}
+            %i
+            %i
+            %i
+            %i
+          = t(".speak_answer", default: "Antwort sprechen")

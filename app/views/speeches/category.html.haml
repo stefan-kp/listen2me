@@ -1,23 +1,26 @@
-.max-w-7xl.mx-auto.px-4.sm:px-6.lg:px-8.py-8{"aria-labelledby": "category-title"}
-  .flex.items-center.justify-between.mb-8
-    .flex.items-center.gap-4
-      = link_to speeches_path, 
-        class: "text-gray-600 hover:text-gray-900", 
-        role: "button",
-        "aria-label": t('.back_to_categories') do
-        = heroicon "arrow-left", options: { class: "h-5 w-5", "aria-hidden": "true" }
-      %h1#category-title.text-2xl.font-bold.text-gray-900.flex.items-center.gap-2
-        = heroicon @category.icon_name, options: { class: "h-8 w-8 text-gray-500", "aria-hidden": "true" }
+.l2m-page{"aria-labelledby": "category-title"}
+  .l2m-conversation-topbar
+    = link_to speeches_path, class: "l2m-back-link", "aria-label": t(".back_to_categories") do
+      %span{"aria-hidden": "true"} ←
+      = t(".back")
+
+  .l2m-view-heading
+    %div
+      %p.l2m-eyebrow= t(".category_label", default: "Satzkategorie")
+      %h1#category-title
         = @category.name
+    = heroicon @category.icon_name, options: { class: "h-10 w-10 text-emerald-800", "aria-hidden": "true" }
 
-  .mb-8
-    = render 'text_form'
+  = render "text_form"
 
-  %section{"aria-labelledby": "sentences-title"}
-    %h2#sentences-title.sr-only= t('.category_sentences', category: @category.name)
-    .bg-white.shadow.sm:rounded-lg.divide-y.divide-gray-200{role: "list", "aria-label": t('.sentences_list')}
+  %section.l2m-phrases-section{"aria-labelledby": "sentences-title"}
+    .l2m-section-heading
+      %div
+        %p.l2m-section-kicker= t(".quick_sentences", default: "Schnelle Sätze")
+        %h2#sentences-title= t(".category_sentences", category: @category.name)
+    .l2m-phrase-grid{role: "list", "aria-label": t(".sentences_list")}
       - if @sentences.any?
-        = render partial: 'sentence', collection: @sentences
+        = render partial: "sentence", collection: @sentences
       - else
-        %p.p-4.text-center.text-gray-500{"aria-label": t('.no_sentences')}
-          = t('.no_sentences') 
+        %p.l2m-empty-state{"aria-label": t(".no_sentences")}
+          = t(".no_sentences")

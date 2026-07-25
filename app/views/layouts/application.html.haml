@@ -16,7 +16,24 @@
     
     %title= content_for?(:title) ? "#{yield(:title)} - Listen2Me" : "Listen2Me"
 
-  %body.relative
+  - body_controllers = user_signed_in? ? "speech-mode communicator" : nil
+  %body.l2m-body{
+    data: {
+      controller: body_controllers,
+      speech_mode_direct_status_value: t("shared.header.direct_status", default: "Satzkarten sprechen sofort."),
+      speech_mode_draft_status_value: t("shared.header.draft_status", default: "Satzkarten werden zuerst ins Textfeld übernommen."),
+      communicator_speaking_status_value: t("speeches.interaction.speaking", default: "Wird gesprochen …"),
+      communicator_ready_status_value: t("speeches.interaction.ready", default: "Bereit"),
+      communicator_unavailable_status_value: t("speeches.interaction.unavailable", default: "Sprachausgabe ist in diesem Browser nicht verfügbar."),
+      communicator_save_error_status_value: t("speeches.interaction.save_error", default: "Gesprochen, aber nicht gespeichert."),
+      communicator_spoken_at_label_value: t("speeches.interaction.spoken_at", default: "Gesprochen um"),
+      communicator_direct_action_value: t("speeches.sentence.direct_action", default: "Sofort"),
+      communicator_draft_action_value: t("speeches.sentence.draft_action", default: "Schreiben"),
+      communicator_direct_suggestion_label_value: t("speeches.interaction.direct_suggestion_label", default: "sofort sprechen"),
+      communicator_draft_suggestion_label_value: t("speeches.interaction.draft_suggestion_label", default: "zuerst schreiben"),
+      communicator_followup_rules_value: t("speeches.interaction.followup_rules", default: []),
+      communicator_default_followups_value: t("speeches.interaction.default_followups", default: [])
+    }}
     .skip-nav
       = link_to t('.skip_to_main'), '#main-content', 
         class: 'skip-link',
@@ -25,9 +42,11 @@
     = render 'shared/header'
     = render 'shared/flash_messages'
     
-    %main#main-content{tabindex: -1, role: "main"}
+    %main#main-content.l2m-main{tabindex: -1, role: "main"}
       = yield
+
+    = render "shared/bottom_navigation" if user_signed_in?
       
     - if content_for?(:keyboard_shortcuts)
       %footer{role: "contentinfo", "aria-label": t('.keyboard_shortcuts')}
-        = yield(:keyboard_shortcuts) 
+        = yield(:keyboard_shortcuts)

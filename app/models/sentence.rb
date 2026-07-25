@@ -3,7 +3,7 @@ class Sentence < ApplicationRecord
   belongs_to :category, optional: true
   belongs_to :language
 
-  validates :content, presence: true
+  validates :content, presence: true, length: { maximum: 240 }
   validates :language, presence: true
 
   before_create :set_initial_count

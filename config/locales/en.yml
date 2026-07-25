@@ -38,6 +38,11 @@ en:
       enter_text_aria: "Enter text to be spoken"
       select_category_aria: "Select category for the text"
       speak_button_aria: "Speak the entered text"
+      just_spoken: "Just spoken"
+      repeat: "Repeat"
+      edit: "Edit"
+      direct_hint: "Sentence cards speak immediately."
+      draft_hint: "Sentence cards are copied here first."
 
     conversation_form:
       <<: *text_form_en
@@ -55,6 +60,31 @@ en:
       frequent_sentences: "Frequently used sentences"
       frequent_sentences_description: "List of most frequently used sentences"
       confirm_delete: "Do you really want to delete this sentence?"
+      eyebrow: "Communicate"
+      headline: "What would you like to say?"
+      own_mode_hint: "Here you compose your own sentences. The other person is not included."
+      one_tap: "1 tap"
+      one_tap_title: "Answers that speak immediately"
+      help_note: "“Help” only speaks the sentence and does not trigger an emergency call."
+      "yes": "Yes"
+      "no": "No"
+      stop: "Stop"
+      help_sentence: "I need help"
+      help: "Help"
+      speak_immediately: "Speak %{text} immediately"
+      contextual: "Continue with context"
+      next_sentence: "You could say this next"
+      new_topic: "New topic"
+      three_suggestions: "Three short suggestions are ready."
+      quick_sentences: "Quick sentences"
+      no_sentences: "Your frequently used sentences will appear here."
+      history: "History"
+      recently_spoken: "Recently spoken"
+      recent_empty: "Your spoken sentences will appear here."
+      conversation_promo_label: "Conversation"
+      conversation_promo_title: "Include the other person"
+      conversation_promo_copy: "In Conversation, Listen2Me also considers what the other person says."
+      start_conversation: "Start conversation"
 
     category:
       <<: *text_form_en
@@ -82,6 +112,35 @@ en:
       category_label: "Category: %{name}"
       delete_sentence: "Delete sentence: %{text}"
       speak_sentence: "Speak sentence: %{text}"
+      draft_sentence: "Write sentence first: %{text}"
+      direct_action: "Speak now"
+      draft_action: "Write first"
+
+    interaction:
+      speaking: "Speaking …"
+      ready: "Ready"
+      unavailable: "Speech output is not available in this browser."
+      save_error: "The sentence was spoken but could not be saved."
+      spoken_at: "Spoken at"
+      direct_suggestion_label: "speak immediately"
+      draft_suggestion_label: "write first"
+      default_followups:
+        - "That works for me."
+        - "One moment, please."
+        - "I would like to add something."
+      followup_rules:
+        - terms: ["thirsty", "drink", "water"]
+          suggestions: ["Water, please.", "Just a small sip.", "Please put it here."]
+        - terms: ["help"]
+          suggestions: ["Please come over for a moment.", "I will show you what I need.", "Please help me stand up."]
+        - terms: ["pain", "hurts"]
+          suggestions: ["It hurts here.", "Please wait a moment.", "I would like to sit differently."]
+        - terms: ["tired", "rest"]
+          suggestions: ["Please be a little quieter.", "Please leave me alone for a moment.", "Please wake me later."]
+        - terms: ["toilet", "bathroom"]
+          suggestions: ["Please come with me.", "I need help with that.", "Please wait outside the door."]
+        - terms: ["hungry", "food", "eat"]
+          suggestions: ["Something small, please.", "I will tell you what I feel like eating.", "Later, please."]
 
   languages:
     german: "German"
@@ -89,30 +148,29 @@ en:
 
   suggestions:
     system_prompt: |
-      You are a language assistant communicating with a patient who is unable to speak. Your task is to provide meaningful suggestions for communication word-finding. The output should be in JSON format to adapt the response suggestions.
-      You always generate suggestions for the patient. This means, put yourself in their position and think about what they would say next.
+      You are a communication assistant for a person who uses text as their voice. Create short, natural suggestions for what that person might say next.
+      Always generate suggestions from the speaker's point of view, never from the other person's point of view.
 
       # Details
 
-      - The patient can type responses that you will process
-      - As a language assistant, you should provide context-related suggestions for possible answers
-      - When the patient talks about a topic, like food, make appropriate suggestions (e.g., "I would like a pizza" or "I would like some bread")
+      - The speaker can type responses
+      - Provide context-related suggestions for possible answers
+      - For example, when the topic is food, suggest fitting replies such as "I would like a pizza" or "I would like some bread"
       - The response suggestions should always be in the same JSON format: an array with a list of messages, each containing a "content" attribute
-      - I will give you both the patient's responses/questions and the messages of a third person in the room. These have the role "Patient". And I will give you the messages of a third person in the room. These have the role "Visitor".
-      - The last message of the patient/visitor is always at the end of the conversation. This gives you the important information for the suggestions. The previous messages are important for the context.
-      - I will give you also a description of the patient (user_description), which contains important context information
-      - I will give you also the conversation summary (summary), which contains important context information
+      - The speaker's messages have the role "speaker"; the other person's messages have the role "partner"
+      - The last message is especially important for the next suggestion; earlier messages provide context
+      - The optional description (user_description) and conversation summary (summary) provide additional context
       - I will give you also the category of the sentence (category), which contains important context information
       # Steps
 
-      1. Process the patient's input
+      1. Process the latest message
       2. Identify the context of communication (e.g., topics like food, drinks, activities)
       3. Create context-related response suggestions
       4. Structure the suggestions in JSON format
 
       # Output Format
 
-      The output must be in JSON format and always an array with at least 4 objects:
+      The output must be JSON with exactly 3 objects:
 
       ```json
       {
@@ -122,8 +180,12 @@ en:
           },
           {
               "content": "[Suggestion2]"
+          },
+          {
+              "content": "[Suggestion3]"
           }
-      ]
+        ]
+      }
       ```
 
       # Examples
@@ -131,7 +193,7 @@ en:
       ## Example 1
 
       ### Input
-      Patient enters "I'm hungry"
+      The speaker enters "I'm hungry"
 
       ### Output
       ```json
@@ -141,6 +203,9 @@ en:
           },
           {
               "content": "I would like some bread"
+          },
+          {
+              "content": "Something small, please"
           }
       ]
       ```
@@ -148,7 +213,7 @@ en:
       ## Example 2
 
       ### Input
-      Patient says "I want something to drink"
+      The speaker says "I want something to drink"
 
       ### Output
       ```json
@@ -158,6 +223,9 @@ en:
           },
           {
               "content": "I would like some juice"
+          },
+          {
+              "content": "Just a small sip, please"
           }
       ]
       ```
@@ -191,12 +259,60 @@ en:
         password_confirmation: "Password Confirmation"
 
   messages:
+    message:
+      you: "You"
+      partner: "Other person"
     form:
       enter_message: "Enter message..."
       speak: "Speak"
       send: "Send"
 
   conversations:
+    workspace:
+      back: "Back"
+      demo_badge: "Conversation demo"
+      eyebrow: "Conversation mode"
+      headline: "Listen. Suggest. You decide."
+      lead: "In this mode the other person is included automatically. You decide which answer is spoken."
+      active_label: "Conversation active"
+      preparing: "Conversation ready"
+      partner_included: "The other person is included."
+      active: "Active"
+      conversation: "Conversation"
+      live_history: "Live transcript"
+      messages_list: "Conversation messages"
+      waiting: "The conversation is ready. Talk to the other person or use the demo input."
+      manual_partner: "Enter the other person's message"
+      partner_label: "What did the other person say?"
+      partner_placeholder: "For example: Would you like something to drink?"
+      add: "Add"
+      reply_suggestions: "Reply suggestions"
+      what_reply: "What would you like to answer?"
+      immediate: "Now"
+      your_answer: "Your answer"
+      answer_placeholder: "Choose a suggestion or write your own …"
+      speak_answer: "Speak answer"
+      you: "You"
+      partner: "Other person"
+      write: "Write"
+      direct_help: "One tap speaks the answer immediately. You can switch to “Write first” above."
+      draft_help: "One tap copies the answer to the text field so you can edit and speak it."
+      preparing_status: "Preparing conversation …"
+      speaking_status: "Speaking answer …"
+      suggestions_status: "Preparing new suggestions …"
+      setup_error: "The conversation could not be started. Please reload the page."
+      save_error: "The message could not be saved. You can try again."
+      speech_error: "Speech output is not available in this browser."
+      microphone_unavailable: "Microphone unavailable. You can enter the other person's text below."
+      recognized: "Message recognized."
+      listening_prefix: "Listening:"
+      interrupted: "Listening was interrupted. Trying again …"
+      paused: "Listening pauses during speech output."
+      listening_stopped: "Listening paused"
+      user_paused: "The microphone is paused."
+      pause_microphone: "Pause microphone"
+      resume_microphone: "Turn microphone back on"
+      storage_note: "Messages are stored in this demo account. If AI is configured, conversation content may be sent to the selected provider."
     show:
       conversation: "Conversation"
       back_to_home: "Back to Home"
@@ -233,6 +349,7 @@ en:
       voice_settings: "Voice Settings"
       voice_settings_description: "The ElevenLabs integration is optional. If no API credentials are entered, the browser's speech synthesis will be used automatically. However, ElevenLabs offers more natural speech quality."
       llm_settings: "AI Settings"
+      credential_placeholder: "Leave blank to keep the current key"
       save: "Save Changes"
       conversation_summary: "Conversation Analysis"
       conversation_summary_explanation: "The conversation analysis helps the AI better understand your preferences and communication patterns. It analyzes your past conversations to provide more personalized suggestions. It's recommended to update this analysis periodically as your conversations grow."
@@ -245,10 +362,10 @@ en:
     generate_summary:
       prompt:
         intro: "Please analyze these conversations and extract key information about the participants."
-        user_section: "The user/patient"
+        user_section: "The speaker"
         user_points: |
           - Personal preferences
-          - Medical conditions or needs
+          - Important needs or routines
           - Daily routines or habits
           - Important relationships or contacts
           - Frequently discussed topics
@@ -257,9 +374,9 @@ en:
           - Names or identifiers used
           - Roles or relationships to the user
           - Communication patterns
-        privacy_note: "Only include information that was explicitly mentioned in the conversations. Maintain privacy by excluding sensitive medical details."
+        privacy_note: "Only include information that was explicitly mentioned in the conversations. Exclude sensitive personal details that are not needed for better suggestions."
       success: "Conversation summary was successfully generated"
-      error: "Error generating summary: %{message}"
+      error: "The conversation analysis could not be created. Please try again later."
       errors:
         unsupported_provider: "Unsupported LLM provider: %{provider}"
 
@@ -272,7 +389,20 @@ en:
       home: "Home"
       speeches: "Speech output"
       conversations: "Conversations"
+      conversation_mode: "Conversation"
       sign_in: "Sign in"
+      on_tap: "When tapped"
+      card_behavior: "Sentence card behavior"
+      direct: "Speak immediately"
+      direct_short: "Speak"
+      draft: "Write first"
+      draft_short: "Write"
+      direct_status: "Sentence cards speak immediately."
+      draft_status: "Sentence cards are copied to the text field first."
+      settings: "Profile and settings"
+      settings_short: "Settings"
+    bottom_navigation:
+      mobile_navigation: "Mobile main navigation"
     flash_messages:
       close_message: "Close message"
       success_message: "Success message"
@@ -322,17 +452,16 @@ en:
 
   suggestion_service:
     summary_prompt: |
-      You are a speech assistant communicating with a patient who is unable to speak. Your task is to extract meaningful information about the patient.
-      This information will then be used for the speech assistant's suggestions, so it's important that you extract the information accurately and completely.
+      You are a communication assistant. Extract only helpful, explicitly stated information about the person who uses text as their voice.
+      This information will later be used to create more relevant suggestions.
       
       Please analyze these conversations and create a detailed summary in markdown format.
       The summary should be in the same language as the conversations.
       
       Structure the information as follows:
 
-      1. The User/Patient:
+      1. The Speaker:
       - Personal preferences
-      - Medical needs, especially required medications
       - Daily routines or habits
       - Important relationships or contacts
       - Frequently discussed topics
@@ -346,7 +475,7 @@ en:
       - Family and friends
 
       Only include information explicitly mentioned in the conversations.
-      Maintain privacy by excluding sensitive medical details.
+      Maintain privacy by excluding sensitive personal details that are not needed for better suggestions.
       Use markdown formatting for better readability (headers, lists, emphasis).
     errors:
       unsupported_provider: "Unsupported LLM provider: %{provider}"

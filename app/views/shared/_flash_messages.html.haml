@@ -11,7 +11,7 @@
     role: "alert",
     "aria-live": type == "notice" ? "polite" : "assertive",
     "aria-label": "#{message_type}: #{message}"}
-    .w-96.transform.transition-all.duration-300.ease-out{
+    .l2m-flash-panel.transform.transition-all.duration-300.ease-out{
       data: { flash_target: "message" }}
       .rounded-lg.border.p-4.shadow-md{class: flash_class}
         .flex.items-start.gap-3
@@ -20,8 +20,8 @@
           .flex-1.pt-0.5
             %p.text-sm.font-medium{class: text_class}= message
           .ml-4.flex-shrink-0
-            %button.rounded-md.p-1.transition-colors{
+            %button.l2m-flash-close.rounded-md.p-1.transition-colors{
               class: "#{text_class} hover:bg-opacity-10 hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-#{type == 'notice' ? 'green' : 'red'}-500",
               data: { action: "click->flash#close" },
               "aria-label": t('.close_message')}
-              = heroicon "x-mark", options: { class: "h-5 w-5", "aria-hidden": "true" } 
+              = heroicon "x-mark", options: { class: "h-5 w-5", "aria-hidden": "true" }

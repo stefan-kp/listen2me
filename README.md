@@ -22,14 +22,13 @@ The application supports two types of speech output:
 - Quality depends on browser and installed voices
 - Automatically used when ElevenLabs is not configured
 
-### 2. ElevenLabs Integration (Optional)
-- High-quality, natural-sounding voices
-- Multilingual support
-- Requires:
-  - ElevenLabs API key
-  - Voice ID
-- Configure through the settings page
-- Automatic fallback to browser speech if not configured or on errors
+### 2. Personal voice provider (planned adapter)
+- The settings retain the provider and voice fields needed for a future
+  server-side personal-voice adapter.
+- The current demo deliberately uses browser speech only. Provider keys are
+  never sent to the browser and are encrypted in the database.
+- Context suggestions work without a configured AI provider by using three
+  built-in, localized fallback suggestions.
 
 ![Category Overview](docs/sample1.png)
 ![Conversation View](docs/sample2.png)
@@ -50,11 +49,6 @@ The application supports two types of speech output:
    cd listen2me
    ```
 
-   copy the database config:
-   ```bash
-   cp config/database.yml.sample config/database.yml
-   ```
-
 2. Start the application:
    ```bash
    docker compose up
@@ -63,9 +57,9 @@ The application supports two types of speech output:
 3. Access the application:
    - Open your browser and go to http://localhost:80
    - Create a new account
-   - IMPORTANT Add your API keys in the settings:
-     - ElevenLabs API key for text-to-speech
-     - Choose your preferred LLM provider (OpenAI, Anthropic, or Gemini) and add the API key
+   - API keys are optional for the current demo.
+   - An AI provider key enables generated conversation suggestions; without it,
+     safe built-in suggestions remain available.
 
 That's it! The application will automatically:
 - Set up the database
@@ -76,6 +70,13 @@ That's it! The application will automatically:
 > **Note**: The application uses Docker and PostgreSQL. The database configuration 
 > is handled automatically through environment variables in docker-compose.yml - 
 > no manual database configuration is needed.
+
+For deployments, keep `SECRET_KEY_BASE` stable. Provider-key encryption is
+derived from it unless the three dedicated variables
+`ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY`,
+`ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY`, and
+`ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT` are supplied. Dedicated,
+secret-managed values are recommended for production.
 
 ### Stopping the Application
 ```bash

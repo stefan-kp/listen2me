@@ -7,6 +7,8 @@ class User < ApplicationRecord
   has_many :sentences, dependent: :destroy
   has_many :categories, dependent: :destroy
 
+  encrypts :elevenlabs_api_key, :llm_api_key
+
   validates :first_name, presence: true
   validates :last_name, presence: true
 

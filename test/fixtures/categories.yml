@@ -25,3 +25,9 @@ category_to_delete:
   name: "Zu löschen"
   icon_name: "trash"
   user_id: 1
+
+other_users_category:
+  id: 5
+  name: "Private Kategorie"
+  icon_name: "lock-closed"
+  user_id: 2

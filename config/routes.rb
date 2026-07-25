@@ -18,14 +18,14 @@ Rails.application.routes.draw do
 
     resources :speeches do
       member do
-        get :speak
+        post :speak
         get :category
       end
     end
 
     resources :conversations do
       member do
-        get :suggestions
+        post :suggestions
       end
       resources :messages, only: [ :create ]
     end

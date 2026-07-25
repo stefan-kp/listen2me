@@ -9,6 +9,11 @@ de:
       enter_text_aria: "Text eingeben, der gesprochen werden soll"
       select_category_aria: "Kategorie für den Text auswählen"
       speak_button_aria: "Eingegebenen Text vorlesen lassen"
+      just_spoken: "Gerade gesprochen"
+      repeat: "Noch einmal"
+      edit: "Ändern"
+      direct_hint: "Satzkarten sprechen sofort."
+      draft_hint: "Satzkarten landen zuerst hier."
 
     conversation_form:
       <<: *text_form_de
@@ -26,6 +31,31 @@ de:
       categories_list: "Liste der verfügbaren Kategorien"
       category_link: "Zur Kategorie %{name} mit %{count} Verwendungen"
       frequent_sentences_list: "Liste der häufig verwendeten Sätze"
+      eyebrow: "Kommunizieren"
+      headline: "Was möchtest du sagen?"
+      own_mode_hint: "Hier formulierst du eigene Sätze. Das Gegenüber wird nicht einbezogen."
+      one_tap: "1 Tipp"
+      one_tap_title: "Antworten, die sofort sprechen"
+      help_note: "„Hilfe“ spricht nur den Satz und löst keinen Notruf aus."
+      "yes": "Ja"
+      "no": "Nein"
+      stop: "Stopp"
+      help_sentence: "Ich brauche Hilfe"
+      help: "Hilfe"
+      speak_immediately: "%{text} sofort sprechen"
+      contextual: "Kontextsensitiv weiter"
+      next_sentence: "Das könntest du als Nächstes sagen"
+      new_topic: "Neues Thema"
+      three_suggestions: "Drei kurze Vorschläge sind bereit."
+      quick_sentences: "Schnelle Sätze"
+      no_sentences: "Deine häufig verwendeten Sätze erscheinen hier."
+      history: "Verlauf"
+      recently_spoken: "Zuletzt gesprochen"
+      recent_empty: "Deine gesprochenen Sätze erscheinen hier."
+      conversation_promo_label: "Gespräch"
+      conversation_promo_title: "Das Gegenüber einbeziehen"
+      conversation_promo_copy: "Im Gespräch berücksichtigt Listen2Me auch die Beiträge des Gegenübers."
+      start_conversation: "Gespräch starten"
 
     category:
       <<: *text_form_de
@@ -53,12 +83,86 @@ de:
       category_label: "Kategorie: %{name}"
       delete_sentence: "Satz löschen: %{text}"
       speak_sentence: "Satz vorlesen: %{text}"
+      draft_sentence: "Satz zuerst schreiben: %{text}"
+      direct_action: "Sofort sprechen"
+      draft_action: "Erst schreiben"
+
+    interaction:
+      speaking: "Wird gesprochen …"
+      ready: "Bereit"
+      unavailable: "Sprachausgabe ist in diesem Browser nicht verfügbar."
+      save_error: "Der Satz wurde gesprochen, konnte aber nicht gespeichert werden."
+      spoken_at: "Gesprochen um"
+      direct_suggestion_label: "sofort sprechen"
+      draft_suggestion_label: "zuerst schreiben"
+      default_followups:
+        - "Das passt für mich."
+        - "Bitte einen Moment."
+        - "Ich möchte noch etwas ergänzen."
+      followup_rules:
+        - terms: ["durst", "trinken", "wasser"]
+          suggestions: ["Wasser, bitte.", "Nur einen kleinen Schluck.", "Stell es bitte hierhin."]
+        - terms: ["hilfe", "helfen"]
+          suggestions: ["Bitte komm kurz zu mir.", "Ich zeige dir, wobei.", "Hilf mir bitte beim Aufstehen."]
+        - terms: ["schmerz", "weh"]
+          suggestions: ["Es tut hier weh.", "Bitte warte kurz.", "Ich möchte mich anders hinsetzen."]
+        - terms: ["müde", "ausruhen"]
+          suggestions: ["Bitte etwas leiser.", "Lass mich kurz allein.", "Weck mich bitte später."]
+        - terms: ["toilette"]
+          suggestions: ["Bitte begleite mich.", "Ich brauche dabei Hilfe.", "Bitte warte vor der Tür."]
+        - terms: ["hunger", "essen"]
+          suggestions: ["Etwas Kleines, bitte.", "Ich sage dir, worauf ich Lust habe.", "Später, bitte."]
 
   languages:
     german: "Deutsch"
     english: "Englisch"
 
   conversations:
+    workspace:
+      back: "Zurück"
+      demo_badge: "Gesprächs-Demo"
+      eyebrow: "Gesprächsmodus"
+      headline: "Zuhören. Vorschlagen. Du entscheidest."
+      lead: "In diesem Modus wird das Gegenüber automatisch einbezogen. Du entscheidest, welche Antwort gesprochen wird."
+      active_label: "Gespräch aktiv"
+      preparing: "Gespräch bereit"
+      partner_included: "Das Gegenüber wird berücksichtigt."
+      active: "Aktiv"
+      conversation: "Gespräch"
+      live_history: "Live-Verlauf"
+      messages_list: "Gesprächsbeiträge"
+      waiting: "Das Gespräch ist bereit. Sprich mit deinem Gegenüber oder nutze das Demo-Eingabefeld."
+      manual_partner: "Beitrag des Gegenübers eingeben"
+      partner_label: "Was hat das Gegenüber gesagt?"
+      partner_placeholder: "Zum Beispiel: Möchtest du etwas trinken?"
+      add: "Übernehmen"
+      reply_suggestions: "Antwortvorschläge"
+      what_reply: "Was möchtest du antworten?"
+      immediate: "Sofort"
+      your_answer: "Deine Antwort"
+      answer_placeholder: "Vorschlag wählen oder selbst schreiben …"
+      speak_answer: "Antwort sprechen"
+      you: "Du"
+      partner: "Gegenüber"
+      write: "Schreiben"
+      direct_help: "Ein Tipp spricht die Antwort sofort. Oben kannst du zu „Erst schreiben“ wechseln."
+      draft_help: "Ein Tipp übernimmt die Antwort ins Textfeld. Dort kannst du sie ändern und sprechen."
+      preparing_status: "Gespräch wird vorbereitet …"
+      speaking_status: "Antwort wird gesprochen …"
+      suggestions_status: "Neue Vorschläge werden vorbereitet …"
+      setup_error: "Das Gespräch konnte nicht gestartet werden. Bitte lade die Seite erneut."
+      save_error: "Der Beitrag konnte nicht gespeichert werden. Du kannst ihn erneut versuchen."
+      speech_error: "Die Sprachausgabe ist in diesem Browser nicht verfügbar."
+      microphone_unavailable: "Mikrofon nicht verfügbar. Partnertext kann unten eingegeben werden."
+      recognized: "Beitrag erkannt."
+      listening_prefix: "Hört zu:"
+      interrupted: "Zuhören wurde unterbrochen. Neuer Versuch …"
+      paused: "Zuhören pausiert während der Sprachausgabe."
+      listening_stopped: "Zuhören pausiert"
+      user_paused: "Das Mikrofon ist pausiert."
+      pause_microphone: "Mikrofon pausieren"
+      resume_microphone: "Mikrofon wieder einschalten"
+      storage_note: "Beiträge werden in diesem Demo-Konto gespeichert. Mit eingerichteter KI können Gesprächsinhalte an den gewählten Anbieter gesendet werden."
     show:
       conversation: "Konversation"
       back_to_home: "Zurück zur Startseite"
@@ -90,30 +194,29 @@ de:
 
   suggestions:
     system_prompt: |
-      Du bist ein Sprachassistent, der mit einem Patienten kommuniziert, der nicht mehr in der Lage ist, selbst zu sprechen. Deine Aufgabe ist es, sinnvolle Vorschläge für die Wortfindung der Kommunikation zu liefern. Die Ausgabe erfolgt im JSON-Format, um die Antwortenvorschläge anzupassen.
-      Du generierst immer Vorschläge für den Patienten. Das heißt, versetze sich in seine Lage, was er als nächstes sagen würde.
+      Du bist ein Kommunikationsassistent für eine Person, die Text als Stimme verwendet. Erstelle kurze, natürliche Vorschläge dafür, was diese Person als Nächstes sagen könnte.
+      Generiere immer Vorschläge aus Sicht der sprechenden Person, niemals aus Sicht des Gegenübers.
       
       # Details
 
-      - Der Patient kann Antworten selbst eintippen, die dann von dir verarbeitet werden
-      - Als Sprachassistent sollst du kontextbezogene Vorschläge für mögliche Antworten geben
-      - Wenn der Patient über ein Thema, wie z.B. Essen, spricht, mache passende Vorschläge (z.B. "Ich möchte eine Pizza" oder "Ich möchte ein Brot")
+      - Die sprechende Person kann Antworten selbst eintippen
+      - Gib kontextbezogene Vorschläge für mögliche Antworten
+      - Wenn es zum Beispiel um Essen geht, mache passende Vorschläge wie "Ich möchte eine Pizza" oder "Ich möchte ein Brot"
       - Die Antwortvorschläge sollten immer im gleichen JSON-Format sein: ein Array mit einer Liste von Nachrichten, die jeweils ein "content"-Attribut enthalten
-      - Ich übergebe dir sowohl die Antworten bzw. Fragen des Patienten. Diese haben die Rolle "Patient". Und ich übergebe dir die Nachrichten eines etwaigen Dritten in dem Raum. Diese haben die Rolle "Visitor".
-      - Die letzte Nachricht des Patienten bzw, des Visitors ist immer am Ende der Konversation. Dieser gibt die wichtige Informationen für die Vorschläge. Die vorherigen Nachrichten sind für den Kontext wichtig.
-      - Ich übergebe dir auch eine Beschreibung des Patienten (user_description), die wichtige Kontextinformationen enthält
-      - Ich übergebe dir auch die Gesprächsanalyse des Patienten (summary) auf basis der bisherigen Gespräche, die wichtige Kontextinformationen enthält
+      - Beiträge der sprechenden Person haben die Rolle "speaker", Beiträge des Gegenübers die Rolle "partner"
+      - Der letzte Beitrag ist für den nächsten Vorschlag besonders wichtig; vorherige Beiträge liefern Kontext
+      - Die optionale Beschreibung (user_description) und Gesprächszusammenfassung (summary) liefern zusätzlichen Kontext
       - Ich übergebe dir auch die Kategorie des Satzes (category), die wichtige Kontextinformationen enthält
       # Steps
 
-      1. Verarbeite die Eingabe des Patienten
+      1. Verarbeite den letzten Beitrag
       2. Identifiziere den Kontext der Kommunikation (z.B. Themen wie Essen, Trinken, Aktivitäten)
       3. Erstelle kontextbezogene Antwortvorschläge
       4. Strukturriere die Vorschläge im JSON-Format
 
       # Output Format
 
-      Die Ausgabe muss im JSON-Format sein und immer ein Array mit mindestens 4 Objekten sein:
+      Die Ausgabe muss im JSON-Format sein und genau 3 Objekte enthalten:
 
       ```json
       {
@@ -123,6 +226,9 @@ de:
           },
           {
               "content": "[Vorschlag2]"
+          },
+          {
+              "content": "[Vorschlag3]"
           }
         ]
       }
@@ -133,7 +239,7 @@ de:
       ## Beispiel 1
 
       ### Eingabe
-      Der Patient gibt "Ich habe Hunger" ein.
+      Die sprechende Person gibt "Ich habe Hunger" ein.
 
       ### Ausgabe
       ```json
@@ -143,6 +249,9 @@ de:
           },
           {
               "content": "Ich möchte ein Brot"
+          },
+          {
+              "content": "Etwas Kleines, bitte"
           }
       ]
       ```
@@ -150,7 +259,7 @@ de:
       ## Beispiel 2
 
       ### Eingabe
-      Der Patient sagt "Ich möchte etwas trinken".
+      Die sprechende Person sagt "Ich möchte etwas trinken".
 
       ### Ausgabe
       ```json
@@ -160,6 +269,9 @@ de:
           },
           {
               "content": "Ich möchte einen Saft"
+          },
+          {
+              "content": "Nur einen kleinen Schluck, bitte"
           }
       ]
       ```
@@ -170,6 +282,9 @@ de:
       - Die Struktur der JSON-Ausgabe sollte strikt beibehalten werden 
 
   messages:
+    message:
+      you: "Du"
+      partner: "Gegenüber"
     form:
       enter_message: "Nachricht eingeben..."
       speak: "Vorlesen"
@@ -185,7 +300,21 @@ de:
       home: "Startseite"
       speeches: "Sprachausgabe"
       conversations: "Konversationen"
+      conversation_mode: "Gespräch"
       sign_in: "Anmelden"
+      on_tap: "Beim Antippen"
+      card_behavior: "Verhalten von Satzkarten"
+      direct: "Sofort sprechen"
+      direct_short: "Sofort"
+      draft: "Erst schreiben"
+      draft_short: "Schreiben"
+      direct_status: "Satzkarten sprechen sofort."
+      draft_status: "Satzkarten werden zuerst ins Textfeld übernommen."
+      settings: "Profil und Einstellungen"
+      settings_short: "Einstellungen"
+
+    bottom_navigation:
+      mobile_navigation: "Mobile Hauptnavigation"
 
     flash_messages:
       close_message: "Nachricht schließen"
@@ -216,6 +345,7 @@ de:
       voice_settings: "Spracheinstellungen"
       voice_settings_description: "Die ElevenLabs-Integration ist optional. Wenn keine API-Zugangsdaten eingegeben werden, wird automatisch die Sprachausgabe des Browsers verwendet. ElevenLabs bietet jedoch eine natürlichere Sprachqualität."
       llm_settings: "KI-Einstellungen"
+      credential_placeholder: "Leer lassen, um den vorhandenen Schlüssel beizubehalten"
       save: "Änderungen speichern"
       conversation_summary: "Gesprächsanalyse"
       conversation_summary_explanation: "Die Gesprächsanalyse hilft der KI, Ihre Vorlieben und Kommunikationsmuster besser zu verstehen. Sie analysiert Ihre bisherigen Gespräche, um personalisiertere Vorschläge zu machen. Es wird empfohlen, diese Analyse regelmäßig zu aktualisieren, wenn neue Gespräche hinzukommen."
@@ -229,7 +359,7 @@ de:
 
     generate_summary:
       success: "Gesprächsanalyse wurde erfolgreich erstellt"
-      error: "Fehler beim Erstellen der Analyse: %{message}"
+      error: "Die Gesprächsanalyse konnte nicht erstellt werden. Bitte versuche es später erneut."
       errors:
         unsupported_provider: "Nicht unterstützter LLM-Anbieter: %{provider}"
 
@@ -285,13 +415,12 @@ de:
 
   suggestion_service:
     summary_prompt: |
-      Du bist ein Sprachassistent, der mit einem Patienten kommuniziert, der nicht mehr in der Lage ist, selbst zu sprechen. Deine Aufgabe ist es, sinnvolle Informationen über den Patienten zu extrahieren.
-      Diese Informationen werden dann für die Vorschläge des Sprachassistenten verwendet, deswegen ist es wichtig, dass du die Informationen genau und vollständig extrahierst.
+      Du bist ein Kommunikationsassistent. Extrahiere nur hilfreiche, ausdrücklich genannte Informationen über die Person, die Text als Stimme verwendet.
+      Diese Informationen werden später für passendere Vorschläge verwendet.
       Bitte analysiere diese Gespräche und extrahiere wichtige Informationen über:
       
-      1. Den Benutzer/Patienten:
+      1. Die sprechende Person:
       - Persönliche Vorlieben
-      - Medizinische Bedürfnisse, insbesondere benötigte Medikamente
       - Tagesabläufe oder Gewohnheiten
       - Wichtige Beziehungen oder Kontakte
       - Häufig besprochene Themen
@@ -306,6 +435,6 @@ de:
       - Familien und Freunde
       
       Berücksichtige nur Informationen, die explizit in den Gesprächen erwähnt wurden.
-      Wahre die Privatsphäre, indem du sensible medizinische Details ausschließt.
+      Wahre die Privatsphäre, indem du sensible persönliche Details ausschließt, die für bessere Vorschläge nicht nötig sind.
     errors:
-      unsupported_provider: "Nicht unterstützter LLM-Anbieter: %{provider}" 
+      unsupported_provider: "Nicht unterstützter LLM-Anbieter: %{provider}"

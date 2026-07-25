@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_16_135711) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_25_160100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -20,7 +20,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_16_135711) do
     t.integer "usage_count", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "user_id", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_categories_on_user_id"
   end
 
   create_table "conversations", force: :cascade do |t|
@@ -86,7 +87,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_16_135711) do
     t.index ["summary_generated_at"], name: "index_users_on_summary_generated_at"
   end
 
-  add_foreign_key "categories", "users"
+  add_foreign_key "categories", "users", on_delete: :cascade
   add_foreign_key "conversations", "sentences", column: "initial_sentence_id", on_delete: :nullify
   add_foreign_key "conversations", "users"
   add_foreign_key "messages", "conversations"

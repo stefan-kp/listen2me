@@ -1,7 +1,24 @@
 require "test_helper"
 
 class UserTest < ActiveSupport::TestCase
-  # test "the truth" do
-  #   assert true
-  # end
+  test "provider keys are encrypted at rest" do
+    user = users(:default_user)
+    user.update!(
+      elevenlabs_api_key: "elevenlabs-plain-secret",
+      llm_api_key: "llm-plain-secret"
+    )
+
+    raw_values = ApplicationRecord.connection.select_one(<<~SQL)
+      SELECT elevenlabs_api_key, llm_api_key
+      FROM users
+      WHERE id = #{ApplicationRecord.connection.quote(user.id)}
+    SQL
+
+    assert_equal "elevenlabs-plain-secret", user.reload.elevenlabs_api_key
+    assert_equal "llm-plain-secret", user.llm_api_key
+    assert_not_equal "elevenlabs-plain-secret", raw_values.fetch("elevenlabs_api_key")
+    assert_not_equal "llm-plain-secret", raw_values.fetch("llm_api_key")
+    assert_includes User.encrypted_attributes, :elevenlabs_api_key
+    assert_includes User.encrypted_attributes, :llm_api_key
+  end
 end

@@ -4,23 +4,35 @@ export default class extends Controller {
   static targets = ["tab", "panel"]
 
   connect() {
-    // Set initial state based on elevenlabs_api_key
     const hasApiKey = this.element.dataset.hasApiKey === "true"
     const initialTab = hasApiKey ? "about" : "system"
-    console.log("hasApiKey:", hasApiKey, "initialTab:", initialTab) // Debug-Log
-    
-    // Initially hide all panels
+
     this.hideAllPanels()
-    
-    // Show initial panel
     this.showPanel(initialTab)
     this.updateTabs(initialTab)
   }
 
   switch(event) {
     event.preventDefault()
-    const tabName = event.currentTarget.dataset.tab
-    
+    this.activate(event.currentTarget.dataset.tab)
+  }
+
+  keydown(event) {
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return
+
+    event.preventDefault()
+    const currentIndex = this.tabTargets.indexOf(event.currentTarget)
+    const nextIndex = event.key === "Home"
+      ? 0
+      : event.key === "End"
+        ? this.tabTargets.length - 1
+        : (currentIndex + (event.key === "ArrowRight" ? 1 : -1) + this.tabTargets.length) % this.tabTargets.length
+    const nextTab = this.tabTargets[nextIndex]
+    this.activate(nextTab.dataset.tab)
+    nextTab.focus()
+  }
+
+  activate(tabName) {
     this.hideAllPanels()
     this.showPanel(tabName)
     this.updateTabs(tabName)
@@ -28,20 +40,22 @@ export default class extends Controller {
 
   hideAllPanels() {
     this.panelTargets.forEach(panel => {
-      panel.style.display = 'none'
+      panel.hidden = true
     })
   }
 
   showPanel(tabName) {
     const panel = this.panelTargets.find(p => p.dataset.panel === tabName)
     if (panel) {
-      panel.style.display = 'block'
+      panel.hidden = false
     }
   }
 
   updateTabs(selectedTab) {
     this.tabTargets.forEach(tab => {
       const isSelected = tab.dataset.tab === selectedTab
+      tab.setAttribute("aria-selected", String(isSelected))
+      tab.tabIndex = isSelected ? 0 : -1
       tab.classList.toggle("border-blue-500", isSelected)
       tab.classList.toggle("text-blue-600", isSelected)
       tab.classList.toggle("border-transparent", !isSelected)
@@ -50,4 +64,4 @@ export default class extends Controller {
       tab.classList.toggle("hover:border-gray-300", !isSelected)
     })
   }
-} 
+}

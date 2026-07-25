@@ -1,29 +1,59 @@
-%header.main-header{role: "banner"}
-  %nav.main-nav{role: "navigation", "aria-label": t('.main_navigation')}
-    .nav-content
-      = link_to root_path, class: "logo", "aria-label": t('.home') do
-        = image_tag "logo.png", alt: "Listen2Me Logo", class: "logo-image"
-        %span.logo-text.sr-only Listen2Me
-      
-      .nav-center
-        - if user_signed_in?
-          = link_to speeches_path, 
-            class: "nav-button", 
-            "aria-label": t('.speeches') do
-            = heroicon "speaker-wave"
-            %span= t('.speeches')
-            
-          = link_to conversations_path, 
-            class: "nav-button", 
-            "aria-label": t('.conversations') do
-            = heroicon "chat-bubble-left-right"
-            %span= t('.conversations')
-      
-      .nav-right
-        - if user_signed_in?
-          = render 'shared/user_menu'
-        - else
-          = link_to t('.sign_in'), 
-            new_user_session_path, 
-            class: "nav-button"
-        = render 'shared/language_switcher' 
+%header.l2m-header{role: "banner"}
+  .l2m-header-inner
+    = link_to root_path, class: "l2m-brand", "aria-label": t(".home") do
+      %span.l2m-brand-mark{"aria-hidden": "true"}
+        %i
+        %i
+        %i
+        %i
+      %span Listen2Me
+
+    - if user_signed_in?
+      %nav.l2m-primary-nav{role: "navigation", "aria-label": t(".main_navigation")}
+        = link_to speeches_path,
+          class: ["l2m-primary-nav-link", ("is-active" if controller_name == "speeches")].compact.join(" "),
+          "aria-current": ("page" if controller_name == "speeches") do
+          = heroicon "speaker-wave", options: { class: "h-5 w-5", "aria-hidden": "true" }
+          %span= t(".speeches")
+
+        = link_to new_conversation_path,
+          class: ["l2m-primary-nav-link", ("is-active" if controller_name == "conversations" && action_name != "index")].compact.join(" "),
+          "aria-current": ("page" if controller_name == "conversations" && action_name != "index") do
+          = heroicon "chat-bubble-left-right", options: { class: "h-5 w-5", "aria-hidden": "true" }
+          %span= t(".conversation_mode", default: "Gespräch")
+
+      .l2m-header-mode
+        %span.l2m-header-mode-label= t(".on_tap", default: "Beim Antippen")
+        .l2m-mode-switch{role: "group", "aria-label": t(".card_behavior", default: "Verhalten von Satzkarten")}
+          %button.is-active{
+            type: "button",
+            data: {
+              action: "click->speech-mode#choose",
+              speech_mode_target: "button",
+              speech_mode_mode_param: "direct",
+              mode: "direct"
+            },
+            "aria-pressed": "true"}
+            %span.l2m-mode-full= t(".direct", default: "Sofort sprechen")
+            %span.l2m-mode-short= t(".direct_short", default: "Sofort")
+          %button{
+            type: "button",
+            data: {
+              action: "click->speech-mode#choose",
+              speech_mode_target: "button",
+              speech_mode_mode_param: "draft",
+              mode: "draft"
+            },
+            "aria-pressed": "false"}
+            %span.l2m-mode-full= t(".draft", default: "Erst schreiben")
+            %span.l2m-mode-short= t(".draft_short", default: "Schreiben")
+        %span.sr-only{role: "status", "aria-live": "polite", data: { speech_mode_target: "status" }}
+
+      = link_to settings_path, class: "l2m-profile-link", "aria-label": t(".settings", default: "Profil und Einstellungen") do
+        %span{"aria-hidden": "true"}
+          = "#{current_user.first_name.to_s.first}#{current_user.last_name.to_s.first}".upcase
+        %span.l2m-profile-name= current_user.first_name
+    - else
+      .l2m-guest-actions
+        = link_to t(".sign_in"), new_user_session_path, class: "l2m-button l2m-button-secondary"
+        = render "shared/language_switcher"

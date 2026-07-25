@@ -36,9 +36,6 @@
 # Ignore environment files
 .env.*
 
-# Ignore database configuration
-/config/database.yml
-
 # Ignore node modules
 /node_modules
 
@@ -55,7 +52,3 @@
 
 # Ignore RSpec state
 spec/examples.txt
-
-
-# Keep development credentials for open source
-!/config/credentials/development.key
