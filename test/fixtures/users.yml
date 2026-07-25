@@ -12,6 +12,9 @@ default_user:
   elevenlabs_voice_id: "current-user-voice"
   llm_model: "gpt-4"
   llm_provider: "openai"
+  preferred_locale: "de"
+  preferred_speech_mode: "direct"
+  onboarding_completed_at: <%= 1.day.ago %>
 
 other_user:
   id: 2
@@ -23,3 +26,6 @@ other_user:
   elevenlabs_voice_id: "other-user-voice"
   llm_model: "gpt-4"
   llm_provider: "openai"
+  preferred_locale: "de"
+  preferred_speech_mode: "direct"
+  onboarding_completed_at: <%= 1.day.ago %>

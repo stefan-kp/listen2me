@@ -16,6 +16,8 @@ Rails.application.routes.draw do
   scope "(:locale)", locale: /#{I18n.available_locales.join('|')}/ do
     root "speeches#index"
 
+    resource :onboarding, only: %i[show update], controller: "onboarding"
+
     resources :speeches do
       member do
         post :speak
@@ -28,6 +30,7 @@ Rails.application.routes.draw do
         post :suggestions
       end
       resources :messages, only: [ :create ]
+      resource :realtime_call, only: :create
     end
 
     resource :settings, only: %i[show update] do

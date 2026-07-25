@@ -23,6 +23,7 @@ export default class extends Controller {
     this.shouldListen = true
     this.userPaused = false
     this.pausedForSpeech = false
+    this.realtimeActive = false
     this.restartTimer = null
     this.dispatchedFinals = new Set()
     this.pauseForSpeech = this.pauseForSpeech.bind(this)
@@ -182,12 +183,24 @@ export default class extends Controller {
 
   pauseForSpeech() {
     this.pausedForSpeech = true
+    if (this.realtimeActive) {
+      this.setActive(false)
+      if (!this.userPaused) this.setDetail(this.pausedDetailValue)
+      return
+    }
+
     this.stopRecording()
     if (!this.userPaused) this.setDetail(this.pausedDetailValue)
   }
 
   resumeAfterSpeech() {
     this.pausedForSpeech = false
+    if (this.realtimeActive) {
+      this.setActive(!this.userPaused)
+      if (!this.userPaused) this.setDetail(this.includedDetailValue)
+      return
+    }
+
     if (!this.shouldListen || this.userPaused) return
 
     this.startRecording()
@@ -195,6 +208,16 @@ export default class extends Controller {
 
   toggle(event) {
     event.preventDefault()
+
+    if (this.realtimeActive) {
+      this.userPaused = !this.userPaused
+      this.shouldListen = !this.userPaused
+      this.setActive(!this.userPaused)
+      this.setDetail(this.userPaused ? this.userPausedDetailValue : this.includedDetailValue)
+      this.updateToggle()
+      this.dispatch("listening", { detail: { paused: this.userPaused } })
+      return
+    }
 
     if (this.userPaused || !this.shouldListen) {
       this.userPaused = false
@@ -210,6 +233,24 @@ export default class extends Controller {
       this.setDetail(this.userPausedDetailValue)
       this.updateToggle()
     }
+  }
+
+  suspendForRealtime() {
+    this.realtimeActive = true
+    this.shouldListen = false
+    this.stopRecording()
+    this.setActive(!this.userPaused)
+    this.setDetail(this.userPaused ? this.userPausedDetailValue : this.includedDetailValue)
+  }
+
+  resumeAfterRealtime() {
+    if (!this.realtimeActive) return
+
+    this.realtimeActive = false
+    if (this.userPaused) return
+
+    this.shouldListen = true
+    this.startRecording()
   }
 
   retry(event) {

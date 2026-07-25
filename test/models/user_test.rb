@@ -1,6 +1,25 @@
 require "test_helper"
 
 class UserTest < ActiveSupport::TestCase
+  test "onboarding preferences only accept supported values" do
+    user = users(:default_user)
+
+    user.preferred_locale = "fr"
+    user.preferred_speech_mode = "automatic"
+
+    assert_not user.valid?
+    assert user.errors.of_kind?(:preferred_locale, :inclusion)
+    assert user.errors.of_kind?(:preferred_speech_mode, :inclusion)
+  end
+
+  test "onboarding is complete when a completion timestamp exists" do
+    user = users(:default_user)
+
+    assert user.onboarding_completed?
+    user.onboarding_completed_at = nil
+    assert_not user.onboarding_completed?
+  end
+
   test "provider keys are encrypted at rest" do
     user = users(:default_user)
     user.update!(

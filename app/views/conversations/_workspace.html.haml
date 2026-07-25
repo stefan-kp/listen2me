@@ -3,11 +3,24 @@
 - default_suggestions = SuggestionService::FALLBACK_SUGGESTIONS.fetch(suggestion_locale).map { |suggestion| suggestion["content"] }
 - normalized_suggestions = Array(@suggestions).filter_map { |suggestion| suggestion.respond_to?(:[]) ? (suggestion["content"] || suggestion[:content]) : suggestion.to_s.presence }.first(3)
 - normalized_suggestions = default_suggestions unless normalized_suggestions.length == 3
+- realtime_available = current_user.llm_provider == "openai" && current_user.llm_api_key.present?
 
 .l2m-page.l2m-conversation-page{
   data: {
-    controller: "conversation audio-recorder",
-    action: "audio-recorder:transcript->conversation#receivePartner",
+    controller: "conversation realtime audio-recorder",
+    action: [
+      "audio-recorder:transcript->conversation#receivePartner",
+      "realtime:prepare->conversation#prepareRealtime",
+      "conversation:ready->realtime#conversationReady",
+      "realtime:ready->conversation#enableRealtime",
+      "realtime:ready->audio-recorder#suspendForRealtime",
+      "realtime:fallback->conversation#disableRealtime",
+      "realtime:fallback->audio-recorder#resumeAfterRealtime",
+      "realtime:transcript->conversation#receivePartner",
+      "realtime:suggestions->conversation#receiveRealtimeSuggestions",
+      "conversation:message-saved->realtime#messageSaved",
+      "audio-recorder:listening->realtime#listeningChanged"
+    ].join(" "),
     conversation_conversation_id_value: conversation_id,
     conversation_create_url_value: conversations_path,
     conversation_message_url_template_value: conversation_messages_path(conversation_id: "__ID__"),
@@ -38,7 +51,21 @@
     audio_recorder_paused_detail_value: t(".paused", default: "Zuhören pausiert während der Sprachausgabe."),
     audio_recorder_user_paused_detail_value: t(".user_paused", default: "Das Mikrofon ist pausiert."),
     audio_recorder_pause_label_value: t(".pause_microphone", default: "Mikrofon pausieren"),
-    audio_recorder_resume_label_value: t(".resume_microphone", default: "Mikrofon wieder einschalten")
+    audio_recorder_resume_label_value: t(".resume_microphone", default: "Mikrofon wieder einschalten"),
+    realtime_available_value: realtime_available,
+    realtime_conversation_id_value: conversation_id,
+    realtime_call_url_template_value: conversation_realtime_call_path(conversation_id: "__ID__"),
+    realtime_suggestion_prompt_value: t(".realtime_suggestion_prompt"),
+    realtime_standard_status_value: t(".standard_status"),
+    realtime_standard_detail_value: t(".standard_detail"),
+    realtime_connecting_status_value: t(".realtime_connecting"),
+    realtime_connecting_detail_value: t(".realtime_connecting_detail"),
+    realtime_live_status_value: t(".realtime_live"),
+    realtime_live_detail_value: t(".realtime_live_detail"),
+    realtime_unavailable_status_value: t(".realtime_unavailable"),
+    realtime_unavailable_detail_value: t(".realtime_unavailable_detail"),
+    realtime_start_label_value: t(".realtime_start"),
+    realtime_stop_label_value: t(".realtime_stop")
   },
   "aria-labelledby": "conversation-title"}
   .l2m-conversation-topbar
@@ -80,6 +107,25 @@
           audio_recorder_target: "toggle"
         }}
         = t(".pause_microphone", default: "Mikrofon pausieren")
+
+  .l2m-realtime-control
+    .l2m-realtime-copy
+      %span.l2m-realtime-icon{"aria-hidden": "true"} ✦
+      %span
+        %strong{role: "status", "aria-live": "polite", data: { realtime_target: "status" }}
+          = t(".standard_status")
+        %small{data: { realtime_target: "detail" }}= t(".standard_detail")
+    - if realtime_available
+      %button.l2m-button.l2m-button-secondary{
+        type: "button",
+        data: {
+          action: "click->realtime#toggle",
+          realtime_target: "button"
+        }}
+        = t(".realtime_start")
+    - else
+      = link_to settings_path(anchor: "system"), class: "l2m-text-link" do
+        = t(".realtime_setup")
 
   %p.l2m-inline-error{hidden: true, role: "alert", data: { conversation_target: "error" }}
 

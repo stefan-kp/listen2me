@@ -43,6 +43,7 @@ export default class extends Controller {
     this.suggestionRequest = null
     this.suggestionTimer = null
     this.suggestionGeneration = 0
+    this.realtimeActive = false
     this.handleModeChange = this.handleModeChange.bind(this)
     window.addEventListener("speech-mode:changed", this.handleModeChange)
 
@@ -105,7 +106,8 @@ export default class extends Controller {
     const content = String(text || "").trim()
     if (!content) return
 
-    const saved = await this.postMessage(content, "partner")
+    const source = event.type === "realtime:transcript" ? "realtime" : "manual"
+    const saved = await this.postMessage(content, "partner", source)
     if (saved && this.hasPartnerInputTarget && this.partnerInputTarget.value.trim() === content) {
       this.partnerInputTarget.value = ""
     }
@@ -149,19 +151,19 @@ export default class extends Controller {
       return false
     }
 
-    const saved = await this.postMessage(text, "speaker")
+    const saved = await this.postMessage(text, "speaker", "interface")
     if (saved && this.inputTarget.value.trim() === text) this.inputTarget.value = ""
     return saved
   }
 
-  postMessage(text, role) {
-    const persist = () => this.persistMessage(text, role)
+  postMessage(text, role, source) {
+    const persist = () => this.persistMessage(text, role, source)
     const result = this.messageQueue.then(persist, persist)
     this.messageQueue = result.then(() => undefined, () => undefined)
     return result
   }
 
-  async persistMessage(text, role) {
+  async persistMessage(text, role, source) {
     this.clearError()
 
     try {
@@ -179,7 +181,15 @@ export default class extends Controller {
 
       if (!response.ok) throw new Error(`HTTP ${response.status}`)
       this.appendMessage(text, role)
-      this.refreshSuggestions()
+      if (this.realtimeActive) {
+        this.suggestionsTarget.classList.add("is-loading")
+        this.setStatus(this.suggestionsStatusValue)
+        this.dispatch("message-saved", {
+          detail: { text, role, source }
+        })
+      } else {
+        this.refreshSuggestions()
+      }
       return true
     } catch (_error) {
       this.showError(this.saveErrorValue)
@@ -188,6 +198,8 @@ export default class extends Controller {
   }
 
   refreshSuggestions() {
+    if (this.realtimeActive) return
+
     const generation = ++this.suggestionGeneration
     window.clearTimeout(this.suggestionTimer)
     this.suggestionRequest?.abort()
@@ -253,6 +265,39 @@ export default class extends Controller {
     })
 
     if (focusedIndex >= 0) buttons[Math.min(focusedIndex, buttons.length - 1)]?.focus({ preventScroll: true })
+  }
+
+  async prepareRealtime() {
+    try {
+      await this.ensureSession()
+    } catch (_error) {
+      // The existing setup error is already visible in the conversation UI.
+    }
+  }
+
+  enableRealtime() {
+    this.realtimeActive = true
+    window.clearTimeout(this.suggestionTimer)
+    this.suggestionRequest?.abort()
+    this.suggestionRequest = null
+    this.suggestionsTarget.classList.remove("is-loading")
+    this.setStatus(this.activeStatusValue)
+  }
+
+  disableRealtime() {
+    const wasActive = this.realtimeActive
+    this.realtimeActive = false
+    if (wasActive && this.hasConversationIdValue && this.conversationIdValue > 0) {
+      this.refreshSuggestions()
+    }
+  }
+
+  receiveRealtimeSuggestions(event) {
+    if (!this.realtimeActive) return
+
+    this.renderSuggestions(event.detail?.suggestions)
+    this.suggestionsTarget.classList.remove("is-loading")
+    this.setStatus(this.activeStatusValue)
   }
 
   appendMessage(text, role) {

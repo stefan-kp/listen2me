@@ -8,7 +8,9 @@ Listen2Me is an assistive communication application designed for people who are 
 - Sentence categorization and management
 - Quick access to frequently used sentences
 - Multilingual interface (English/German)
+- Three-step onboarding for language, interaction mode, and device checks
 - Conversation mode with AI-powered response suggestions
+- Optional low-latency Realtime conversation adapter with a local fallback
 - Responsive design for desktop and mobile devices
 
 ## Speech Output
@@ -20,7 +22,7 @@ The application supports two types of speech output:
 - No additional configuration required
 - Available in all modern browsers
 - Quality depends on browser and installed voices
-- Automatically used when ElevenLabs is not configured
+- Currently used for every spoken output, including when provider credentials are stored
 
 ### 2. Personal voice provider (planned adapter)
 - The settings retain the provider and voice fields needed for a future
@@ -60,6 +62,11 @@ The application supports two types of speech output:
    - API keys are optional for the current demo.
    - An AI provider key enables generated conversation suggestions; without it,
      safe built-in suggestions remain available.
+
+The first sign-in opens a short onboarding flow. The regular conversation mode
+works without external services. When an OpenAI key is stored in Settings, the
+conversation screen additionally offers an experimental, user-initiated
+Realtime mode; if it cannot connect, the normal flow remains available.
 
 That's it! The application will automatically:
 - Set up the database

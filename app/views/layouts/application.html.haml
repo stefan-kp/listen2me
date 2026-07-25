@@ -16,7 +16,8 @@
     
     %title= content_for?(:title) ? "#{yield(:title)} - Listen2Me" : "Listen2Me"
 
-  - body_controllers = user_signed_in? ? "speech-mode communicator" : nil
+  - onboarding_flow = content_for?(:onboarding)
+  - body_controllers = user_signed_in? && !onboarding_flow ? "speech-mode communicator" : nil
   %body.l2m-body{
     data: {
       controller: body_controllers,
@@ -39,13 +40,13 @@
         class: 'skip-link',
         "aria-label": t('.skip_to_main_aria')
     
-    = render 'shared/header'
+    = render 'shared/header' unless onboarding_flow
     = render 'shared/flash_messages'
     
     %main#main-content.l2m-main{tabindex: -1, role: "main"}
       = yield
 
-    = render "shared/bottom_navigation" if user_signed_in?
+    = render "shared/bottom_navigation" if user_signed_in? && !onboarding_flow
       
     - if content_for?(:keyboard_shortcuts)
       %footer{role: "contentinfo", "aria-label": t('.keyboard_shortcuts')}

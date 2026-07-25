@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem "rails", "~> 8.0.1"
+gem "rails", "~> 8.1.3"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
 # Use postgresql as the database for Active Record
@@ -59,8 +59,7 @@ end
 group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
-  gem "selenium-webdriver", "~> 4.10.0"
-  gem "webdrivers", "~> 5.3.0"
+  gem "selenium-webdriver", "~> 4.46"
 end
 gem "ruby-openai"
 gem "haml-rails"
@@ -68,11 +67,10 @@ gem "haml-rails"
 gem "heroicon"
 
 gem "tailwindcss-rails", "~> 3.3.1"
-gem "thruster", require: false
 
 gem "langchainrb", "~> 0.19.3"
 
 gem "dotenv-rails", groups: [ :development, :test ]
 
-gem "devise"
-gem "devise-i18n"
+gem "devise", "~> 5.0.4"
+gem "devise-i18n", "~> 1.16"
