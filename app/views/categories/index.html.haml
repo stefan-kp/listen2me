@@ -16,22 +16,22 @@
             .flex.items-center.gap-4
               = heroicon category.icon_name, options: { class: "h-8 w-8 text-gray-500", "aria-hidden": "true" }
               .flex.flex-col
-                %p.text-sm.font-medium.text-gray-900= category.name
+                %p.text-sm.font-medium.text-gray-900= display_category_name(category)
                 %p.text-sm.text-gray-500
                   = t('.sentences_count', count: category.sentences.count)
             .l2m-category-actions
               = link_to edit_category_path(category),
                 id: "edit_category_#{category.id}",
                 class: "l2m-category-action p-2 text-gray-400 hover:text-indigo-600 transition-colors",
-                "aria-label": t('.edit_category', name: category.name) do
+                "aria-label": t('.edit_category', name: display_category_name(category)) do
                 = heroicon "pencil-square", options: { class: "h-5 w-5", "aria-hidden": "true" }
 
               = button_to category_path(category),
                 method: :delete,
                 id: "delete_category_#{category.id}",
                 class: "l2m-category-action p-2 text-gray-400 hover:text-red-600 transition-colors",
-                form: { data: { turbo_confirm: t('.confirm_delete', name: category.name, count: category.sentences.count) } },
-                "aria-label": t('.delete_category', name: category.name) do
+                form: { data: { turbo_confirm: t('.confirm_delete', name: display_category_name(category), count: category.sentences.count) } },
+                "aria-label": t('.delete_category', name: display_category_name(category)) do
                 = heroicon "trash", options: { class: "h-5 w-5", "aria-hidden": "true" }
       - else
         %li.px-4.py-5.sm:px-6.text-center.text-gray-500{"aria-label": t('.no_categories')}

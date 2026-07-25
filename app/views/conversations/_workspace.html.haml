@@ -3,7 +3,7 @@
 - default_suggestions = SuggestionService::FALLBACK_SUGGESTIONS.fetch(suggestion_locale).map { |suggestion| suggestion["content"] }
 - normalized_suggestions = Array(@suggestions).filter_map { |suggestion| suggestion.respond_to?(:[]) ? (suggestion["content"] || suggestion[:content]) : suggestion.to_s.presence }.first(3)
 - normalized_suggestions = default_suggestions unless normalized_suggestions.length == 3
-- realtime_available = current_user.llm_provider == "openai" && current_user.llm_api_key.present?
+- realtime_available = OpenAI::RealtimeCall.configured?
 
 .l2m-page.l2m-conversation-page{
   data: {
@@ -26,7 +26,7 @@
     conversation_message_url_template_value: conversation_messages_path(conversation_id: "__ID__"),
     conversation_suggestions_url_template_value: suggestions_conversation_path(id: "__ID__"),
     conversation_show_url_template_value: conversation_path(id: "__ID__"),
-    conversation_fallback_suggestions_value: default_suggestions,
+    conversation_fallback_suggestions_value: default_suggestions.to_json,
     conversation_own_label_value: t(".you", default: "Du"),
     conversation_partner_label_value: t(".partner", default: "Gegenüber"),
     conversation_direct_action_value: t(".immediate", default: "Sofort"),
@@ -124,7 +124,7 @@
         }}
         = t(".realtime_start")
     - else
-      = link_to settings_path(anchor: "system"), class: "l2m-text-link" do
+      = link_to settings_path(anchor: "voice-device"), class: "l2m-text-link" do
         = t(".realtime_setup")
 
   %p.l2m-inline-error{hidden: true, role: "alert", data: { conversation_target: "error" }}
@@ -158,7 +158,7 @@
               placeholder: t(".partner_placeholder", default: "Zum Beispiel: Möchtest du etwas trinken?"),
               data: { conversation_target: "partnerInput" }}
             %button.l2m-button.l2m-button-secondary{type: "submit"}= t(".add", default: "Übernehmen")
-      %p.l2m-privacy-note= t(".storage_note", default: "Beiträge werden in diesem Demo-Konto gespeichert. Mit eingerichteter KI können Gesprächsinhalte an den gewählten Anbieter gesendet werden.")
+      %p.l2m-privacy-note= t(".storage_note", default: "Beiträge werden in diesem Demo-Konto gespeichert. Nach jedem gespeicherten Beitrag können Inhalte für neue Vorschläge an den serverseitigen KI-Dienst gesendet werden. Bei aktiver Live-KI wird zusätzlich Mikrofon-Audio an den konfigurierten Realtime-Dienst übertragen.")
 
     %aside.l2m-suggestion-card{"aria-labelledby": "suggestion-title"}
       .l2m-card-heading

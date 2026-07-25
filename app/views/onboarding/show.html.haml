@@ -1,7 +1,7 @@
 - content_for :onboarding, true
 - content_for :title, t(".title")
 
-.l2m-onboarding-shell{data: { controller: "onboarding" }}
+.l2m-onboarding-shell{data: { controller: "onboarding device-check" }}
   %header.l2m-onboarding-header
     = link_to onboarding_path, class: "l2m-brand", "aria-label": t(".home") do
       %span.l2m-brand-mark{"aria-hidden": "true"}
@@ -116,7 +116,7 @@
                   %small= t(".voice_test_copy")
               %button.l2m-button.l2m-button-secondary{
                 type: "button",
-                data: { action: "click->onboarding#testVoice" }}
+                data: { action: "click->device-check#testVoice" }}
                 = t(".test")
 
             .l2m-audio-check
@@ -127,18 +127,19 @@
                   %small= t(".microphone_test_copy")
               %button.l2m-button.l2m-button-secondary{
                 type: "button",
-                data: { action: "click->onboarding#testMicrophone" }}
+                data: { action: "click->device-check#testMicrophone" }}
                 = t(".test")
 
           %p.l2m-audio-status{
             role: "status",
             "aria-live": "polite",
             data: {
-              onboarding_target: "audioStatus",
+              device_check_target: "status",
               voice_success: t(".voice_success"),
               voice_error: t(".voice_error"),
               microphone_success: t(".microphone_success"),
               microphone_error: t(".microphone_error"),
+              testing: t(".testing"),
               test_sentence: t(".test_sentence")
             }}
 

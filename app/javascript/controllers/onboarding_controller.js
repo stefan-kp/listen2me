@@ -1,5 +1,4 @@
 import { Controller } from "@hotwired/stimulus"
-import { speakText } from "controllers/speech_output"
 
 const SPEECH_MODE_STORAGE_KEY = "listen2me:speech-mode"
 
@@ -11,8 +10,7 @@ export default class extends Controller {
     "progressLabel",
     "back",
     "next",
-    "submit",
-    "audioStatus"
+    "submit"
   ]
 
   connect() {
@@ -63,35 +61,5 @@ export default class extends Controller {
     )?.value
 
     if (selectedMode) window.localStorage.setItem(SPEECH_MODE_STORAGE_KEY, selectedMode)
-  }
-
-  async testVoice(event) {
-    event.preventDefault()
-    const messages = this.audioStatusTarget.dataset
-
-    try {
-      await speakText(messages.testSentence)
-      this.audioStatusTarget.textContent = messages.voiceSuccess
-    } catch (_error) {
-      this.audioStatusTarget.textContent = messages.voiceError
-    }
-  }
-
-  async testMicrophone(event) {
-    event.preventDefault()
-    const messages = this.audioStatusTarget.dataset
-
-    if (!navigator.mediaDevices?.getUserMedia) {
-      this.audioStatusTarget.textContent = messages.microphoneError
-      return
-    }
-
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      stream.getTracks().forEach((track) => track.stop())
-      this.audioStatusTarget.textContent = messages.microphoneSuccess
-    } catch (_error) {
-      this.audioStatusTarget.textContent = messages.microphoneError
-    }
   }
 }

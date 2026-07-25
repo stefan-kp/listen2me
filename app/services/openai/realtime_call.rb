@@ -1,11 +1,12 @@
 require "net/http"
 require "openssl"
 require "securerandom"
+require "timeout"
 
 module OpenAI
   class RealtimeCall
     ENDPOINT = URI("https://api.openai.com/v1/realtime/calls")
-    DEFAULT_MODEL = "gpt-realtime-2.1-mini"
+    DEFAULT_MODEL = "gpt-realtime-2.1"
 
     Result = Data.define(:status, :body) do
       def success?
@@ -15,22 +16,42 @@ module OpenAI
 
     class ConnectionError < StandardError; end
 
+    def self.api_key
+      ENV["OPENAI_API_KEY"].presence ||
+        Rails.application.credentials.dig(:openai, :api_key)
+    end
+
+    def self.configured?
+      api_key.present?
+    end
+
     def self.call(...)
       new(...).call
     end
 
-    def initialize(user:, conversation:, sdp:, locale:, transport: nil)
+    def initialize(
+      user:,
+      conversation:,
+      sdp:,
+      locale:,
+      api_key: self.class.api_key,
+      transport: nil
+    )
       @user = user
       @conversation = conversation
       @sdp = sdp
       @locale = locale.to_s
+      @api_key = api_key.to_s
       @transport = transport
     end
 
     def call
+      raise ConnectionError, "OpenAI Realtime is not configured" if @api_key.blank?
+
       response = (@transport || method(:perform_request)).call(build_request)
       Result.new(status: response.code.to_i, body: response.body.to_s)
-    rescue Net::OpenTimeout, Net::ReadTimeout, SocketError, SystemCallError, OpenSSL::SSL::SSLError => error
+    rescue Net::OpenTimeout, Net::ReadTimeout, Net::WriteTimeout, Timeout::Error,
+      SocketError, SystemCallError, EOFError, OpenSSL::SSL::SSLError => error
       raise ConnectionError, error.class.name
     end
 
@@ -39,7 +60,7 @@ module OpenAI
     def build_request
       boundary = "----listen2me-#{SecureRandom.hex(16)}"
       request = Net::HTTP::Post.new(ENDPOINT)
-      request["Authorization"] = "Bearer #{@user.llm_api_key}"
+      request["Authorization"] = "Bearer #{@api_key}"
       request["OpenAI-Safety-Identifier"] = safety_identifier
       request["Content-Type"] = "multipart/form-data; boundary=#{boundary}"
       request.body = multipart_body(boundary)
@@ -66,6 +87,9 @@ module OpenAI
       {
         type: "realtime",
         model: ENV.fetch("OPENAI_REALTIME_MODEL", DEFAULT_MODEL),
+        reasoning: {
+          effort: "low"
+        },
         output_modalities: [ "text" ],
         instructions: session_instructions,
         audio: {

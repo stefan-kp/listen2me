@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   db:
     image: postgres:15
@@ -27,7 +25,16 @@ services:
       SECRET_KEY_BASE: development_key_123
       TARGET_PORT: 3000
       DEBUG: "true"
+      LITELLM_HOST: ${LITELLM_HOST:-}
+      LITELLM_SECRET: ${LITELLM_SECRET:-}
+      LITELLM_FAST_MODEL: ${LITELLM_FAST_MODEL:-fast}
+      LITELLM_CHEAP_MODEL: ${LITELLM_CHEAP_MODEL:-cheap}
+      LITELLM_TIMEOUT_SECONDS: ${LITELLM_TIMEOUT_SECONDS:-5}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_REALTIME_MODEL: ${OPENAI_REALTIME_MODEL:-gpt-realtime-2.1}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
 volumes:
   postgres_data:
-  bundle_cache: 
+  bundle_cache:

@@ -57,7 +57,7 @@
           - @categories.each do |category|
             = link_to category_speech_path(id: category.id), class: "l2m-category-tab" do
               = heroicon category.icon_name, options: { class: "h-4 w-4", "aria-hidden": "true" }
-              %span= category.name
+              %span= display_category_name(category)
 
         #frequent_sentences.l2m-phrase-grid{role: "list", "aria-label": t(".frequent_sentences")}
           - if @frequent_sentences.any?

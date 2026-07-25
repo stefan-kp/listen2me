@@ -32,8 +32,8 @@
       communicator_draft_action_value: t("speeches.sentence.draft_action", default: "Schreiben"),
       communicator_direct_suggestion_label_value: t("speeches.interaction.direct_suggestion_label", default: "sofort sprechen"),
       communicator_draft_suggestion_label_value: t("speeches.interaction.draft_suggestion_label", default: "zuerst schreiben"),
-      communicator_followup_rules_value: t("speeches.interaction.followup_rules", default: []),
-      communicator_default_followups_value: t("speeches.interaction.default_followups", default: [])
+      communicator_followup_rules_value: t("speeches.interaction.followup_rules", default: []).to_json,
+      communicator_default_followups_value: t("speeches.interaction.default_followups", default: []).to_json
     }}
     .skip-nav
       = link_to t('.skip_to_main'), '#main-content', 

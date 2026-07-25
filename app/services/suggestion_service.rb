@@ -1,5 +1,8 @@
 class SuggestionService
-  SUPPORTED_PROVIDERS = %w[openai anthropic gemini].freeze
+  SUGGESTION_COUNT = 3
+  MAX_SUGGESTION_LENGTH = 160
+  DEFAULT_MODEL_PROFILE = "fast"
+  SUMMARY_MODEL_PROFILE = "cheap"
   FALLBACK_SUGGESTIONS = {
     "de" => [
       { "content" => "Ja, bitte." },
@@ -15,31 +18,42 @@ class SuggestionService
 
   attr_reader :last_message
 
-  def initialize(conversation)
+  def initialize(conversation, client: LiteLlm::Client.new)
     @conversation = conversation
     @user = conversation&.user
+    @client = client
   end
 
   def generate_suggestions
-    return fallback_suggestions unless llm_configured?
+    return fallback_suggestions unless proxy_available?
 
-    response = llm.chat(
+    completion = @client.chat(
       messages: format_conversation_history,
+      profile: suggestion_model_profile,
+      temperature: 0.3,
+      max_tokens: 180,
       response_format: { type: "json_object" }
     )
 
-    parse_suggestions(response&.completion) || fallback_suggestions
+    parse_suggestions(completion) || fallback_suggestions
   rescue StandardError => e
     Rails.logger.warn "Suggestion generation failed (#{e.class})"
     fallback_suggestions
   end
 
   def generate_conversation_summary
-    return if @user.nil? || !llm_configured?
+    return if @user.nil? || !proxy_available?
 
     conversation_data = prepare_conversation_data
-    prompt = build_summary_prompt
-    response = call_llm_with_prompt(prompt, conversation_data)
+    response = @client.chat(
+      messages: [
+        { role: "system", content: build_summary_prompt },
+        { role: "user", content: conversation_data.to_json }
+      ],
+      profile: SUMMARY_MODEL_PROFILE,
+      temperature: 0.2,
+      max_tokens: 600
+    )
     return if response.blank?
 
     @user.update!(
@@ -55,30 +69,13 @@ class SuggestionService
 
   private
 
-  def llm_configured?
-    @conversation.present? &&
-      @user.present? &&
-      @user.llm_api_key.present? &&
-      SUPPORTED_PROVIDERS.include?(@user.llm_provider.to_s)
+  def proxy_available?
+    @conversation.present? && @user.present? && @client.configured?
   end
 
-  def llm
-    klass = case @user.llm_provider
-    when "openai"
-      Langchain::LLM::OpenAI
-    when "anthropic"
-      Langchain::LLM::Anthropic
-    when "gemini"
-      Langchain::LLM::GoogleGemini
-    end
-
-    klass.new(
-      api_key: @user.llm_api_key,
-      default_options: {
-        temperature: 0.7,
-        chat_model: @user.llm_model
-      }
-    )
+  def suggestion_model_profile
+    profile = @user.suggestion_model_profile.to_s
+    User::SUGGESTION_MODEL_PROFILES.include?(profile) ? profile : DEFAULT_MODEL_PROFILE
   end
 
   def format_conversation_history
@@ -124,15 +121,26 @@ class SuggestionService
 
   def parse_suggestions(completion)
     parsed = JSON.parse(completion.to_s)
-    suggestions = parsed.is_a?(Hash) ? parsed["response"] : parsed
-    return unless suggestions.is_a?(Array)
+    return unless parsed.is_a?(Hash) && parsed.keys == [ "response" ]
 
-    normalized = suggestions.filter_map do |suggestion|
-      content = suggestion.is_a?(Hash) ? suggestion["content"] || suggestion[:content] : suggestion
-      { "content" => content.to_s.strip } if content.present?
-    end.first(3)
+    suggestions = parsed.fetch("response")
+    return unless suggestions.is_a?(Array) && suggestions.size == SUGGESTION_COUNT
 
-    normalized if normalized.size == 3
+    normalized = suggestions.map do |suggestion|
+      return unless suggestion.is_a?(Hash) && suggestion.keys == [ "content" ]
+
+      content = suggestion.fetch("content")
+      return unless content.is_a?(String)
+
+      content = content.strip
+      return unless content.present? && content.length <= MAX_SUGGESTION_LENGTH
+
+      { "content" => content }
+    end
+
+    return unless normalized.map { |suggestion| suggestion.fetch("content") }.uniq.size == SUGGESTION_COUNT
+
+    normalized
   rescue JSON::ParserError, TypeError
     nil
   end
@@ -159,48 +167,5 @@ class SuggestionService
 
   def build_summary_prompt
     I18n.t("suggestion_service.summary_prompt")
-  end
-
-  def call_llm_with_prompt(prompt, data)
-    client = create_llm_client
-
-    case @user.llm_provider
-    when "openai"
-      response = client.chat(
-        parameters: {
-          model: @user.llm_model || "gpt-4",
-          messages: [
-            { role: "system", content: prompt },
-            { role: "user", content: data.to_json }
-          ],
-          temperature: 0.7
-        }
-      )
-      response.dig("choices", 0, "message", "content")
-    when "anthropic"
-      response = client.messages(
-        model: @user.llm_model || "claude-3-opus-20240229",
-        messages: [ { role: "user", content: "#{prompt}\n\nConversations:\n#{data.to_json}" } ],
-        temperature: 0.7
-      )
-      response.content.first.text
-    when "gemini"
-      response = client.generate_content(
-        "#{prompt}\n\nConversations:\n#{data.to_json}",
-        temperature: 0.7
-      )
-      response.text
-    end
-  end
-
-  def create_llm_client
-    case @user.llm_provider
-    when "openai"
-      OpenAI::Client.new(access_token: @user.llm_api_key)
-    when "anthropic"
-      Anthropic::Client.new(access_token: @user.llm_api_key)
-    when "gemini"
-      Google::Gemini::Client.new(access_token: @user.llm_api_key)
-    end
   end
 end

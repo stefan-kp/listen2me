@@ -1,15 +1,17 @@
 require "test_helper"
 
 class UserTest < ActiveSupport::TestCase
-  test "onboarding preferences only accept supported values" do
+  test "preferences only accept supported values" do
     user = users(:default_user)
 
     user.preferred_locale = "fr"
     user.preferred_speech_mode = "automatic"
+    user.suggestion_model_profile = "provider/model-name"
 
     assert_not user.valid?
     assert user.errors.of_kind?(:preferred_locale, :inclusion)
     assert user.errors.of_kind?(:preferred_speech_mode, :inclusion)
+    assert user.errors.of_kind?(:suggestion_model_profile, :inclusion)
   end
 
   test "onboarding is complete when a completion timestamp exists" do

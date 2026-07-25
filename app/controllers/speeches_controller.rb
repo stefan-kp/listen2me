@@ -3,9 +3,9 @@ class SpeechesController < ApplicationController
     @frequent_sentences = current_user.sentences
                                       .includes(:category, :language)
                                       .where(language: Language.find_by(code: I18n.locale))
-                                      .order(usage_count: :desc)
+                                      .order(usage_count: :desc, id: :asc)
                                       .limit(10)
-    @categories = current_user.categories
+    @categories = current_user.categories.order(:id)
     # Fügen Sie einen Titel für Screen Reader hinzu
     @page_title = t(".frequent_sentences")
     @page_description = t(".frequent_sentences_description")
@@ -41,13 +41,13 @@ class SpeechesController < ApplicationController
 
   def category
     @category = current_user.categories.find(params[:id])
-    @categories = current_user.categories
+    @categories = current_user.categories.order(:id)
     @sentences = current_user.sentences
                              .where(
                                category: @category,
                                language: Language.find_by(code: I18n.locale)
                              )
-                             .order(usage_count: :desc)
+                             .order(usage_count: :desc, id: :asc)
   end
 
   def speak

@@ -1,111 +1,218 @@
-.container.mx-auto.p-4.max-w-2xl
-  .bg-white.shadow.sm:rounded-lg
-    .px-4.py-5.sm:p-6{data: { 
-      controller: "tabs", 
-      has_api_key: (current_user.elevenlabs_api_key.present?).to_s
-    }}
-      %h1.text-lg.font-medium.leading-6.text-gray-900= t('.title')
-      
-      .mt-4.border-b.border-gray-200
-        %nav.-mb-px.flex.space-x-8{role: "tablist", "aria-label": t(".title")}
-          = link_to "#about",
-            id: "settings-about-tab",
-            class: "whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm",
-            role: "tab",
-            "aria-controls": "settings-about-panel",
-            "aria-selected": "false",
-            data: { tabs_target: "tab", action: "click->tabs#switch keydown->tabs#keydown", tab: "about" } do
-            = heroicon("user", options: { class: "h-5 w-5 inline-block mr-2" })
-            = t('.about_me')
-          = link_to "#system",
-            id: "settings-system-tab",
-            class: "whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm",
-            role: "tab",
-            "aria-controls": "settings-system-panel",
-            "aria-selected": "false",
-            data: { tabs_target: "tab", action: "click->tabs#switch keydown->tabs#keydown", tab: "system" } do
-            = heroicon("cog-6-tooth", options: { class: "h-5 w-5 inline-block mr-2" })
-            = t('.system')
+- content_for :title, t(".title")
 
-      = form_with model: current_user, url: settings_path, class: "mt-5 space-y-6" do |f|
-        #settings-about-panel.space-y-4{
-          role: "tabpanel",
-          "aria-labelledby": "settings-about-tab",
-          data: { tabs_target: "panel", panel: "about" }}
-          %h4.font-medium.text-gray-700= t('.about_settings')
-          
-          .form-group
-            = f.label :description, class: "form-label"
+.l2m-page.l2m-settings-page{"aria-labelledby": "settings-title"}
+  .l2m-view-heading
+    %div
+      %p.l2m-eyebrow= t(".eyebrow")
+      %h1#settings-title= t(".title")
+    %p.l2m-view-hint= t(".intro")
+
+  = render "devise/shared/error_messages", resource: current_user
+
+  .l2m-settings-shell{data: { controller: "tabs" }}
+    %nav.l2m-settings-tabs{role: "tablist", "aria-label": t(".sections")}
+      = link_to "#profile",
+        id: "settings-profile-tab",
+        class: "l2m-settings-tab",
+        role: "tab",
+        "aria-controls": "profile",
+        "aria-selected": "false",
+        data: { tabs_target: "tab", action: "click->tabs#switch keydown->tabs#keydown", tab: "profile" } do
+        = heroicon "user", options: { class: "h-5 w-5", "aria-hidden": "true" }
+        %span= t(".about_me")
+
+      = link_to "#voice-device",
+        id: "settings-device-tab",
+        class: "l2m-settings-tab",
+        role: "tab",
+        "aria-controls": "voice-device",
+        "aria-selected": "false",
+        data: { tabs_target: "tab", action: "click->tabs#switch keydown->tabs#keydown", tab: "voice-device" } do
+        = heroicon "speaker-wave", options: { class: "h-5 w-5", "aria-hidden": "true" }
+        %span= t(".device")
+
+      = link_to "#system",
+        id: "settings-system-tab",
+        class: "l2m-settings-tab",
+        role: "tab",
+        "aria-controls": "system",
+        "aria-selected": "false",
+        data: { tabs_target: "tab", action: "click->tabs#switch keydown->tabs#keydown", tab: "system" } do
+        = heroicon "sparkles", options: { class: "h-5 w-5", "aria-hidden": "true" }
+        %span= t(".system")
+
+      = link_to "#account",
+        id: "settings-account-tab",
+        class: "l2m-settings-tab",
+        role: "tab",
+        "aria-controls": "account",
+        "aria-selected": "false",
+        data: { tabs_target: "tab", action: "click->tabs#switch keydown->tabs#keydown", tab: "account" } do
+        = heroicon "user-circle", options: { class: "h-5 w-5", "aria-hidden": "true" }
+        %span= t(".account")
+
+    .l2m-settings-panels
+      %section#profile.l2m-settings-panel{
+        role: "tabpanel",
+        "aria-labelledby": "settings-profile-tab",
+        data: { tabs_target: "panel", panel: "profile" }}
+        .l2m-settings-panel-heading
+          %div
+            %p.l2m-section-kicker= t(".personal")
+            %h2= t(".about_settings")
+          = heroicon "user", options: { class: "h-7 w-7", "aria-hidden": "true" }
+        %p.l2m-settings-copy= t(".about_description")
+
+        = form_with model: current_user, url: settings_path, id: "profile-settings-form", class: "l2m-settings-form" do |f|
+          .l2m-field
+            = f.label :description, t(".description_label")
             = f.text_area :description,
-              class: "form-textarea",
-              rows: 4,
-              placeholder: t('.description_placeholder')
-        
-        #settings-system-panel.space-y-4{
-          role: "tabpanel",
-          "aria-labelledby": "settings-system-tab",
-          data: { tabs_target: "panel", panel: "system" }}
-          .space-y-4
-            %h4.font-medium.text-gray-700= t('.voice_settings')
-            %p.mt-1.text-sm.text-gray-500= t('.voice_settings_description')
-            
-            .form-group
-              = f.label :elevenlabs_voice_id, class: "form-label"
-              = f.text_field :elevenlabs_voice_id,
-                class: "form-input"
+              class: "l2m-input",
+              rows: 5,
+              maxlength: 2000,
+              placeholder: t(".description_placeholder")
+            %small= t(".description_help")
 
-            .form-group
-              = f.label :elevenlabs_api_key, class: "form-label"
-              = f.password_field :elevenlabs_api_key,
-                class: "form-input",
-                value: nil,
-                autocomplete: "new-password",
-                placeholder: t(".credential_placeholder", default: "Leer lassen, um den vorhandenen Schlüssel beizubehalten")
-          
-          .space-y-4.mt-8
-            %h4.font-medium.text-gray-700= t('.llm_settings')
-            
-            .form-group
-              = f.label :llm_provider, class: "form-label"
-              = f.select :llm_provider, options_for_select([['OpenAI', 'openai'],['Anthropic', 'anthropic'], ['Gemini', 'gemini']], current_user.llm_provider),{},class: "form-select"
-                
-            .form-group
-              = f.label :llm_model, class: "form-label"
-              = f.text_field :llm_model,
-                class: "form-input"
-                
-            .form-group
-              = f.label :llm_api_key, class: "form-label"
-              = f.password_field :llm_api_key,
-                class: "form-input",
-                value: nil,
-                autocomplete: "new-password",
-                placeholder: t(".credential_placeholder", default: "Leer lassen, um den vorhandenen Schlüssel beizubehalten")
-        
-        .mt-8.flex.justify-end
-          = f.submit t('.save'),
-            class: "ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          .l2m-settings-actions
+            = f.submit t(".save"), class: "l2m-button l2m-button-dark"
 
-      .mt-8.border-t.pt-8
-        .flex.items-center.justify-between.mb-4
-          %h2.text-lg.font-medium.text-gray-900= t('.conversation_summary')
+      %section#voice-device.l2m-settings-panel{
+        role: "tabpanel",
+        "aria-labelledby": "settings-device-tab",
+        data: {
+          tabs_target: "panel",
+          panel: "voice-device",
+          controller: "device-check"
+        }}
+        .l2m-settings-panel-heading
+          %div
+            %p.l2m-section-kicker= t(".device_kicker")
+            %h2= t(".device_title")
+          = heroicon "speaker-wave", options: { class: "h-7 w-7", "aria-hidden": "true" }
+        %p.l2m-settings-copy= t(".device_description")
+
+        .l2m-audio-checks
+          .l2m-audio-check
+            %div
+              = heroicon "speaker-wave", options: { class: "h-6 w-6", "aria-hidden": "true" }
+              %span
+                %strong= t(".voice_test_title")
+                %small= t(".voice_test_copy")
+            %button.l2m-button.l2m-button-secondary{
+              type: "button",
+              data: { action: "click->device-check#testVoice" }}
+              = t(".test")
+
+          .l2m-audio-check
+            %div
+              = heroicon "microphone", options: { class: "h-6 w-6", "aria-hidden": "true" }
+              %span
+                %strong= t(".microphone_test_title")
+                %small= t(".microphone_test_copy")
+            %button.l2m-button.l2m-button-secondary{
+              type: "button",
+              data: { action: "click->device-check#testMicrophone" }}
+              = t(".test")
+
+        %p.l2m-audio-status{
+          role: "status",
+          "aria-live": "polite",
+          data: {
+            device_check_target: "status",
+            voice_success: t(".voice_success"),
+            voice_error: t(".voice_error"),
+            microphone_success: t(".microphone_success"),
+            microphone_error: t(".microphone_error"),
+            testing: t(".testing"),
+            test_sentence: t(".test_sentence")
+          }}
+
+        %p.l2m-settings-note
+          = heroicon "shield-check", options: { class: "h-5 w-5", "aria-hidden": "true" }
+          %span= t(".personal_voice_later")
+
+      %section#system.l2m-settings-panel{
+        role: "tabpanel",
+        "aria-labelledby": "settings-system-tab",
+        data: { tabs_target: "panel", panel: "system" }}
+        .l2m-settings-panel-heading
+          %div
+            %p.l2m-section-kicker= t(".ai_kicker")
+            %h2= t(".llm_settings")
+          = heroicon "sparkles", options: { class: "h-7 w-7", "aria-hidden": "true" }
+        %p.l2m-settings-copy= t(".llm_settings_description")
+
+        = form_with model: current_user, url: settings_path, id: "ai-settings-form", class: "l2m-settings-form" do |f|
+          %fieldset.l2m-profile-choice
+            %legend= t(".model_profile_label")
+            %p= t(".model_profile_help")
+            .l2m-profile-choice-grid
+              = f.label :suggestion_model_profile_fast, class: "l2m-profile-choice-card" do
+                = f.radio_button :suggestion_model_profile, "fast",
+                  checked: current_user.suggestion_model_profile != "cheap"
+                %span.l2m-choice-check{"aria-hidden": "true"} ✓
+                = heroicon "bolt", options: { class: "h-6 w-6", "aria-hidden": "true" }
+                %strong= t(".model_profile_fast")
+                %small= t(".model_profile_fast_description")
+                %em= t(".recommended")
+
+              = f.label :suggestion_model_profile_cheap, class: "l2m-profile-choice-card" do
+                = f.radio_button :suggestion_model_profile, "cheap",
+                  checked: current_user.suggestion_model_profile == "cheap"
+                %span.l2m-choice-check{"aria-hidden": "true"} ✓
+                = heroicon "banknotes", options: { class: "h-6 w-6", "aria-hidden": "true" }
+                %strong= t(".model_profile_cheap")
+                %small= t(".model_profile_cheap_description")
+
+          %p.l2m-settings-note
+            = heroicon "shield-check", options: { class: "h-5 w-5", "aria-hidden": "true" }
+            %span= t(".proxy_explanation")
+
+          .l2m-settings-actions
+            = f.submit t(".save_ai"), class: "l2m-button l2m-button-dark"
+
+        .l2m-settings-divider
+
+        .l2m-settings-subsection
+          %div
+            %h3= t(".conversation_summary")
+            %p.l2m-settings-copy= t(".conversation_summary_explanation")
           = button_to generate_summary_settings_path,
             method: :post,
-            class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-75",
-            data: { controller: "loading-button", loading_button_text_value: t('.generating_summary'), turbo_submits_with: "" } do
-            = heroicon "arrow-path", options: { class: "h-5 w-5 mr-2 transition-transform duration-1000", data: { loading_button_target: "icon" }}
-            %span{data: { loading_button_target: "label" }}= t('.generate_summary')
-
-        %p.text-sm.text-gray-500.mb-4= t('.conversation_summary_explanation')
+            class: "l2m-button l2m-button-secondary",
+            data: { controller: "loading-button", loading_button_text_value: t(".generating_summary"), turbo_submits_with: "" } do
+            = heroicon "arrow-path", options: { class: "h-5 w-5", "data-loading-button-target": "icon", "aria-hidden": "true" }
+            %span{data: { loading_button_target: "label" }}= t(".generate_summary")
 
         - if current_user.conversation_summary.present?
-          .prose.prose-sm.mt-4
-            .text-sm.text-gray-500.mb-2
-              = t('.last_generated', time: l(current_user.summary_generated_at, format: :long))
-            .bg-gray-50.rounded-lg.p-4.prose.prose-slate.max-w-none
-              = markdown_to_html(current_user.conversation_summary)
+          .l2m-summary-card
+            %small= t(".last_generated", time: l(current_user.summary_generated_at, format: :long))
+            .l2m-summary-content= markdown_to_html(current_user.conversation_summary)
         - else
-          %p.text-sm.text-gray-500.italic= t('.no_summary')
+          %p.l2m-empty-state= t(".no_summary")
 
-.hidden
-  .border-blue-500.text-blue-600.border-transparent.text-gray-500.hover:text-gray-700.hover:border-gray-300
+      %section#account.l2m-settings-panel{
+        role: "tabpanel",
+        "aria-labelledby": "settings-account-tab",
+        data: { tabs_target: "panel", panel: "account" }}
+        .l2m-settings-panel-heading
+          %div
+            %p.l2m-section-kicker= t(".account_kicker")
+            %h2= t(".account_title")
+          = heroicon "user-circle", options: { class: "h-7 w-7", "aria-hidden": "true" }
+        %p.l2m-settings-copy= t(".account_description")
+
+        .l2m-account-summary
+          %span.l2m-account-avatar{"aria-hidden": "true"}
+            = "#{current_user.first_name.to_s.first}#{current_user.last_name.to_s.first}".upcase
+          %span
+            %strong= [current_user.first_name, current_user.last_name].compact.join(" ")
+            %small= current_user.email
+
+        .l2m-account-actions
+          = link_to edit_user_registration_path, class: "l2m-button l2m-button-secondary" do
+            = heroicon "pencil-square", options: { class: "h-5 w-5", "aria-hidden": "true" }
+            = t(".edit_account")
+          = button_to destroy_user_session_path, method: :delete, class: "l2m-button l2m-button-dark" do
+            = heroicon "arrow-right-on-rectangle", options: { class: "h-5 w-5", "aria-hidden": "true" }
+            = t(".sign_out")

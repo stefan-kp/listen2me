@@ -16,3 +16,7 @@
   language.name = attributes.fetch(:name)
   language.save!
 end
+
+User.find_each do |user|
+  DefaultContentInstaller.call(user: user)
+end

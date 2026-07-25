@@ -1,4 +1,6 @@
 class SettingsController < ApplicationController
+  rate_limit to: 3, within: 1.hour, only: :generate_summary, by: -> { current_user.id }
+
   def show
   end
 
@@ -12,8 +14,11 @@ class SettingsController < ApplicationController
 
   def generate_summary
     service = SuggestionService.new(current_user.conversations.last)
-    service.generate_conversation_summary
-    redirect_to settings_path, notice: t(".success")
+    if service.generate_conversation_summary.present?
+      redirect_to settings_path, notice: t(".success")
+    else
+      redirect_to settings_path, alert: t(".error")
+    end
   rescue StandardError => e
     Rails.logger.warn "Conversation summary generation failed (#{e.class})"
     redirect_to settings_path, alert: t(".error")
@@ -22,19 +27,6 @@ class SettingsController < ApplicationController
   private
 
   def settings_params
-    permitted = params.require(:user).permit(
-      :elevenlabs_api_key,
-      :elevenlabs_voice_id,
-      :llm_api_key,
-      :llm_provider,
-      :llm_model,
-      :description
-    )
-
-    %w[elevenlabs_api_key llm_api_key].each do |credential|
-      permitted.delete(credential) if permitted[credential].blank?
-    end
-
-    permitted
+    params.require(:user).permit(:description, :suggestion_model_profile)
   end
 end

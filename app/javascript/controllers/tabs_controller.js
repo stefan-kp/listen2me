@@ -4,38 +4,45 @@ export default class extends Controller {
   static targets = ["tab", "panel"]
 
   connect() {
-    const hasApiKey = this.element.dataset.hasApiKey === "true"
-    const initialTab = hasApiKey ? "about" : "system"
+    const requestedTab = window.location.hash.replace("#", "")
+    const initialTab = this.hasTab(requestedTab) ? requestedTab : this.tabTargets[0]?.dataset.tab
 
-    this.hideAllPanels()
-    this.showPanel(initialTab)
-    this.updateTabs(initialTab)
+    this.activate(initialTab, { updateHash: false })
   }
 
   switch(event) {
     event.preventDefault()
-    this.activate(event.currentTarget.dataset.tab)
+    const tabName = event.currentTarget.dataset.tab
+    this.activate(tabName)
   }
 
   keydown(event) {
-    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return
+    if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(event.key)) return
 
     event.preventDefault()
     const currentIndex = this.tabTargets.indexOf(event.currentTarget)
+    const forwards = ["ArrowRight", "ArrowDown"].includes(event.key)
     const nextIndex = event.key === "Home"
       ? 0
       : event.key === "End"
         ? this.tabTargets.length - 1
-        : (currentIndex + (event.key === "ArrowRight" ? 1 : -1) + this.tabTargets.length) % this.tabTargets.length
+        : (currentIndex + (forwards ? 1 : -1) + this.tabTargets.length) % this.tabTargets.length
     const nextTab = this.tabTargets[nextIndex]
     this.activate(nextTab.dataset.tab)
     nextTab.focus()
   }
 
-  activate(tabName) {
+  activate(tabName, { updateHash = true } = {}) {
+    if (!tabName) return
+
     this.hideAllPanels()
     this.showPanel(tabName)
     this.updateTabs(tabName)
+    if (updateHash) window.history.replaceState(null, "", `#${tabName}`)
+  }
+
+  hasTab(tabName) {
+    return this.tabTargets.some((tab) => tab.dataset.tab === tabName)
   }
 
   hideAllPanels() {
@@ -56,12 +63,7 @@ export default class extends Controller {
       const isSelected = tab.dataset.tab === selectedTab
       tab.setAttribute("aria-selected", String(isSelected))
       tab.tabIndex = isSelected ? 0 : -1
-      tab.classList.toggle("border-blue-500", isSelected)
-      tab.classList.toggle("text-blue-600", isSelected)
-      tab.classList.toggle("border-transparent", !isSelected)
-      tab.classList.toggle("text-gray-500", !isSelected)
-      tab.classList.toggle("hover:text-gray-700", !isSelected)
-      tab.classList.toggle("hover:border-gray-300", !isSelected)
+      tab.classList.toggle("is-active", isSelected)
     })
   }
 }

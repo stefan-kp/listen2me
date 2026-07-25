@@ -13,7 +13,7 @@
     %span.l2m-phrase-content= sentence.content
     %span.l2m-phrase-meta
       - if sentence.category.present?
-        %span= sentence.category.name
+        %span= display_category_name(sentence.category)
       %small{
         data: {
           communicator_target: "modeHint",

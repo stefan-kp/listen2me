@@ -8,7 +8,7 @@
     %div
       %p.l2m-eyebrow= t(".category_label", default: "Satzkategorie")
       %h1#category-title
-        = @category.name
+        = display_category_name(@category)
     = heroicon @category.icon_name, options: { class: "h-10 w-10 text-emerald-800", "aria-hidden": "true" }
 
   = render "text_form"
@@ -17,7 +17,7 @@
     .l2m-section-heading
       %div
         %p.l2m-section-kicker= t(".quick_sentences", default: "Schnelle Sätze")
-        %h2#sentences-title= t(".category_sentences", category: @category.name)
+        %h2#sentences-title= t(".category_sentences", category: display_category_name(@category))
     .l2m-phrase-grid{role: "list", "aria-label": t(".sentences_list")}
       - if @sentences.any?
         = render partial: "sentence", collection: @sentences

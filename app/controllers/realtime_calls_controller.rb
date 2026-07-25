@@ -32,6 +32,6 @@ class RealtimeCallsController < ApplicationController
   private
 
   def realtime_configured?
-    current_user.llm_provider == "openai" && current_user.llm_api_key.present?
+    OpenAI::RealtimeCall.configured?
   end
 end

@@ -1,55 +1,57 @@
-.min-h-screen.flex.items-center.justify-center.bg-gray-50.py-12.px-4.sm:px-6.lg:px-8
-  .max-w-md.w-full
-    .text-center.mb-8
-      = link_to root_path do
-        =# image_tag "logo.svg", class: "mx-auto h-12 w-auto", alt: "Listen2Me"
-      %h2.mt-6.text-3xl.font-bold.text-gray-900= t('.sign_up')
-      %p.mt-2.text-sm.text-gray-600
-        = t(".or")
-        = link_to t(".sign_in"), new_session_path(resource_name), class: "font-medium text-blue-600 hover:text-blue-500"
+- content_for :title, t(".sign_up")
 
-    .bg-white.p-8.shadow.rounded-lg
-      = form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "space-y-6" }) do |f|
-        = render "devise/shared/error_messages", resource: resource
+.l2m-auth-page{"aria-labelledby": "sign-up-title"}
+  .l2m-auth-card.l2m-auth-card-wide
+    .l2m-auth-heading
+      %p.l2m-eyebrow= t(".eyebrow")
+      %h1#sign-up-title= t(".sign_up")
+      %p= t(".intro")
 
-        .space-y-6
-          .flex.gap-4
-            .flex-1
-              = f.label :first_name, class: "block text-sm font-medium text-gray-700"
-              = f.text_field :first_name, autofocus: true,
-                class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm",
-                placeholder: User.human_attribute_name(:first_name)
+    = form_for resource,
+      as: resource_name,
+      url: registration_path(resource_name),
+      html: { class: "l2m-auth-form" } do |f|
+      = render "devise/shared/error_messages", resource: resource
 
-            .flex-1
-              = f.label :last_name, class: "block text-sm font-medium text-gray-700"
-              = f.text_field :last_name,
-                class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm",
-                placeholder: User.human_attribute_name(:last_name)
+      .l2m-field-row
+        .l2m-field
+          = f.label :first_name, t(".first_name")
+          = f.text_field :first_name,
+            autofocus: true,
+            autocomplete: "given-name",
+            class: "l2m-input",
+            placeholder: t(".first_name_placeholder")
 
-          .form-group
-            = f.label :email, class: "block text-sm font-medium text-gray-700"
-            = f.email_field :email,
-              class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm",
-              placeholder: User.human_attribute_name(:email)
+        .l2m-field
+          = f.label :last_name, t(".last_name")
+          = f.text_field :last_name,
+            autocomplete: "family-name",
+            class: "l2m-input",
+            placeholder: t(".last_name_placeholder")
 
-          .form-group
-            = f.label :password, class: "block text-sm font-medium text-gray-700"
-            = f.password_field :password,
-              class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm",
-              placeholder: User.human_attribute_name(:password)
-            - if @minimum_password_length
-              %p.mt-1.text-sm.text-gray-500
-                = t('devise.shared.minimum_password_length', count: @minimum_password_length)
+      .l2m-field
+        = f.label :email, t(".email")
+        = f.email_field :email,
+          autocomplete: "email",
+          class: "l2m-input",
+          placeholder: t(".email_placeholder")
 
-          .form-group
-            = f.label :password_confirmation, class: "block text-sm font-medium text-gray-700"
-            = f.password_field :password_confirmation,
-              class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm",
-              placeholder: User.human_attribute_name(:password_confirmation)
+      .l2m-field
+        = f.label :password, t(".password")
+        = f.password_field :password,
+          autocomplete: "new-password",
+          class: "l2m-input",
+          placeholder: t(".password_placeholder")
+        - if @minimum_password_length
+          %small= t("devise.shared.minimum_password_length", count: @minimum_password_length)
 
-        .mt-6
-          = f.submit t('.sign_up'),
-            class: "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+      .l2m-field
+        = f.label :password_confirmation, t(".password_confirmation")
+        = f.password_field :password_confirmation,
+          autocomplete: "new-password",
+          class: "l2m-input",
+          placeholder: t(".password_confirmation_placeholder")
 
-    .mt-6.text-center.text-sm.text-gray-600
-      = render "devise/shared/links" 
+      = f.submit t(".sign_up"), class: "l2m-button l2m-button-dark"
+
+    = render "devise/shared/links"

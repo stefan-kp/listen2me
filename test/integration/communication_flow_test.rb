@@ -15,6 +15,12 @@ class CommunicationFlowTest < ActionDispatch::IntegrationTest
     assert_select ".l2m-urgent-button", count: 4
     assert_not_includes response.body, @user.elevenlabs_api_key
     assert_not_includes response.body, sentences(:other_users_sentence).content
+
+    body = Nokogiri::HTML(response.body).at_css("body")
+    followup_rules = JSON.parse(body["data-communicator-followup-rules-value"])
+    default_followups = JSON.parse(body["data-communicator-default-followups-value"])
+    assert followup_rules.all? { |rule| rule.key?("terms") && rule.key?("suggestions") }
+    assert_equal 3, default_followups.size
   end
 
   test "speaking custom text stores a sentence without creating a conversation" do
@@ -44,6 +50,9 @@ class CommunicationFlowTest < ActionDispatch::IntegrationTest
     assert_select "h1", text: "Zuhören. Vorschlagen. Du entscheidest."
     assert_select "[data-controller~='audio-recorder']"
     assert_not_includes response.body, @user.elevenlabs_api_key
+
+    workspace = Nokogiri::HTML(response.body).at_css("[data-conversation-fallback-suggestions-value]")
+    assert_equal 3, JSON.parse(workspace["data-conversation-fallback-suggestions-value"]).size
   end
 
   test "conversation can start without an initial sentence and returns suggestions" do
@@ -72,6 +81,19 @@ class CommunicationFlowTest < ActionDispatch::IntegrationTest
     get conversation_path(id: conversation.id)
     assert_response :success
     assert_select ".l2m-message-partner", text: /Möchtest du etwas trinken/
+  end
+
+  test "generated suggestions are rendered without triggering speech automatically" do
+    conversation = @user.conversations.create!
+    conversation.messages.create!(content: "Möchtest du etwas trinken?", role: :partner)
+
+    post suggestions_conversation_path(id: conversation.id),
+      headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+    assert_response :success
+    assert_includes response.body, "conversation#useSuggestion"
+    assert_not_includes response.body, "speech#speakAndSubmit"
+    assert_not_includes response.body, "speech:finished"
   end
 
   test "oversized communication text is rejected before storage" do

@@ -177,6 +177,7 @@ en:
       microphone_test_title: "Microphone"
       microphone_test_copy: "Checks permission for Conversation mode."
       test: "Test"
+      testing: "Running check …"
       test_sentence: "Listen2Me is ready."
       voice_success: "Speech output works."
       voice_error: "Speech output is not available in this browser."
@@ -196,92 +197,13 @@ en:
 
   suggestions:
     system_prompt: |
-      You are a communication assistant for a person who uses text as their voice. Create short, natural suggestions for what that person might say next.
-      Always generate suggestions from the speaker's point of view, never from the other person's point of view.
-
-      # Details
-
-      - The speaker can type responses
-      - Provide context-related suggestions for possible answers
-      - For example, when the topic is food, suggest fitting replies such as "I would like a pizza" or "I would like some bread"
-      - The response suggestions should always be in the same JSON format: an array with a list of messages, each containing a "content" attribute
-      - The speaker's messages have the role "speaker"; the other person's messages have the role "partner"
-      - The last message is especially important for the next suggestion; earlier messages provide context
-      - The optional description (user_description) and conversation summary (summary) provide additional context
-      - I will give you also the category of the sentence (category), which contains important context information
-      # Steps
-
-      1. Process the latest message
-      2. Identify the context of communication (e.g., topics like food, drinks, activities)
-      3. Create context-related response suggestions
-      4. Structure the suggestions in JSON format
-
-      # Output Format
-
-      The output must be JSON with exactly 3 objects:
-
-      ```json
-      {
-        "response": [
-          {
-              "content": "[Suggestion1]"
-          },
-          {
-              "content": "[Suggestion2]"
-          },
-          {
-              "content": "[Suggestion3]"
-          }
-        ]
-      }
-      ```
-
-      # Examples
-
-      ## Example 1
-
-      ### Input
-      The speaker enters "I'm hungry"
-
-      ### Output
-      ```json
-      [
-          {
-              "content": "I would like a pizza"
-          },
-          {
-              "content": "I would like some bread"
-          },
-          {
-              "content": "Something small, please"
-          }
-      ]
-      ```
-
-      ## Example 2
-
-      ### Input
-      The speaker says "I want something to drink"
-
-      ### Output
-      ```json
-      [
-          {
-              "content": "I would like a glass of water"
-          },
-          {
-              "content": "I would like some juice"
-          },
-          {
-              "content": "Just a small sip, please"
-          }
-      ]
-      ```
-
-      # Notes
-
-      - Ensure relevance and appropriateness of suggestions in relation to the given context
-      - The JSON output structure should be strictly maintained
+      You support a person who uses text as their voice.
+      Produce exactly three short, natural next sentences from their point of view.
+      "speaker" means this person and "partner" means the other person.
+      Prioritize last_message; context, category, user_description, and summary are supporting context only.
+      Do not invent personal or medical facts. Each sentence must stand alone, be unique, and contain at most 160 characters.
+      Return only JSON without explanations or Markdown:
+      {"response":[{"content":"…"},{"content":"…"},{"content":"…"}]}
 
   activerecord:
     errors:
@@ -360,7 +282,7 @@ en:
       user_paused: "The microphone is paused."
       pause_microphone: "Pause microphone"
       resume_microphone: "Turn microphone back on"
-      storage_note: "Messages are stored in this demo account. If AI is configured, conversation content may be sent to the selected provider."
+      storage_note: "Messages are stored in this demo account. After each saved message, content may be sent to the server-configured AI service to generate new suggestions. While Live AI is active, microphone audio is also sent to the configured Realtime service."
       standard_status: "Standard mode"
       standard_detail: "Browser recognition with local fallback suggestions."
       realtime_connecting: "Connecting Live AI …"
@@ -405,21 +327,58 @@ en:
   settings:
     show:
       title: "Settings"
+      eyebrow: "Your Listen2Me"
+      intro: "Adapt the interface, devices, and reply suggestions to your communication."
+      sections: "Settings sections"
       about_me: "About Me"
-      system: "System"
-      about_settings: "About Me Settings"
-      description_placeholder: "Tell us about yourself, your preferences, and any important information that should be considered during conversations..."
-      voice_settings: "Personal Voice (Preparation)"
-      voice_settings_description: "The current demo always uses the browser voice. The ElevenLabs fields are stored securely, but they are not connected to speech output yet. A personal voice will follow as a separate, clearly labelled implementation step."
-      llm_settings: "AI Settings"
-      credential_placeholder: "Leave blank to keep the current key"
+      device: "Voice & device"
+      system: "Suggestions"
+      account: "Account"
+      personal: "Personal context"
+      about_settings: "What should Listen2Me know about you?"
+      about_description: "These optional details help make reply suggestions more relevant and personal."
+      description_label: "Helpful context for suggestions"
+      description_placeholder: "For example: Please use short sentences. I like tea and address my family by their first names."
+      description_help: "Only add information that is genuinely helpful for your communication."
       save: "Save Changes"
+      device_kicker: "Check your browser"
+      device_title: "Do speech and microphone work?"
+      device_description: "These checks only run after you click and stay in your browser. No microphone recording is stored or uploaded."
+      voice_test_title: "Speech output"
+      voice_test_copy: "Checks whether the browser can speak a sentence."
+      microphone_test_title: "Microphone"
+      microphone_test_copy: "Checks permission for Conversation mode."
+      test: "Test"
+      testing: "Running check …"
+      test_sentence: "Listen2Me is ready."
+      voice_success: "Speech output works."
+      voice_error: "Speech output is not available in this browser."
+      microphone_success: "The microphone is ready. Nothing was recorded or stored."
+      microphone_error: "The microphone is unavailable. Text input still works."
+      personal_voice_later: "The demo currently uses the browser voice. A personal voice can be connected server-side later—provider keys do not belong in this form."
+      ai_kicker: "Reply suggestions"
+      llm_settings: "Choose speed or economy"
+      llm_settings_description: "Choose faster or more economical use. The Listen2Me server handles the technical model selection."
+      model_profile_label: "AI suggestion profile"
+      model_profile_help: "Both profiles only provide text suggestions. Nothing is spoken automatically."
+      model_profile_fast: "Fast"
+      model_profile_fast_description: "Prioritizes low response time for fluid conversations."
+      model_profile_cheap: "Economical"
+      model_profile_cheap_description: "Prioritizes lower cost for tests and less time-sensitive use."
+      recommended: "Recommended for conversations"
+      proxy_explanation: "Suggestions are generated securely through the Listen2Me server. If it is unavailable, three standard suggestions remain available."
+      save_ai: "Save suggestion profile"
       conversation_summary: "Conversation Analysis"
-      conversation_summary_explanation: "The conversation analysis helps the AI better understand your preferences and communication patterns. It analyzes your past conversations to provide more personalized suggestions. It's recommended to update this analysis periodically as your conversations grow."
+      conversation_summary_explanation: "Creates a summary from previous conversations for more relevant suggestions. If AI is unavailable, the existing summary remains unchanged."
       generate_summary: "Generate Summary"
       last_generated: "Last generated: %{time}"
       no_summary: "No conversation summary generated yet"
       generating_summary: "Generating..."
+      account_kicker: "Access"
+      account_title: "Manage account"
+      account_description: "Change your name, email address, or password—or sign out on this device."
+      edit_account: "Edit account details"
+      sign_out: "Sign out"
     update:
       updated: "Settings updated successfully"
     generate_summary:
@@ -486,6 +445,42 @@ en:
       new_text: "Alt + N: Enter new text"
 
   categories:
+    default_names:
+      basic_needs: "Basic Needs"
+      food: "Food"
+      drinks: "Drinks"
+      health: "Health"
+      pain: "Pain"
+      bathroom: "Bathroom"
+      emotions: "Emotions"
+      help: "Help"
+      emergency: "Emergency"
+      family: "Family"
+      daily_care: "Daily Care"
+      rest: "Rest"
+      entertainment: "Entertainment"
+      movement: "Movement"
+      temperature: "Temperature"
+
+    index:
+      title: "Manage Categories"
+      new_category: "New Category"
+      categories_list: "List of categories"
+      sentences_count:
+        zero: "No sentences"
+        one: "1 sentence"
+        other: "%{count} sentences"
+      edit_category: "Edit category '%{name}'"
+      confirm_delete: "Do you really want to delete the category '%{name}'? Its %{count} sentences will also be deleted."
+      delete_category: "Delete category '%{name}'"
+      no_categories: "No categories available"
+    create:
+      category_created: "Category was created"
+    destroy:
+      category_deleted: "Category was deleted"
+      cannot_delete_with_sentences:
+        one: "The category cannot be deleted because it still contains one sentence"
+        other: "The category cannot be deleted because it still contains %{count} sentences"
     new:
       title: "Create New Category"
       back_to_categories: "Back to Categories"

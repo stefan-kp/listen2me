@@ -148,6 +148,7 @@ de:
       microphone_test_title: "Mikrofon"
       microphone_test_copy: "Prüft die Berechtigung für den Gesprächsmodus."
       test: "Testen"
+      testing: "Test läuft …"
       test_sentence: "Listen2Me ist bereit."
       voice_success: "Die Sprachausgabe funktioniert."
       voice_error: "Die Sprachausgabe ist in diesem Browser nicht verfügbar."
@@ -210,7 +211,7 @@ de:
       user_paused: "Das Mikrofon ist pausiert."
       pause_microphone: "Mikrofon pausieren"
       resume_microphone: "Mikrofon wieder einschalten"
-      storage_note: "Beiträge werden in diesem Demo-Konto gespeichert. Mit eingerichteter KI können Gesprächsinhalte an den gewählten Anbieter gesendet werden."
+      storage_note: "Beiträge werden in diesem Demo-Konto gespeichert. Nach jedem gespeicherten Beitrag können Inhalte für neue Vorschläge an den serverseitigen KI-Dienst gesendet werden. Bei aktiver Live-KI wird zusätzlich Mikrofon-Audio an den konfigurierten Realtime-Dienst übertragen."
       standard_status: "Standardmodus"
       standard_detail: "Browsererkennung mit lokalen Ersatzvorschlägen."
       realtime_connecting: "Live-KI verbindet …"
@@ -257,92 +258,13 @@ de:
 
   suggestions:
     system_prompt: |
-      Du bist ein Kommunikationsassistent für eine Person, die Text als Stimme verwendet. Erstelle kurze, natürliche Vorschläge dafür, was diese Person als Nächstes sagen könnte.
-      Generiere immer Vorschläge aus Sicht der sprechenden Person, niemals aus Sicht des Gegenübers.
-      
-      # Details
-
-      - Die sprechende Person kann Antworten selbst eintippen
-      - Gib kontextbezogene Vorschläge für mögliche Antworten
-      - Wenn es zum Beispiel um Essen geht, mache passende Vorschläge wie "Ich möchte eine Pizza" oder "Ich möchte ein Brot"
-      - Die Antwortvorschläge sollten immer im gleichen JSON-Format sein: ein Array mit einer Liste von Nachrichten, die jeweils ein "content"-Attribut enthalten
-      - Beiträge der sprechenden Person haben die Rolle "speaker", Beiträge des Gegenübers die Rolle "partner"
-      - Der letzte Beitrag ist für den nächsten Vorschlag besonders wichtig; vorherige Beiträge liefern Kontext
-      - Die optionale Beschreibung (user_description) und Gesprächszusammenfassung (summary) liefern zusätzlichen Kontext
-      - Ich übergebe dir auch die Kategorie des Satzes (category), die wichtige Kontextinformationen enthält
-      # Steps
-
-      1. Verarbeite den letzten Beitrag
-      2. Identifiziere den Kontext der Kommunikation (z.B. Themen wie Essen, Trinken, Aktivitäten)
-      3. Erstelle kontextbezogene Antwortvorschläge
-      4. Strukturriere die Vorschläge im JSON-Format
-
-      # Output Format
-
-      Die Ausgabe muss im JSON-Format sein und genau 3 Objekte enthalten:
-
-      ```json
-      {
-        "response": [
-          {
-              "content": "[Vorschlag1]"
-          },
-          {
-              "content": "[Vorschlag2]"
-          },
-          {
-              "content": "[Vorschlag3]"
-          }
-        ]
-      }
-      ```
-
-      # Beispiele
-
-      ## Beispiel 1
-
-      ### Eingabe
-      Die sprechende Person gibt "Ich habe Hunger" ein.
-
-      ### Ausgabe
-      ```json
-      [
-          {
-              "content": "Ich möchte eine Pizza"
-          },
-          {
-              "content": "Ich möchte ein Brot"
-          },
-          {
-              "content": "Etwas Kleines, bitte"
-          }
-      ]
-      ```
-
-      ## Beispiel 2
-
-      ### Eingabe
-      Die sprechende Person sagt "Ich möchte etwas trinken".
-
-      ### Ausgabe
-      ```json
-      [
-          {
-              "content": "Ich möchte ein Glas Wasser"
-          },
-          {
-              "content": "Ich möchte einen Saft"
-          },
-          {
-              "content": "Nur einen kleinen Schluck, bitte"
-          }
-      ]
-      ```
-
-      # Hinweise
-
-      - Achte auf die Relevanz und Angemessenheit der Vorschläge in Bezug auf den gegebenen Kontext
-      - Die Struktur der JSON-Ausgabe sollte strikt beibehalten werden 
+      Du unterstützt eine Person, die Text als Stimme verwendet.
+      Erzeuge genau drei kurze, natürliche nächste Sätze aus ihrer Sicht.
+      "speaker" bezeichnet diese Person, "partner" das Gegenüber.
+      Berücksichtige besonders last_message; context, category, user_description und summary sind nur ergänzender Kontext.
+      Erfinde keine persönlichen oder medizinischen Tatsachen. Jeder Satz muss eigenständig, eindeutig und höchstens 160 Zeichen lang sein.
+      Antworte ausschließlich als JSON ohne Erklärung oder Markdown:
+      {"response":[{"content":"…"},{"content":"…"},{"content":"…"}]}
 
   messages:
     message:
@@ -401,21 +323,58 @@ de:
   settings:
     show:
       title: "Einstellungen"
+      eyebrow: "Dein Listen2Me"
+      intro: "Passe Oberfläche, Geräte und Antwortvorschläge an deine Kommunikation an."
+      sections: "Bereiche der Einstellungen"
       about_me: "Über mich"
-      system: "System"
-      about_settings: "Persönliche Einstellungen"
-      description_placeholder: "Erzählen Sie uns von sich, Ihren Vorlieben und wichtigen Informationen, die während der Gespräche berücksichtigt werden sollen..."
-      voice_settings: "Persönliche Stimme (Vorbereitung)"
-      voice_settings_description: "Die aktuelle Demo spricht immer mit der Stimme des Browsers. Die ElevenLabs-Felder werden bereits sicher gespeichert, sind aber noch nicht mit der Sprachausgabe verbunden. Eine persönliche Stimme folgt als eigener, ausdrücklich gekennzeichneter Ausbauschritt."
-      llm_settings: "KI-Einstellungen"
-      credential_placeholder: "Leer lassen, um den vorhandenen Schlüssel beizubehalten"
+      device: "Stimme & Gerät"
+      system: "Vorschläge"
+      account: "Konto"
+      personal: "Persönlicher Kontext"
+      about_settings: "Was soll Listen2Me über dich wissen?"
+      about_description: "Diese freiwilligen Angaben helfen dabei, Antwortvorschläge passender und persönlicher zu formulieren."
+      description_label: "Hilfreicher Kontext für Vorschläge"
+      description_placeholder: "Zum Beispiel: Bitte kurze Sätze. Ich trinke gern Tee und spreche meine Familie mit Vornamen an."
+      description_help: "Trage nur Informationen ein, die für deine Kommunikation wirklich hilfreich sind."
       save: "Änderungen speichern"
+      device_kicker: "Browser prüfen"
+      device_title: "Funktionieren Stimme und Mikrofon?"
+      device_description: "Diese Tests laufen nur nach deinem Klick im Browser. Eine Mikrofonaufnahme wird weder gespeichert noch hochgeladen."
+      voice_test_title: "Sprachausgabe"
+      voice_test_copy: "Prüft, ob der Browser einen Satz sprechen kann."
+      microphone_test_title: "Mikrofon"
+      microphone_test_copy: "Prüft die Berechtigung für den Gesprächsmodus."
+      test: "Testen"
+      testing: "Test läuft …"
+      test_sentence: "Listen2Me ist bereit."
+      voice_success: "Die Sprachausgabe funktioniert."
+      voice_error: "Die Sprachausgabe ist in diesem Browser nicht verfügbar."
+      microphone_success: "Das Mikrofon ist bereit. Es wurde nichts aufgezeichnet oder gespeichert."
+      microphone_error: "Das Mikrofon ist nicht verfügbar. Die Texteingabe funktioniert trotzdem."
+      personal_voice_later: "Die Demo verwendet derzeit die Stimme des Browsers. Eine persönliche Stimme wird später serverseitig angebunden – Anbieter-Schlüssel gehören nicht in dieses Formular."
+      ai_kicker: "Antwortvorschläge"
+      llm_settings: "Geschwindigkeit oder Sparsamkeit wählen"
+      llm_settings_description: "Du wählst zwischen schneller oder sparsamer Nutzung. Die technische Auswahl übernimmt der Listen2Me-Server."
+      model_profile_label: "Profil für KI-Vorschläge"
+      model_profile_help: "Beide Profile liefern nur Textvorschläge. Nichts wird automatisch gesprochen."
+      model_profile_fast: "Schnell"
+      model_profile_fast_description: "Priorisiert kurze Reaktionszeit für flüssige Gespräche."
+      model_profile_cheap: "Sparsam"
+      model_profile_cheap_description: "Priorisiert niedrige Kosten für Tests und weniger zeitkritische Nutzung."
+      recommended: "Für Gespräche empfohlen"
+      proxy_explanation: "Die Vorschläge werden sicher über den Listen2Me-Server erzeugt. Bei einer Störung bleiben drei Standardvorschläge verfügbar."
+      save_ai: "Vorschlagsprofil speichern"
       conversation_summary: "Gesprächsanalyse"
-      conversation_summary_explanation: "Die Gesprächsanalyse hilft der KI, Ihre Vorlieben und Kommunikationsmuster besser zu verstehen. Sie analysiert Ihre bisherigen Gespräche, um personalisiertere Vorschläge zu machen. Es wird empfohlen, diese Analyse regelmäßig zu aktualisieren, wenn neue Gespräche hinzukommen."
+      conversation_summary_explanation: "Erstellt aus bisherigen Gesprächen eine Zusammenfassung für passendere Vorschläge. Bei nicht erreichbarer KI bleibt die bisherige Zusammenfassung unverändert."
       generate_summary: "Analyse erstellen"
       last_generated: "Zuletzt erstellt: %{time}"
       no_summary: "Noch keine Gesprächsanalyse erstellt"
       generating_summary: "Wird erstellt..."
+      account_kicker: "Zugang"
+      account_title: "Konto verwalten"
+      account_description: "Ändere Name, E-Mail-Adresse oder Passwort – oder melde dich auf diesem Gerät ab."
+      edit_account: "Kontodaten bearbeiten"
+      sign_out: "Abmelden"
 
     update:
       updated: "Einstellungen erfolgreich aktualisiert"
@@ -423,14 +382,30 @@ de:
     generate_summary:
       success: "Gesprächsanalyse wurde erfolgreich erstellt"
       error: "Die Gesprächsanalyse konnte nicht erstellt werden. Bitte versuche es später erneut."
-      errors:
-        unsupported_provider: "Nicht unterstützter LLM-Anbieter: %{provider}"
 
   categories:
+    default_names:
+      basic_needs: "Grundbedürfnisse"
+      food: "Essen"
+      drinks: "Getränke"
+      health: "Gesundheit"
+      pain: "Schmerzen"
+      bathroom: "Bad & Toilette"
+      emotions: "Gefühle"
+      help: "Hilfe"
+      emergency: "Notfall"
+      family: "Familie"
+      daily_care: "Körperpflege"
+      rest: "Ruhe"
+      entertainment: "Unterhaltung"
+      movement: "Bewegung"
+      temperature: "Temperatur"
+
     index:
       title: "Kategorien verwalten"
       new_category: "Neue Kategorie"
       categories_list: "Liste der Kategorien"
+      edit_category: "Kategorie '%{name}' bearbeiten"
       sentences_count:
         zero: "Keine Sätze"
         one: "1 Satz"

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_25_170000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_25_180100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -84,6 +84,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_25_170000) do
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
     t.datetime "summary_generated_at"
+    t.string "suggestion_model_profile", default: "fast", null: false
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
@@ -97,4 +98,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_25_170000) do
   add_foreign_key "sentences", "categories"
   add_foreign_key "sentences", "languages"
   add_foreign_key "sentences", "users"
+  add_check_constraint "users", "suggestion_model_profile::text = ANY (ARRAY['fast'::character varying, 'cheap'::character varying]::text[])", name: "users_suggestion_model_profile_check"
 end
