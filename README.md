@@ -42,23 +42,34 @@ and use that service name instead, for example `http://litellm:4000`.
 
 ## Speech Output
 
-The application supports two types of speech output:
+Every sentence is spoken only after an explicit user action. Generated
+suggestions are never auto-spoken. Speech output follows a resilient server and
+browser chain:
 
-### 1. Browser Speech (Default)
-- Uses the built-in Web Speech API
-- No additional configuration required
-- Available in all modern browsers
-- Quality depends on browser and installed voices
-- Currently used for every spoken output, including when provider credentials are stored
+1. The selected server-side provider streams raw 24 kHz PCM to the browser.
+2. If the provider fails before audio starts, the built-in browser voice takes
+   over immediately.
+3. If a stream breaks after audio has started, Listen2Me stops and asks for a
+   retry rather than speaking the sentence twice.
 
-### 2. Personal voice provider (planned adapter)
-- The current settings contain device tests, but no personal provider key
-  fields.
-- A future personal-voice adapter must run server-side.
-- The current demo deliberately uses browser speech only. Provider keys are
-  never sent to the browser.
-- Context suggestions work without a configured LiteLLM proxy by using three
-  built-in, localized fallback suggestions.
+OpenAI is the default with `gpt-4o-mini-tts` and the `marin` voice. Configure
+`OPENAI_API_KEY`; optionally override `OPENAI_TTS_MODEL`, `OPENAI_TTS_VOICE`,
+or use an eligible custom voice through `OPENAI_CUSTOM_VOICE_ID`.
+
+Cartesia and ElevenLabs are optional comparison providers. Their keys remain on
+the Rails server, and a German/public voice is discovered when no explicit
+`CARTESIA_VOICE_ID` or `ELEVENLABS_VOICE_ID` is configured. They are never
+selected automatically after an OpenAI error. The shared default daily limits
+are 500 Cartesia characters and 300 ElevenLabs characters across the whole
+demo; repeated identical phrases are served from a bounded, process-memory
+cache. A limit of `0` disables that provider. Adjust
+`CARTESIA_DAILY_CHARACTER_LIMIT` and `ELEVENLABS_DAILY_CHARACTER_LIMIT` only
+deliberately.
+
+Browser speech remains available without any external service. Provider keys
+are never rendered in HTML or returned to JavaScript. The settings page exposes
+only availability and a human-readable provider choice. The UI discloses that
+cloud speech is AI-generated.
 
 ![Category Overview](docs/sample1.png)
 ![Conversation View](docs/sample2.png)
@@ -96,9 +107,11 @@ works without external services. If `OPENAI_API_KEY` is configured on the
 server, the conversation screen additionally offers an experimental,
 user-initiated Realtime mode; if it cannot connect, the normal flow remains
 available. This key is not stored in a user account and is never sent to the
-browser. The default is OpenAI's `gpt-realtime-2.1` model with low reasoning
+browser. The default is OpenAI's faster `gpt-realtime-2.1-mini` model with low reasoning
 effort for lower interaction latency; it can be overridden with
 `OPENAI_REALTIME_MODEL`.
+Normal Live AI sessions end after five minutes or 40 suggestion requests to
+keep the public demo bounded; users can explicitly start another session.
 
 That's it! The application will automatically:
 - Set up the database

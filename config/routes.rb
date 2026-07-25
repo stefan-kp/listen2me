@@ -25,6 +25,8 @@ Rails.application.routes.draw do
       end
     end
 
+    resource :speech_output, only: :create
+
     resources :conversations do
       member do
         post :suggestions

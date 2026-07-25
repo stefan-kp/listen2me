@@ -1,6 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
 
 const SUGGESTION_TOOL_NAME = "show_reply_suggestions"
+const MAX_SESSION_MILLISECONDS = 5 * 60 * 1000
+const MAX_SUGGESTION_REQUESTS = 40
 
 export default class extends Controller {
   static targets = ["status", "detail", "button"]
@@ -9,6 +11,7 @@ export default class extends Controller {
     available: Boolean,
     conversationId: Number,
     callUrlTemplate: String,
+    history: Array,
     suggestionPrompt: String,
     standardStatus: { type: String, default: "Standardmodus" },
     standardDetail: { type: String, default: "Browsererkennung mit sicherem Fallback." },
@@ -29,6 +32,10 @@ export default class extends Controller {
     this.generation = 0
     this.seenTranscriptItems = new Set()
     this.conversationWaiter = null
+    this.connectionController = null
+    this.connectionTimer = null
+    this.sessionTimer = null
+    this.suggestionRequests = 0
     this.pauseForSpeech = this.pauseForSpeech.bind(this)
     this.resumeAfterSpeech = this.resumeAfterSpeech.bind(this)
     window.addEventListener("speech:pauseRecording", this.pauseForSpeech)
@@ -66,8 +73,13 @@ export default class extends Controller {
     this.buttonTarget.disabled = true
 
     try {
-      const conversationId = await this.ensureConversation()
       this.stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      const conversationId = await this.ensureConversation()
+      this.connectionController = new AbortController()
+      this.connectionTimer = window.setTimeout(() => {
+        this.connectionController?.abort()
+        this.handleConnectionLoss()
+      }, 10_000)
       this.microphoneTrack = this.stream.getAudioTracks()[0]
       this.peerConnection = new RTCPeerConnection()
       this.microphoneTrack && this.peerConnection.addTrack(this.microphoneTrack, this.stream)
@@ -92,7 +104,8 @@ export default class extends Controller {
           "X-CSRF-Token": this.csrfToken(),
           "Content-Type": "application/sdp",
           "Accept": "application/sdp"
-        }
+        },
+        signal: this.connectionController.signal
       })
       if (!response.ok) throw new Error(`HTTP ${response.status}`)
 
@@ -181,6 +194,13 @@ export default class extends Controller {
   }
 
   requestSuggestions() {
+    if (this.suggestionRequests >= MAX_SUGGESTION_REQUESTS) {
+      this.cleanup()
+      this.renderStandard()
+      return
+    }
+
+    this.suggestionRequests += 1
     const generation = ++this.generation
     this.send({
       type: "response.create",
@@ -254,6 +274,15 @@ export default class extends Controller {
   markReady() {
     if (!this.dataChannel || this.dataChannel.readyState !== "open") return
 
+    window.clearTimeout(this.connectionTimer)
+    this.connectionTimer = null
+    this.connectionController = null
+    this.suggestionRequests = 0
+    this.sessionTimer = window.setTimeout(() => {
+      this.cleanup()
+      this.renderStandard()
+    }, MAX_SESSION_MILLISECONDS)
+    this.seedHistory()
     this.active = true
     this.connecting = false
     this.updateMicrophone()
@@ -261,6 +290,26 @@ export default class extends Controller {
     this.buttonTarget.disabled = false
     this.buttonTarget.textContent = this.stopLabelValue
     this.dispatch("ready")
+  }
+
+  seedHistory() {
+    this.historyValue.slice(-20).forEach((entry) => {
+      const text = String(entry?.text || "").trim()
+      const role = entry?.role === "speaker" ? "speaker" : "partner"
+      if (!text) return
+
+      this.send({
+        type: "conversation.item.create",
+        item: {
+          type: "message",
+          role: "user",
+          content: [{
+            type: "input_text",
+            text: `[${role}] ${text}`
+          }]
+        }
+      })
+    })
   }
 
   handleConnectionLoss() {
@@ -275,6 +324,12 @@ export default class extends Controller {
     this.active = false
     this.connecting = false
     this.cancelConversationWaiter()
+    window.clearTimeout(this.connectionTimer)
+    this.connectionTimer = null
+    window.clearTimeout(this.sessionTimer)
+    this.sessionTimer = null
+    this.connectionController?.abort()
+    this.connectionController = null
     this.dataChannel?.close()
     this.peerConnection?.close()
     this.stream?.getTracks().forEach((track) => track.stop())

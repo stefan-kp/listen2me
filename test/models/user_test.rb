@@ -7,11 +7,13 @@ class UserTest < ActiveSupport::TestCase
     user.preferred_locale = "fr"
     user.preferred_speech_mode = "automatic"
     user.suggestion_model_profile = "provider/model-name"
+    user.speech_provider = "browser-with-a-key"
 
     assert_not user.valid?
     assert user.errors.of_kind?(:preferred_locale, :inclusion)
     assert user.errors.of_kind?(:preferred_speech_mode, :inclusion)
     assert user.errors.of_kind?(:suggestion_model_profile, :inclusion)
+    assert user.errors.of_kind?(:speech_provider, :inclusion)
   end
 
   test "onboarding is complete when a completion timestamp exists" do

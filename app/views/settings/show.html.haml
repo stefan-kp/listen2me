@@ -91,6 +91,58 @@
           = heroicon "speaker-wave", options: { class: "h-7 w-7", "aria-hidden": "true" }
         %p.l2m-settings-copy= t(".device_description")
 
+        = form_with model: current_user, url: settings_path, id: "voice-settings-form", class: "l2m-settings-form" do |f|
+          %fieldset.l2m-profile-choice
+            %legend= t(".voice_provider_label")
+            %p= t(".voice_provider_help")
+            .l2m-profile-choice-grid.l2m-voice-provider-grid
+              = f.label :speech_provider_openai,
+                class: ["l2m-profile-choice-card", ("is-disabled" unless @speech_provider_status["openai"])] do
+                = f.radio_button :speech_provider, "openai",
+                  disabled: !@speech_provider_status["openai"]
+                %span.l2m-choice-check{"aria-hidden": "true"} ✓
+                = heroicon "sparkles", options: { class: "h-6 w-6", "aria-hidden": "true" }
+                %strong= t(".provider_openai")
+                %small= t(".provider_openai_description")
+                %em= @speech_provider_status["openai"] ? t(".provider_recommended") : t(".provider_unavailable")
+
+              = f.label :speech_provider_browser, class: "l2m-profile-choice-card" do
+                = f.radio_button :speech_provider, "browser"
+                %span.l2m-choice-check{"aria-hidden": "true"} ✓
+                = heroicon "device-phone-mobile", options: { class: "h-6 w-6", "aria-hidden": "true" }
+                %strong= t(".provider_browser")
+                %small= t(".provider_browser_description")
+                %em= t(".provider_always_available")
+
+              = f.label :speech_provider_cartesia,
+                class: ["l2m-profile-choice-card", ("is-disabled" unless @speech_provider_status["cartesia"])] do
+                = f.radio_button :speech_provider, "cartesia",
+                  disabled: !@speech_provider_status["cartesia"]
+                %span.l2m-choice-check{"aria-hidden": "true"} ✓
+                = heroicon "bolt", options: { class: "h-6 w-6", "aria-hidden": "true" }
+                %strong= t(".provider_cartesia")
+                %small= t(".provider_cartesia_description")
+                %em= @speech_provider_status["cartesia"] ? t(".provider_limited") : t(".provider_unavailable")
+
+              = f.label :speech_provider_elevenlabs,
+                class: ["l2m-profile-choice-card", ("is-disabled" unless @speech_provider_status["elevenlabs"])] do
+                = f.radio_button :speech_provider, "elevenlabs",
+                  disabled: !@speech_provider_status["elevenlabs"]
+                %span.l2m-choice-check{"aria-hidden": "true"} ✓
+                = heroicon "musical-note", options: { class: "h-6 w-6", "aria-hidden": "true" }
+                %strong= t(".provider_elevenlabs")
+                %small= t(".provider_elevenlabs_description")
+                %em= @speech_provider_status["elevenlabs"] ? t(".provider_limited") : t(".provider_unavailable")
+
+          %p.l2m-settings-note
+            = heroicon "shield-check", options: { class: "h-5 w-5", "aria-hidden": "true" }
+            %span= t(".voice_provider_privacy")
+
+          .l2m-settings-actions
+            = f.submit t(".save_voice"), class: "l2m-button l2m-button-dark"
+
+        .l2m-settings-divider
+
         .l2m-audio-checks
           .l2m-audio-check
             %div
@@ -120,6 +172,10 @@
           data: {
             device_check_target: "status",
             voice_success: t(".voice_success"),
+            voice_success_openai: t(".voice_success_openai"),
+            voice_success_browser: t(".voice_success_browser"),
+            voice_success_cartesia: t(".voice_success_cartesia"),
+            voice_success_elevenlabs: t(".voice_success_elevenlabs"),
             voice_error: t(".voice_error"),
             microphone_success: t(".microphone_success"),
             microphone_error: t(".microphone_error"),

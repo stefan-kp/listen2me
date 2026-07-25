@@ -1728,6 +1728,16 @@ textarea.l2m-input {
   background: var(--l2m-primary-soft);
 }
 
+.l2m-profile-choice-card.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.l2m-profile-choice-card.is-disabled:hover {
+  border-color: var(--l2m-line);
+  background: var(--l2m-surface);
+}
+
 .l2m-profile-choice-card:focus-within {
   box-shadow: var(--l2m-focus);
 }

@@ -8,8 +8,9 @@ export default class extends Controller {
     event.preventDefault()
 
     await this.runCheck(event.currentTarget, async () => {
-      await speakText(this.messages.testSentence)
-      return this.messages.voiceSuccess
+      const provider = this.element.querySelector("input[name='user[speech_provider]']:checked")?.value
+      const result = await speakText(this.messages.testSentence, { provider })
+      return this.voiceSuccessMessage(result.provider)
     }, this.messages.voiceError)
   }
 
@@ -27,6 +28,12 @@ export default class extends Controller {
 
   get messages() {
     return this.hasStatusTarget ? this.statusTarget.dataset : {}
+  }
+
+  voiceSuccessMessage(provider) {
+    const suffix = String(provider || "browser")
+      .replace(/(^|[-_])(\w)/g, (_match, _separator, letter) => letter.toUpperCase())
+    return this.messages[`voiceSuccess${suffix}`] || this.messages.voiceSuccess
   }
 
   async runCheck(button, check, errorMessage) {

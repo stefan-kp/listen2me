@@ -6,7 +6,7 @@ require "timeout"
 module OpenAI
   class RealtimeCall
     ENDPOINT = URI("https://api.openai.com/v1/realtime/calls")
-    DEFAULT_MODEL = "gpt-realtime-2.1"
+    DEFAULT_MODEL = "gpt-realtime-2.1-mini"
 
     Result = Data.define(:status, :body) do
       def success?
@@ -100,6 +100,7 @@ module OpenAI
             },
             turn_detection: {
               type: "semantic_vad",
+              eagerness: vad_eagerness,
               create_response: false,
               interrupt_response: false
             }
@@ -118,6 +119,11 @@ module OpenAI
 
     def language_code
       @locale.start_with?("de") ? "de" : "en"
+    end
+
+    def vad_eagerness
+      value = ENV.fetch("OPENAI_REALTIME_VAD_EAGERNESS", "auto")
+      %w[low medium high auto].include?(value) ? value : "auto"
     end
 
     def safety_identifier

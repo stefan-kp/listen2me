@@ -19,6 +19,10 @@ class SettingsAndAuthenticationTest < ActionDispatch::IntegrationTest
     assert_select "[role='tablist']", count: 1
     assert_select "label[for='user_suggestion_model_profile_fast']", count: 1
     assert_select "label[for='user_suggestion_model_profile_cheap']", count: 1
+    assert_select "label[for='user_speech_provider_openai']", count: 1
+    assert_select "label[for='user_speech_provider_browser']", count: 1
+    assert_select "label[for='user_speech_provider_cartesia']", count: 1
+    assert_select "label[for='user_speech_provider_elevenlabs']", count: 1
     assert_select "[data-loading-button-target='icon']", count: 1
     assert_select "[data-loading-button-target='label']", count: 1
     assert_select "input[name='user[llm_api_key]']", count: 0
@@ -28,7 +32,7 @@ class SettingsAndAuthenticationTest < ActionDispatch::IntegrationTest
     assert_not_includes response.body, @user.elevenlabs_api_key.to_s
   end
 
-  test "settings update only profile copy and the proxy model profile" do
+  test "settings update only safe profile voice and suggestion preferences" do
     @user.update!(
       llm_api_key: "existing-llm-provider-key",
       elevenlabs_api_key: "existing-voice-provider-key"
@@ -41,6 +45,7 @@ class SettingsAndAuthenticationTest < ActionDispatch::IntegrationTest
       user: {
         description: "Kurze Angaben für passende Vorschläge.",
         suggestion_model_profile: "cheap",
+        speech_provider: "browser",
         llm_api_key: "must-not-be-accepted",
         llm_provider: "untrusted-provider",
         elevenlabs_api_key: "must-not-be-accepted"
@@ -51,6 +56,7 @@ class SettingsAndAuthenticationTest < ActionDispatch::IntegrationTest
     @user.reload
     assert_equal "Kurze Angaben für passende Vorschläge.", @user.description
     assert_equal "cheap", @user.suggestion_model_profile
+    assert_equal "browser", @user.speech_provider
     assert_equal original_llm_key, @user.llm_api_key
     assert_equal original_voice_key, @user.elevenlabs_api_key
   end

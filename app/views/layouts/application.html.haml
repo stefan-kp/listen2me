@@ -33,7 +33,9 @@
       communicator_direct_suggestion_label_value: t("speeches.interaction.direct_suggestion_label", default: "sofort sprechen"),
       communicator_draft_suggestion_label_value: t("speeches.interaction.draft_suggestion_label", default: "zuerst schreiben"),
       communicator_followup_rules_value: t("speeches.interaction.followup_rules", default: []).to_json,
-      communicator_default_followups_value: t("speeches.interaction.default_followups", default: []).to_json
+      communicator_default_followups_value: t("speeches.interaction.default_followups", default: []).to_json,
+      speech_output_url: (speech_output_path if user_signed_in?),
+      speech_provider: (current_user.speech_provider if user_signed_in?)
     }}
     .skip-nav
       = link_to t('.skip_to_main'), '#main-content', 

@@ -27,11 +27,12 @@ class OpenAI::RealtimeCallTest < ActiveSupport::TestCase
     assert_not_includes captured_request["OpenAI-Safety-Identifier"], user.email
 
     session = multipart_json_part(captured_request.body, "session")
-    assert_equal "gpt-realtime-2.1", session.fetch("model")
+    assert_equal "gpt-realtime-2.1-mini", session.fetch("model")
     assert_equal "low", session.dig("reasoning", "effort")
     assert_equal [ "text" ], session.fetch("output_modalities")
     assert_equal false, session.dig("audio", "input", "turn_detection", "create_response")
     assert_equal false, session.dig("audio", "input", "turn_detection", "interrupt_response")
+    assert_equal "auto", session.dig("audio", "input", "turn_detection", "eagerness")
     assert_equal "de", session.dig("audio", "input", "transcription", "language")
     assert_includes captured_request.body, "v=0\r\no=browser"
   end

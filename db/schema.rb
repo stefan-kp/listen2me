@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_25_180100) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_25_200000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -83,12 +83,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_25_180100) do
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
-    t.datetime "summary_generated_at"
+    t.string "speech_provider", default: "openai", null: false
     t.string "suggestion_model_profile", default: "fast", null: false
+    t.datetime "summary_generated_at"
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["summary_generated_at"], name: "index_users_on_summary_generated_at"
+    t.check_constraint "speech_provider::text = ANY (ARRAY['openai'::character varying, 'browser'::character varying, 'cartesia'::character varying, 'elevenlabs'::character varying]::text[])", name: "users_speech_provider_check"
+    t.check_constraint "suggestion_model_profile::text = ANY (ARRAY['fast'::character varying::text, 'cheap'::character varying::text])", name: "users_suggestion_model_profile_check"
   end
 
   add_foreign_key "categories", "users", on_delete: :cascade
@@ -98,5 +101,4 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_25_180100) do
   add_foreign_key "sentences", "categories"
   add_foreign_key "sentences", "languages"
   add_foreign_key "sentences", "users"
-  add_check_constraint "users", "suggestion_model_profile::text = ANY (ARRAY['fast'::character varying, 'cheap'::character varying]::text[])", name: "users_suggestion_model_profile_check"
 end
