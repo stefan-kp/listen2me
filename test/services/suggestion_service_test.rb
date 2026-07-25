@@ -1,6 +1,10 @@
 require "test_helper"
 
 class SuggestionServiceTest < ActiveSupport::TestCase
+  setup do
+    I18n.locale = :de
+  end
+
   class FakeClient
     attr_reader :calls
 

@@ -1,0 +1,8 @@
+- if User.google_oauth_configured?
+  .l2m-auth-links{"aria-label": t("google_auth.navigation")}
+    %span= t("google_auth.or")
+    = button_to t("google_auth.button"),
+      user_google_oauth2_omniauth_authorize_path,
+      method: :post,
+      class: "l2m-button l2m-button-secondary",
+      form: { data: { turbo: false } }

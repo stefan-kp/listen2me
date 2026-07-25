@@ -1,0 +1,28 @@
+de:
+  conversation_history:
+    workspace:
+      history: "Zum Verlauf"
+    index:
+      page_title: "Gesprächsverlauf"
+      eyebrow: "Deine Gespräche"
+      title: "Gespräche fortsetzen"
+      intro: "Öffne ein früheres Gespräch mit seinem bisherigen Verlauf oder beginne ein neues. Beim Fortsetzen werden passende Antwortvorschläge vorbereitet."
+      new_conversation: "Neues Gespräch"
+      conversation_count:
+        one: "Ein gespeichertes Gespräch"
+        other: "%{count} gespeicherte Gespräche"
+      resume_hint: "Das zuletzt aktive Gespräch steht oben."
+      list_label: "Gespeicherte Gespräche"
+      untitled: "Gespräch vom %{date}"
+      resume_named: "Gespräch „%{title}“ fortsetzen"
+      messages_count:
+        one: "Ein Beitrag"
+        other: "%{count} Beiträge"
+      last_activity: "Zuletzt %{date}"
+      you: "Du"
+      partner: "Gegenüber"
+      ready_to_resume: "Bereit zum Fortsetzen."
+      resume: "Fortsetzen"
+      empty_title: "Noch keine Gespräche gespeichert"
+      empty_copy: "Sobald du ein Gespräch beginnst, kannst du es später an dieser Stelle mit seinem Verlauf fortsetzen."
+      empty_action: "Erstes Gespräch starten"

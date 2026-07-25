@@ -1,0 +1,14 @@
+.l2m-realtime-unavailable-note {
+  max-width: 34rem;
+  color: var(--l2m-ink-soft);
+  font-size: 0.84rem;
+  line-height: 1.45;
+  text-align: right;
+}
+
+@media (max-width: 680px) {
+  .l2m-realtime-unavailable-note {
+    max-width: none;
+    text-align: left;
+  }
+}

@@ -9,6 +9,7 @@
       %span Listen2Me
 
     - if user_signed_in?
+      - direct_speech_mode = current_user.preferred_speech_mode != "draft"
       %nav.l2m-primary-nav{role: "navigation", "aria-label": t(".main_navigation")}
         = link_to speeches_path,
           class: ["l2m-primary-nav-link", ("is-active" if controller_name == "speeches")].compact.join(" "),
@@ -25,7 +26,8 @@
       .l2m-header-mode
         %span.l2m-header-mode-label= t(".on_tap", default: "Beim Antippen")
         .l2m-mode-switch{role: "group", "aria-label": t(".card_behavior", default: "Verhalten von Satzkarten")}
-          %button.is-active{
+          %button{
+            class: ("is-active" if direct_speech_mode),
             type: "button",
             data: {
               action: "click->speech-mode#choose",
@@ -33,10 +35,11 @@
               speech_mode_mode_param: "direct",
               mode: "direct"
             },
-            "aria-pressed": "true"}
+            "aria-pressed": direct_speech_mode.to_s}
             %span.l2m-mode-full= t(".direct", default: "Sofort sprechen")
             %span.l2m-mode-short= t(".direct_short", default: "Sofort")
           %button{
+            class: ("is-active" unless direct_speech_mode),
             type: "button",
             data: {
               action: "click->speech-mode#choose",
@@ -44,7 +47,7 @@
               speech_mode_mode_param: "draft",
               mode: "draft"
             },
-            "aria-pressed": "false"}
+            "aria-pressed": (!direct_speech_mode).to_s}
             %span.l2m-mode-full= t(".draft", default: "Erst schreiben")
             %span.l2m-mode-short= t(".draft_short", default: "Schreiben")
         %span.sr-only{role: "status", "aria-live": "polite", data: { speech_mode_target: "status" }}

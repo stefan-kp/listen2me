@@ -15,10 +15,6 @@ de:
       direct_hint: "Satzkarten sprechen sofort."
       draft_hint: "Satzkarten landen zuerst hier."
 
-    conversation_form:
-      <<: *text_form_de
-      new_conversation_form: "Neues Gespräch starten"
-
     index:
       <<: *text_form_de
       categories: "Kategorien"
@@ -31,6 +27,9 @@ de:
       categories_list: "Liste der verfügbaren Kategorien"
       category_link: "Zur Kategorie %{name} mit %{count} Verwendungen"
       frequent_sentences_list: "Liste der häufig verwendeten Sätze"
+      starter_kicker: "Zum Start"
+      starter_sentences: "Empfohlene Sätze"
+      starter_sentences_list: "Liste empfohlener Sätze"
       eyebrow: "Kommunizieren"
       headline: "Was möchtest du sagen?"
       own_mode_hint: "Hier formulierst du eigene Sätze. Das Gegenüber wird nicht einbezogen."
@@ -48,7 +47,9 @@ de:
       new_topic: "Neues Thema"
       three_suggestions: "Drei kurze Vorschläge sind bereit."
       quick_sentences: "Schnelle Sätze"
-      no_sentences: "Deine häufig verwendeten Sätze erscheinen hier."
+      quick_access: "Schneller Zugriff"
+      quick_access_list: "Liste häufig verwendeter und empfohlener Sätze"
+      no_sentences: "Noch keine Sätze verfügbar."
       history: "Verlauf"
       recently_spoken: "Zuletzt gesprochen"
       recent_empty: "Deine gesprochenen Sätze erscheinen hier."
@@ -82,6 +83,7 @@ de:
       usage_count: "Nutzungshäufigkeit"
       category_label: "Kategorie: %{name}"
       delete_sentence: "Satz löschen: %{text}"
+      delete_confirmation: "Möchtest du den Satz „%{text}“ wirklich löschen? Das kann nicht rückgängig gemacht werden."
       speak_sentence: "Satz vorlesen: %{text}"
       draft_sentence: "Satz zuerst schreiben: %{text}"
       direct_action: "Sofort sprechen"
@@ -121,7 +123,7 @@ de:
     show:
       title: "Erste Schritte"
       home: "Listen2Me – Erste Schritte"
-      demo_label: "Persönliche Demo einrichten"
+      setup_label: "Persönlich einrichten"
       eyebrow: "In drei kurzen Schritten"
       headline: "Hallo %{name}, machen wir Listen2Me startklar."
       lead: "Du legst nur fest, wie die Oberfläche reagieren soll. Alles lässt sich später wieder ändern."
@@ -173,7 +175,6 @@ de:
   conversations:
     workspace:
       back: "Zurück"
-      demo_badge: "Gesprächs-Demo"
       eyebrow: "Gesprächsmodus"
       headline: "Zuhören. Vorschlagen. Du entscheidest."
       lead: "In diesem Modus wird das Gegenüber automatisch einbezogen. Du entscheidest, welche Antwort gesprochen wird."
@@ -184,7 +185,7 @@ de:
       conversation: "Gespräch"
       live_history: "Live-Verlauf"
       messages_list: "Gesprächsbeiträge"
-      waiting: "Das Gespräch ist bereit. Sprich mit deinem Gegenüber oder nutze das Demo-Eingabefeld."
+      waiting: "Das Gespräch ist bereit. Sprich mit deinem Gegenüber oder gib den Beitrag unten als Text ein."
       manual_partner: "Beitrag des Gegenübers eingeben"
       partner_label: "Was hat das Gegenüber gesagt?"
       partner_placeholder: "Zum Beispiel: Möchtest du etwas trinken?"
@@ -215,7 +216,7 @@ de:
       user_paused: "Das Mikrofon ist pausiert."
       pause_microphone: "Mikrofon pausieren"
       resume_microphone: "Mikrofon wieder einschalten"
-      storage_note: "Beiträge werden in diesem Demo-Konto gespeichert. Nach jedem gespeicherten Beitrag können Inhalte für neue Vorschläge an den serverseitigen KI-Dienst gesendet werden. Bei aktiver Live-KI wird zusätzlich Mikrofon-Audio an den konfigurierten Realtime-Dienst übertragen."
+      storage_note: "Beiträge werden in deinem Konto gespeichert. Nach jedem gespeicherten Beitrag können Inhalte für neue Vorschläge an den serverseitigen KI-Dienst gesendet werden. Bei aktiver Live-KI wird zusätzlich Mikrofon-Audio an den konfigurierten Realtime-Dienst übertragen."
       standard_status: "Standardmodus"
       standard_detail: "Browsererkennung mit lokalen Ersatzvorschlägen."
       realtime_connecting: "Live-KI verbindet …"
@@ -224,9 +225,10 @@ de:
       realtime_live_detail: "Das Gespräch wird laufend berücksichtigt; gesprochen wird weiterhin nur deine Auswahl."
       realtime_unavailable: "Standardmodus aktiv"
       realtime_unavailable_detail: "Live-KI war nicht erreichbar. Die normale Erkennung läuft weiter."
-      realtime_start: "Live-KI testen"
+      realtime_start: "Live-KI starten"
       realtime_stop: "Live-KI beenden"
       realtime_setup: "Live-KI einrichten"
+      realtime_not_configured: "Live-KI ist auf diesem Server noch nicht eingerichtet."
       realtime_suggestion_prompt: |
         Erstelle genau drei kurze, natürliche Antwortmöglichkeiten für die Person, die Listen2Me verwendet.
         Nutze den bisherigen Gesprächsverlauf. Formuliere immer aus Sicht dieser Person, nie aus Sicht des Gegenübers.
@@ -274,10 +276,6 @@ de:
     message:
       you: "Du"
       partner: "Gegenüber"
-    form:
-      enter_message: "Nachricht eingeben..."
-      speak: "Vorlesen"
-      send: "Senden"
 
   shared:
     user_menu:
@@ -345,18 +343,18 @@ de:
       device_title: "Funktionieren Stimme und Mikrofon?"
       device_description: "Die Tests laufen nur nach deinem Klick. Für eine Cloud-Stimme wird ausschließlich der Testsatz übertragen; eine Mikrofonaufnahme wird weder gespeichert noch hochgeladen."
       voice_provider_label: "Stimme für die Ausgabe"
-      voice_provider_help: "OpenAI ist für die Demo voreingestellt. Die Anzeige bestätigt nur, dass ein Schlüssel hinterlegt ist; der Sprachtest prüft die echte Erreichbarkeit. Bei einer Störung übernimmt die Browserstimme."
+      voice_provider_help: "OpenAI ist als bevorzugte Cloud-Stimme voreingestellt. Die Anzeige bestätigt nur, dass ein Schlüssel hinterlegt ist; der Sprachtest prüft die echte Erreichbarkeit. Bei einer Störung übernimmt die Browserstimme."
       provider_openai: "OpenAI-Stimme"
       provider_openai_description: "Natürliche, klare Cloud-Stimme mit schneller Ausgabe für deutsche und englische Sätze."
       provider_browser: "Stimme des Geräts"
       provider_browser_description: "Kostenlos und ohne Cloud-Sprachausgabe. Die Qualität hängt vom Gerät und Browser ab."
-      provider_cartesia: "Cartesia testen"
+      provider_cartesia: "Cartesia"
       provider_cartesia_description: "Sehr schnelle alternative Stimme. Ein kleines tägliches Zeichenlimit schützt das kostenlose Kontingent."
-      provider_elevenlabs: "ElevenLabs testen"
+      provider_elevenlabs: "ElevenLabs"
       provider_elevenlabs_description: "Alternative Stimme für den direkten Vergleich. Ebenfalls bewusst auf wenige Tests begrenzt."
       provider_recommended: "Empfohlen"
       provider_always_available: "Immer verfügbar"
-      provider_limited: "Begrenztes Testkontingent"
+      provider_limited: "Tageslimit aktiv"
       provider_unavailable: "Nicht eingerichtet"
       voice_provider_privacy: "Cloud-Stimmen erhalten nur den Satz, den du ausdrücklich sprechen lässt. Die Stimme ist KI-generiert. Anbieter-Schlüssel bleiben ausschließlich auf dem Listen2Me-Server."
       save_voice: "Stimme speichern"
@@ -391,6 +389,7 @@ de:
       conversation_summary: "Gesprächsanalyse"
       conversation_summary_explanation: "Erstellt aus bisherigen Gesprächen eine Zusammenfassung für passendere Vorschläge. Bei nicht erreichbarer KI bleibt die bisherige Zusammenfassung unverändert."
       generate_summary: "Analyse erstellen"
+      summary_unavailable: "Sobald ein Gespräch Beiträge enthält, kannst du hier eine Analyse erstellen."
       last_generated: "Zuletzt erstellt: %{time}"
       no_summary: "Noch keine Gesprächsanalyse erstellt"
       generating_summary: "Wird erstellt..."
@@ -404,6 +403,7 @@ de:
       updated: "Einstellungen erfolgreich aktualisiert"
 
     generate_summary:
+      no_conversations: "Für eine Analyse braucht es zuerst ein Gespräch mit mindestens einem Beitrag."
       success: "Gesprächsanalyse wurde erfolgreich erstellt"
       error: "Die Gesprächsanalyse konnte nicht erstellt werden. Bitte versuche es später erneut."
 

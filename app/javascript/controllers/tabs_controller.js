@@ -2,12 +2,28 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["tab", "panel"]
+  static values = { initial: String }
 
   connect() {
+    this.handleHashChange = this.handleHashChange.bind(this)
+    window.addEventListener("hashchange", this.handleHashChange)
+
     const requestedTab = window.location.hash.replace("#", "")
-    const initialTab = this.hasTab(requestedTab) ? requestedTab : this.tabTargets[0]?.dataset.tab
+    const fallbackTab = this.hasInitialValue && this.hasTab(this.initialValue)
+      ? this.initialValue
+      : this.tabTargets[0]?.dataset.tab
+    const initialTab = this.hasTab(requestedTab) ? requestedTab : fallbackTab
 
     this.activate(initialTab, { updateHash: false })
+  }
+
+  disconnect() {
+    window.removeEventListener("hashchange", this.handleHashChange)
+  }
+
+  handleHashChange() {
+    const requestedTab = window.location.hash.replace("#", "")
+    if (this.hasTab(requestedTab)) this.activate(requestedTab, { updateHash: false })
   }
 
   switch(event) {

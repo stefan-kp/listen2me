@@ -44,10 +44,6 @@ en:
       direct_hint: "Sentence cards speak immediately."
       draft_hint: "Sentence cards are copied here first."
 
-    conversation_form:
-      <<: *text_form_en
-      new_conversation_form: "Start new conversation"
-
     index:
       <<: *text_form_en
       categories: "Categories"
@@ -57,6 +53,9 @@ en:
       categories_list: "List of available categories"
       category_link: "Go to category %{name} with %{count} uses"
       frequent_sentences_list: "List of frequently used sentences"
+      starter_kicker: "Getting started"
+      starter_sentences: "Suggested sentences"
+      starter_sentences_list: "List of suggested sentences"
       frequent_sentences: "Frequently used sentences"
       frequent_sentences_description: "List of most frequently used sentences"
       confirm_delete: "Do you really want to delete this sentence?"
@@ -77,7 +76,9 @@ en:
       new_topic: "New topic"
       three_suggestions: "Three short suggestions are ready."
       quick_sentences: "Quick sentences"
-      no_sentences: "Your frequently used sentences will appear here."
+      quick_access: "Quick access"
+      quick_access_list: "List of frequently used and suggested sentences"
+      no_sentences: "No sentences are available yet."
       history: "History"
       recently_spoken: "Recently spoken"
       recent_empty: "Your spoken sentences will appear here."
@@ -111,6 +112,7 @@ en:
       usage_count: "Usage count"
       category_label: "Category: %{name}"
       delete_sentence: "Delete sentence: %{text}"
+      delete_confirmation: "Do you really want to delete the sentence “%{text}”? This cannot be undone."
       speak_sentence: "Speak sentence: %{text}"
       draft_sentence: "Write sentence first: %{text}"
       direct_action: "Speak now"
@@ -150,7 +152,7 @@ en:
     show:
       title: "Getting started"
       home: "Listen2Me – Getting started"
-      demo_label: "Set up your personal demo"
+      setup_label: "Personal setup"
       eyebrow: "Three short steps"
       headline: "Hello %{name}, let’s get Listen2Me ready."
       lead: "Choose how the interface should respond. You can change everything later."
@@ -236,15 +238,10 @@ en:
     message:
       you: "You"
       partner: "Other person"
-    form:
-      enter_message: "Enter message..."
-      speak: "Speak"
-      send: "Send"
 
   conversations:
     workspace:
       back: "Back"
-      demo_badge: "Conversation demo"
       eyebrow: "Conversation mode"
       headline: "Listen. Suggest. You decide."
       lead: "In this mode the other person is included automatically. You decide which answer is spoken."
@@ -255,7 +252,7 @@ en:
       conversation: "Conversation"
       live_history: "Live transcript"
       messages_list: "Conversation messages"
-      waiting: "The conversation is ready. Talk to the other person or use the demo input."
+      waiting: "The conversation is ready. Talk to the other person or enter their message below."
       manual_partner: "Enter the other person's message"
       partner_label: "What did the other person say?"
       partner_placeholder: "For example: Would you like something to drink?"
@@ -286,7 +283,7 @@ en:
       user_paused: "The microphone is paused."
       pause_microphone: "Pause microphone"
       resume_microphone: "Turn microphone back on"
-      storage_note: "Messages are stored in this demo account. After each saved message, content may be sent to the server-configured AI service to generate new suggestions. While Live AI is active, microphone audio is also sent to the configured Realtime service."
+      storage_note: "Messages are stored in your account. After each saved message, content may be sent to the server-configured AI service to generate new suggestions. While Live AI is active, microphone audio is also sent to the configured Realtime service."
       standard_status: "Standard mode"
       standard_detail: "Browser recognition with local fallback suggestions."
       realtime_connecting: "Connecting Live AI …"
@@ -295,9 +292,10 @@ en:
       realtime_live_detail: "The conversation is considered continuously; only your selection is spoken."
       realtime_unavailable: "Standard mode active"
       realtime_unavailable_detail: "Live AI was unavailable. Normal recognition continues."
-      realtime_start: "Try Live AI"
+      realtime_start: "Start Live AI"
       realtime_stop: "Stop Live AI"
       realtime_setup: "Set up Live AI"
+      realtime_not_configured: "Live AI is not configured on this server yet."
       realtime_suggestion_prompt: |
         Create exactly three short, natural reply options for the person using Listen2Me.
         Use the conversation so far. Always write from this person's perspective, never the other person's.
@@ -349,18 +347,18 @@ en:
       device_title: "Do speech and microphone work?"
       device_description: "Checks only run after you click. A cloud voice receives only the test sentence; no microphone recording is stored or uploaded."
       voice_provider_label: "Voice for speech output"
-      voice_provider_help: "OpenAI is the demo default. Availability only confirms that a key is present; the speech test checks the live service. If it fails, the browser voice takes over."
+      voice_provider_help: "OpenAI is the preferred cloud voice. Availability only confirms that a key is present; the speech test checks the live service. If it fails, the browser voice takes over."
       provider_openai: "OpenAI voice"
       provider_openai_description: "A natural, clear cloud voice with fast output for German and English sentences."
       provider_browser: "Device voice"
       provider_browser_description: "Free and without cloud speech output. Quality depends on the device and browser."
-      provider_cartesia: "Try Cartesia"
+      provider_cartesia: "Cartesia"
       provider_cartesia_description: "A very fast alternative voice. A small daily character limit protects the free allowance."
-      provider_elevenlabs: "Try ElevenLabs"
+      provider_elevenlabs: "ElevenLabs"
       provider_elevenlabs_description: "An alternative voice for direct comparison, intentionally limited to a few tests."
       provider_recommended: "Recommended"
       provider_always_available: "Always available"
-      provider_limited: "Limited test allowance"
+      provider_limited: "Daily limit active"
       provider_unavailable: "Not configured"
       voice_provider_privacy: "Cloud voices receive only the sentence you explicitly choose to speak. The voice is AI-generated. Provider keys stay exclusively on the Listen2Me server."
       save_voice: "Save voice"
@@ -395,6 +393,7 @@ en:
       conversation_summary: "Conversation Analysis"
       conversation_summary_explanation: "Creates a summary from previous conversations for more relevant suggestions. If AI is unavailable, the existing summary remains unchanged."
       generate_summary: "Generate Summary"
+      summary_unavailable: "Once a conversation contains messages, you can create an analysis here."
       last_generated: "Last generated: %{time}"
       no_summary: "No conversation summary generated yet"
       generating_summary: "Generating..."
@@ -406,6 +405,7 @@ en:
     update:
       updated: "Settings updated successfully"
     generate_summary:
+      no_conversations: "An analysis needs at least one conversation with a message."
       prompt:
         intro: "Please analyze these conversations and extract key information about the participants."
         user_section: "The speaker"

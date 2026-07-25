@@ -63,7 +63,7 @@ en:
       updated_but_not_signed_in: "Your account has been updated successfully, but since your password was changed, you need to sign in again."
       new:
         sign_up: "Create account"
-        eyebrow: "Your personal demo"
+        eyebrow: "Your personal Listen2Me"
         intro: "Create your own account. Listen2Me will then guide you through setup in three short steps."
         first_name: "First name"
         first_name_placeholder: "First name"

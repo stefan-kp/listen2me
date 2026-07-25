@@ -4,6 +4,11 @@ require "active_support/core_ext/integer/time"
 require_relative "../active_record_encryption"
 
 Rails.application.configure do
+  local_http_origin = ENV["APP_ORIGIN"].to_s.match?(
+    %r{\Ahttp://(?:localhost|127\.0\.0\.1)(?::\d+)?\z}
+  )
+  allow_insecure_local_http = ENV["ALLOW_INSECURE_LOCAL_HTTP"] == "true" && local_http_origin
+
   # Settings specified here will take precedence over those in config/application.rb.
 
   # Code is not reloaded between requests.
@@ -30,10 +35,10 @@ Rails.application.configure do
   config.active_storage.service = :local
 
   # Assume all access to the app is happening through a SSL-terminating reverse proxy.
-  config.assume_ssl = true
+  config.assume_ssl = !allow_insecure_local_http
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  config.force_ssl = true
+  config.force_ssl = !allow_insecure_local_http
 
   # Skip http-to-https redirect for the default health check endpoint.
   # config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }

@@ -1,0 +1,28 @@
+en:
+  conversation_history:
+    workspace:
+      history: "View history"
+    index:
+      page_title: "Conversation history"
+      eyebrow: "Your conversations"
+      title: "Continue a conversation"
+      intro: "Open an earlier conversation with its existing transcript or start a new one. Relevant reply suggestions are prepared when you continue."
+      new_conversation: "New conversation"
+      conversation_count:
+        one: "One saved conversation"
+        other: "%{count} saved conversations"
+      resume_hint: "The most recently active conversation appears first."
+      list_label: "Saved conversations"
+      untitled: "Conversation from %{date}"
+      resume_named: "Continue conversation “%{title}”"
+      messages_count:
+        one: "One message"
+        other: "%{count} messages"
+      last_activity: "Last active %{date}"
+      you: "You"
+      partner: "Other person"
+      ready_to_resume: "Ready to continue."
+      resume: "Continue"
+      empty_title: "No saved conversations yet"
+      empty_copy: "Once you start a conversation, you can return here later and continue with its existing transcript."
+      empty_action: "Start your first conversation"

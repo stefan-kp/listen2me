@@ -1,3 +1,4 @@
+- return_to = local_assigns.fetch(:return_to, "speeches")
 .l2m-phrase-card-wrap{id: dom_id(sentence), role: "listitem"}
   %button.l2m-phrase-card{
     type: "button",
@@ -21,3 +22,11 @@
           draft_text: t(".draft_action", default: "Erst schreiben")
         }}
         = t(".direct_action", default: "Sofort sprechen")
+  = button_to speech_path(id: sentence.id),
+    method: :delete,
+    params: { return_to: return_to },
+    class: "l2m-phrase-delete-button",
+    form: { class: "l2m-phrase-delete-form", data: { turbo_confirm: t(".delete_confirmation", text: sentence.content) } },
+    title: t(".delete_sentence", text: sentence.content),
+    "aria-label": t(".delete_sentence", text: sentence.content) do
+    = heroicon "trash", options: { class: "h-5 w-5", "aria-hidden": "true" }

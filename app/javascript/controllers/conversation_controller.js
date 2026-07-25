@@ -1,8 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import { isSpeechCancellation, speakText } from "controllers/speech_output"
 
-const STORAGE_KEY = "listen2me:speech-mode"
-
 export default class extends Controller {
   static targets = [
     "messages",
@@ -21,6 +19,7 @@ export default class extends Controller {
     suggestionsUrlTemplate: String,
     showUrlTemplate: String,
     fallbackSuggestions: Array,
+    refreshSuggestionsOnConnect: Boolean,
     ownLabel: { type: String, default: "Du" },
     partnerLabel: { type: String, default: "Gegenüber" },
     directAction: { type: String, default: "Sofort" },
@@ -55,6 +54,10 @@ export default class extends Controller {
 
     this.updateModeHelp()
     this.updateSuggestionActions()
+
+    if (this.refreshSuggestionsOnConnectValue && this.hasConversationIdValue && this.conversationIdValue > 0) {
+      this.refreshSuggestions()
+    }
   }
 
   disconnect() {
@@ -368,7 +371,16 @@ export default class extends Controller {
   }
 
   storedMode() {
-    return window.localStorage.getItem(STORAGE_KEY) === "draft" ? "draft" : "direct"
+    const fallback = document.body.dataset.speechModeInitialModeValue === "draft" ? "draft" : "direct"
+    const storageKey = document.body.dataset.speechModeStorageKeyValue
+    if (!storageKey) return fallback
+
+    try {
+      const stored = window.localStorage.getItem(storageKey)
+      return stored === "direct" || stored === "draft" ? stored : fallback
+    } catch (_error) {
+      return fallback
+    }
   }
 
   setStatus(message) {

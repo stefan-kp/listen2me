@@ -8,6 +8,7 @@
     = csp_meta_tag
     = stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload"
     = stylesheet_link_tag "application", "data-turbo-track": "reload"
+    = stylesheet_link_tag "categories", "conversations_history", "conversation_polish", "data-turbo-track": "reload"
     = javascript_importmap_tags
     
     %link{rel: "icon", type: "image/png", sizes: "32x32", href: "/favicon-32x32.png"}
@@ -21,6 +22,9 @@
   %body.l2m-body{
     data: {
       controller: body_controllers,
+      speech_mode_initial_mode_value: (current_user.preferred_speech_mode if user_signed_in?),
+      speech_mode_storage_key_value: ("listen2me:speech-mode:user-#{current_user.id}" if user_signed_in?),
+      speech_mode_update_url_value: (speech_mode_path if user_signed_in?),
       speech_mode_direct_status_value: t("shared.header.direct_status", default: "Satzkarten sprechen sofort."),
       speech_mode_draft_status_value: t("shared.header.draft_status", default: "Satzkarten werden zuerst ins Textfeld übernommen."),
       communicator_speaking_status_value: t("speeches.interaction.speaking", default: "Wird gesprochen …"),

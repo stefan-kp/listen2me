@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_25_200000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_25_210000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -73,6 +73,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_25_200000) do
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "first_name"
+    t.string "google_uid"
     t.string "last_name"
     t.string "llm_api_key"
     t.string "llm_model", default: "gpt-4o"
@@ -88,9 +89,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_25_200000) do
     t.datetime "summary_generated_at"
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["google_uid"], name: "index_users_on_google_uid_unique", unique: true, where: "(google_uid IS NOT NULL)"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["summary_generated_at"], name: "index_users_on_summary_generated_at"
-    t.check_constraint "speech_provider::text = ANY (ARRAY['openai'::character varying, 'browser'::character varying, 'cartesia'::character varying, 'elevenlabs'::character varying]::text[])", name: "users_speech_provider_check"
+    t.check_constraint "google_uid IS NULL OR btrim(google_uid::text) <> ''::text", name: "users_google_uid_not_blank"
+    t.check_constraint "speech_provider::text = ANY (ARRAY['openai'::character varying::text, 'browser'::character varying::text, 'cartesia'::character varying::text, 'elevenlabs'::character varying::text])", name: "users_speech_provider_check"
     t.check_constraint "suggestion_model_profile::text = ANY (ARRAY['fast'::character varying::text, 'cheap'::character varying::text])", name: "users_suggestion_model_profile_check"
   end
 

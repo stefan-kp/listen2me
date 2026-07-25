@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable Layout/LineLength, Metrics/BlockLength
+
 # Assuming you have not yet modified this file, each configuration option below
 # is set to its default value. Note that some are commented out while others
 # are not: uncommented lines are intended to protect your configuration from
@@ -272,6 +274,20 @@ Devise.setup do |config|
   # Add a new OmniAuth provider. Check the wiki for more information on setting
   # up on your models and hooks.
   # config.omniauth :github, 'APP_ID', 'APP_SECRET', scope: 'user,public_repo'
+  google_client_id = ENV["GOOGLE_CLIENT_ID"].presence || ("listen2me-test-client" if Rails.env.test?)
+  google_client_secret = ENV["GOOGLE_CLIENT_SECRET"].presence || ("listen2me-test-secret" if Rails.env.test?)
+
+  if google_client_id.present? && google_client_secret.present?
+    config.omniauth(
+      :google_oauth2,
+      google_client_id,
+      google_client_secret,
+      scope: "openid,email,profile",
+      access_type: "online",
+      prompt: "select_account",
+      overridable_authorize_options: []
+    )
+  end
 
   # ==> Warden configuration
   # If you want to use other strategies, that are not supported by Devise, or
@@ -311,3 +327,6 @@ Devise.setup do |config|
   # changed. Defaults to true, so a user is signed in automatically after changing a password.
   # config.sign_in_after_change_password = true
 end
+
+OmniAuth.config.full_host = ENV["APP_ORIGIN"] if ENV["APP_ORIGIN"].present?
+# rubocop:enable Layout/LineLength, Metrics/BlockLength

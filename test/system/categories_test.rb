@@ -9,7 +9,7 @@ class CategoriesTest < ApplicationSystemTestCase
 
   test "visiting the categories index" do
     visit categories_path
-    
+
     assert_selector "h1", text: "Kategorien verwalten"
     assert_selector "a", text: "Neue Kategorie"
   end
@@ -20,41 +20,45 @@ class CategoriesTest < ApplicationSystemTestCase
 
     fill_in "Name", with: "Essen & Trinken"
     find("label[for='category_icon_name_heart']").click
-    
+
     click_on "Kategorie erstellen"
 
-    assert_text "Kategorie wurde erstellt"
-    assert_selector "p", text: "Essen & Trinken"
+    assert_text "Die Kategorie „Essen & Trinken“ wurde erstellt."
+    assert_selector "h2", text: "Essen & Trinken"
   end
 
   test "updating a category" do
     visit categories_path
-    
+
     within "#category_#{@category.id}" do
-      find(".group").hover
-      find("#edit_category_#{@category.id}").click
+      click_on "Bearbeiten"
     end
 
     fill_in "Name", with: "Geänderter Name"
     click_on "Änderungen speichern"
 
-    assert_text "Kategorie wurde erfolgreich aktualisiert"
-    assert_selector "p", text: "Geänderter Name"
+    assert_text "Die Kategorie „Geänderter Name“ wurde gespeichert."
+    assert_selector "h2", text: "Geänderter Name"
   end
 
-  test "deleting a category" do
+  test "deleting a category also deletes its sentences after confirmation" do
     category_to_delete = categories(:category_to_delete)
-    
+    sentence = @user.sentences.create!(
+      content: "Dieser Satz wird mitgelöscht",
+      category: category_to_delete,
+      language: languages(:de)
+    )
+
     visit categories_path
-    
+
     accept_confirm do
       within "#category_#{category_to_delete.id}" do
-        find(".group").hover
-        find("#delete_category_#{category_to_delete.id}").click
+        click_on "Löschen"
       end
     end
 
-    assert_text "Kategorie wurde gelöscht"
-    assert_no_text "Zu löschen"
+    assert_text "Die Kategorie „Zu löschen“ und ein Satz wurden gelöscht."
+    assert_no_selector "#category_#{category_to_delete.id}"
+    assert_not Sentence.exists?(sentence.id)
   end
-end 
+end

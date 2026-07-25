@@ -315,7 +315,6 @@
 }
 
 .l2m-one-tap-badge,
-.l2m-demo-pill,
 .l2m-promo-label {
   display: inline-flex;
   align-items: center;
@@ -1113,6 +1112,7 @@
 }
 
 .l2m-phrase-card-wrap {
+  position: relative;
   min-width: 0;
 }
 
@@ -1124,7 +1124,7 @@
   align-items: stretch;
   justify-content: space-between;
   gap: 14px;
-  padding: 16px;
+  padding: 16px 58px 16px 16px;
   border: 1.5px solid var(--l2m-line);
   border-radius: 17px;
   background: var(--l2m-surface);
@@ -1132,6 +1132,40 @@
   text-align: left;
   cursor: pointer;
   transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+.l2m-phrase-delete-form {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  margin: 0;
+}
+
+.l2m-phrase-delete-button {
+  display: inline-flex;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--l2m-ink-soft);
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.l2m-phrase-delete-button:hover {
+  border-color: #fecaca;
+  background: #fff1f2;
+  color: #b42318;
+}
+
+.l2m-phrase-delete-button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--l2m-primary) 42%, transparent);
+  outline-offset: 2px;
 }
 
 .l2m-phrase-card:hover {

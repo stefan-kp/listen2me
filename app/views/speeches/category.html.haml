@@ -20,7 +20,7 @@
         %h2#sentences-title= t(".category_sentences", category: display_category_name(@category))
     .l2m-phrase-grid{role: "list", "aria-label": t(".sentences_list")}
       - if @sentences.any?
-        = render partial: "sentence", collection: @sentences
+        = render partial: "sentence", collection: @sentences, locals: { return_to: "category" }
       - else
         %p.l2m-empty-state{"aria-label": t(".no_sentences")}
           = t(".no_sentences")

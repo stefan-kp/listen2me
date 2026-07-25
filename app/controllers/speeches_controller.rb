@@ -1,15 +1,36 @@
 class SpeechesController < ApplicationController
   def index
-    @frequent_sentences = current_user.sentences
+    localized_sentences = current_user.sentences
                                       .includes(:category, :language)
                                       .where(language: Language.find_by(code: I18n.locale))
-                                      .order(usage_count: :desc, id: :asc)
-                                      .limit(10)
+
+    @frequent_sentences = localized_sentences
+                            .where("sentences.usage_count > 0")
+                            .order(usage_count: :desc, id: :asc)
+                            .limit(10)
+                            .to_a
+
+    if @frequent_sentences.any?
+      starter_slots = 10 - @frequent_sentences.size
+      starter_sentences = localized_sentences
+                            .where("COALESCE(sentences.usage_count, 0) = 0")
+                            .order(id: :asc)
+                            .limit(starter_slots)
+                            .to_a
+      @featured_sentences = @frequent_sentences + starter_sentences
+      @featured_kicker = t(".quick_sentences")
+      @featured_title = t(".quick_access")
+      @featured_aria_label = t(".quick_access_list")
+    else
+      @featured_sentences = localized_sentences.order(id: :asc).limit(10).to_a
+      @featured_kicker = t(".starter_kicker")
+      @featured_title = t(".starter_sentences")
+      @featured_aria_label = t(".starter_sentences_list")
+    end
+
     @categories = current_user.categories.order(:id)
-    # Fügen Sie einen Titel für Screen Reader hinzu
-    @page_title = t(".frequent_sentences")
-    @page_description = t(".frequent_sentences_description")
-    @category = current_user.categories.find_by(name: "Basic Needs")
+    @page_title = @featured_title
+    @page_description = @featured_aria_label
   end
 
   def create
@@ -63,8 +84,15 @@ class SpeechesController < ApplicationController
 
   def destroy
     @sentence = current_user.sentences.find(params[:id])
+    category = current_user.categories.find_by(id: @sentence.category_id)
     @sentence.destroy
 
-    redirect_to speeches_path, notice: t(".sentence_deleted")
+    destination = if params[:return_to] == "category" && category.present?
+      category_speech_path(id: category.id)
+    else
+      speeches_path
+    end
+
+    redirect_to destination, notice: t(".sentence_deleted")
   end
 end

@@ -1,5 +1,11 @@
+# frozen_string_literal: true
+
+# rubocop:disable Metrics/BlockLength
 Rails.application.routes.draw do
-  devise_for :users
+  devise_for :users, controllers: {
+    omniauth_callbacks: "users/omniauth_callbacks",
+    registrations: "users/registrations"
+  }
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
@@ -18,7 +24,7 @@ Rails.application.routes.draw do
 
     resource :onboarding, only: %i[show update], controller: "onboarding"
 
-    resources :speeches do
+    resources :speeches, only: %i[index create destroy] do
       member do
         post :speak
         get :category
@@ -26,8 +32,9 @@ Rails.application.routes.draw do
     end
 
     resource :speech_output, only: :create
+    resource :speech_mode, only: :update
 
-    resources :conversations do
+    resources :conversations, only: %i[index new create show] do
       member do
         post :suggestions
       end
@@ -39,8 +46,7 @@ Rails.application.routes.draw do
       post :generate_summary, on: :collection
     end
 
-    resources :categories, except: [:show] do
-      delete :destroy, on: :member
-    end
+    resources :categories, except: :show
   end
 end
+# rubocop:enable Metrics/BlockLength

@@ -1,12 +1,13 @@
 import { Controller } from "@hotwired/stimulus"
 
-const STORAGE_KEY = "listen2me:speech-mode"
-
 export default class extends Controller {
   static targets = ["button", "status", "modeLabel"]
   static values = {
     directStatus: { type: String, default: "Satzkarten sprechen sofort." },
-    draftStatus: { type: String, default: "Satzkarten werden zuerst ins Textfeld übernommen." }
+    draftStatus: { type: String, default: "Satzkarten werden zuerst ins Textfeld übernommen." },
+    initialMode: { type: String, default: "direct" },
+    storageKey: String,
+    updateUrl: String
   }
 
   connect() {
@@ -15,11 +16,12 @@ export default class extends Controller {
 
   choose(event) {
     this.setMode(event.params.mode)
+    this.persistMode()
   }
 
   setMode(mode, options = {}) {
     this.mode = mode === "draft" ? "draft" : "direct"
-    window.localStorage.setItem(STORAGE_KEY, this.mode)
+    this.storeMode(this.mode)
 
     this.buttonTargets.forEach((button) => {
       const active = button.dataset.mode === this.mode
@@ -44,6 +46,49 @@ export default class extends Controller {
   }
 
   storedMode() {
-    return window.localStorage.getItem(STORAGE_KEY) === "draft" ? "draft" : "direct"
+    const stored = this.readStoredMode()
+    if (stored === "direct" || stored === "draft") return stored
+
+    return this.initialModeValue === "draft" ? "draft" : "direct"
+  }
+
+  readStoredMode() {
+    if (!this.hasStorageKeyValue) return null
+
+    try {
+      return window.localStorage.getItem(this.storageKeyValue)
+    } catch (_error) {
+      return null
+    }
+  }
+
+  storeMode(mode) {
+    if (!this.hasStorageKeyValue) return
+
+    try {
+      window.localStorage.setItem(this.storageKeyValue, mode)
+    } catch (_error) {
+      // The database-backed preference remains available when storage is blocked.
+    }
+  }
+
+  persistMode() {
+    if (!this.hasUpdateUrlValue) return
+
+    const csrfToken = document.querySelector("meta[name='csrf-token']")?.content
+    if (!csrfToken) return
+
+    fetch(this.updateUrlValue, {
+      method: "PATCH",
+      credentials: "same-origin",
+      keepalive: true,
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": csrfToken
+      },
+      body: JSON.stringify({ speech_mode: { mode: this.mode } })
+    }).catch(() => {
+      // Local storage remains a safe per-device fallback when persistence is unavailable.
+    })
   }
 }

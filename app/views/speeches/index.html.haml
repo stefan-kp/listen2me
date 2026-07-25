@@ -48,8 +48,8 @@
       %section.l2m-phrases-section{"aria-labelledby": "frequent-title"}
         .l2m-section-heading
           %div
-            %p.l2m-section-kicker= t(".quick_sentences", default: "Schnelle Sätze")
-            %h2#frequent-title= t(".frequently_used")
+            %p.l2m-section-kicker= @featured_kicker
+            %h2#frequent-title= @featured_title
           = link_to categories_path, class: "l2m-text-link" do
             = t(".manage_categories")
 
@@ -59,11 +59,11 @@
               = heroicon category.icon_name, options: { class: "h-4 w-4", "aria-hidden": "true" }
               %span= display_category_name(category)
 
-        #frequent_sentences.l2m-phrase-grid{role: "list", "aria-label": t(".frequent_sentences")}
-          - if @frequent_sentences.any?
-            = render partial: "sentence", collection: @frequent_sentences
+        #frequent_sentences.l2m-phrase-grid{role: "list", "aria-label": @featured_aria_label}
+          - if @featured_sentences.any?
+            = render partial: "sentence", collection: @featured_sentences
           - else
-            %p.l2m-empty-state= t(".no_sentences", default: "Deine häufig verwendeten Sätze erscheinen hier.")
+            %p.l2m-empty-state= t(".no_sentences", default: "Noch keine Sätze verfügbar.")
 
     %aside.l2m-recent-panel{"aria-labelledby": "recent-title"}
       .l2m-recent-heading

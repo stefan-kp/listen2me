@@ -5,6 +5,7 @@
 - normalized_suggestions = default_suggestions unless normalized_suggestions.length == 3
 - realtime_available = OpenAI::RealtimeCall.configured?
 - realtime_history = Array(@messages).last(20).map { |message| { role: message.role, text: message.content } }
+- refresh_suggestions_on_connect = conversation_id.present? && Array(@messages).any?
 
 .l2m-page.l2m-conversation-page{
   data: {
@@ -28,6 +29,7 @@
     conversation_suggestions_url_template_value: suggestions_conversation_path(id: "__ID__"),
     conversation_show_url_template_value: conversation_path(id: "__ID__"),
     conversation_fallback_suggestions_value: default_suggestions.to_json,
+    conversation_refresh_suggestions_on_connect_value: refresh_suggestions_on_connect.to_s,
     conversation_own_label_value: t(".you", default: "Du"),
     conversation_partner_label_value: t(".partner", default: "Gegenüber"),
     conversation_direct_action_value: t(".immediate", default: "Sofort"),
@@ -74,7 +76,9 @@
     = link_to speeches_path, class: "l2m-back-link" do
       %span{"aria-hidden": "true"} ←
       = t(".back", default: "Zurück")
-    %span.l2m-demo-pill= t(".demo_badge", default: "Gesprächs-Demo")
+    = link_to conversations_path, class: "l2m-back-link l2m-history-link" do
+      = heroicon "clock", options: { class: "h-5 w-5", "aria-hidden": "true" }
+      %span= t("conversation_history.workspace.history")
 
   .l2m-conversation-heading
     %div
@@ -126,8 +130,7 @@
         }}
         = t(".realtime_start")
     - else
-      = link_to settings_path(anchor: "voice-device"), class: "l2m-text-link" do
-        = t(".realtime_setup")
+      %span.l2m-realtime-unavailable-note= t(".realtime_not_configured")
 
   %p.l2m-inline-error{hidden: true, role: "alert", data: { conversation_target: "error" }}
 
@@ -147,7 +150,7 @@
         - if @messages.present?
           = render partial: "messages/message", collection: @messages
         - else
-          %p.l2m-empty-state= t(".waiting", default: "Das Gespräch ist bereit. Sprich mit deinem Gegenüber oder nutze das Demo-Eingabefeld.")
+          %p.l2m-empty-state= t(".waiting", default: "Das Gespräch ist bereit. Sprich mit deinem Gegenüber oder gib den Beitrag unten als Text ein.")
 
       %details.l2m-partner-fallback{data: { audio_recorder_target: "manualFallback" }}
         %summary= t(".manual_partner", default: "Beitrag des Gegenübers eingeben")
@@ -160,7 +163,7 @@
               placeholder: t(".partner_placeholder", default: "Zum Beispiel: Möchtest du etwas trinken?"),
               data: { conversation_target: "partnerInput" }}
             %button.l2m-button.l2m-button-secondary{type: "submit"}= t(".add", default: "Übernehmen")
-      %p.l2m-privacy-note= t(".storage_note", default: "Beiträge werden in diesem Demo-Konto gespeichert. Nach jedem gespeicherten Beitrag können Inhalte für neue Vorschläge an den serverseitigen KI-Dienst gesendet werden. Bei aktiver Live-KI wird zusätzlich Mikrofon-Audio an den konfigurierten Realtime-Dienst übertragen.")
+      %p.l2m-privacy-note= t(".storage_note", default: "Beiträge werden in deinem Konto gespeichert. Nach jedem gespeicherten Beitrag können Inhalte für neue Vorschläge an den serverseitigen KI-Dienst gesendet werden. Bei aktiver Live-KI wird zusätzlich Mikrofon-Audio an den konfigurierten Realtime-Dienst übertragen.")
 
     %aside.l2m-suggestion-card{"aria-labelledby": "suggestion-title"}
       .l2m-card-heading

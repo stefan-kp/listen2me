@@ -71,6 +71,33 @@ are never rendered in HTML or returned to JavaScript. The settings page exposes
 only availability and a human-readable provider choice. The UI discloses that
 cloud speech is AI-generated.
 
+## Google sign-in
+
+Google sign-in is optional. Password registration and sign-in continue to work
+when Google is not configured. To enable it, create an OAuth client of type
+**Web application** in Google Cloud and set `GOOGLE_CLIENT_ID` and
+`GOOGLE_CLIENT_SECRET` on the Rails server.
+
+Register the callback URI exactly, including scheme, host, port, and path:
+
+- Local port 3000:
+  `http://localhost:3000/users/auth/google_oauth2/callback`
+- Local preview on port 3004:
+  `http://127.0.0.1:3004/users/auth/google_oauth2/callback`
+- Production:
+  `https://your-host.example/users/auth/google_oauth2/callback`
+
+`localhost` and `127.0.0.1` count as different callback hosts. Behind a reverse
+proxy, set `APP_ORIGIN` to the public HTTPS origin, without a trailing slash.
+When exercising the production container locally over plain HTTP, set
+`APP_ORIGIN` to that exact localhost origin and
+`ALLOW_INSECURE_LOCAL_HTTP=true`. This exception is deliberately ignored for
+non-local hosts.
+Listen2Me requests only OpenID, email, and profile identity data and does not
+store Google access or refresh tokens. A Google identity is keyed by Google's
+stable account ID, not by email address. An existing password account must be
+signed in before Google can be linked to it.
+
 ![Category Overview](docs/sample1.png)
 ![Conversation View](docs/sample2.png)
 

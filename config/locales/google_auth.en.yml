@@ -1,0 +1,31 @@
+en:
+  google_auth:
+    navigation: "Alternative sign in"
+    or: "Or"
+    button: "Continue with Google"
+    success:
+      signed_in: "You are now signed in with Google."
+      linked: "Your Google account was connected securely."
+      confirmed: "Google confirmed your identity. You can now update your account details once."
+    settings:
+      title: "Google sign-in"
+      connected: "Google is connected to this account. You can also use Google to confirm sensitive account changes."
+      not_connected: "Google is not connected yet. It can only be linked after your explicit confirmation."
+      connect: "Connect Google"
+      confirm: "Confirm with Google"
+      unavailable: "Google sign-in is not configured on this server. Password sign-in remains available."
+    reauthentication:
+      active: "Google confirmed your identity. This confirmation is valid for five minutes and is consumed when you save once."
+      required: "Briefly confirm with your connected Google account. You can then update your name, email address, or password without the previous password."
+      unavailable: "Google cannot be confirmed again right now. You can change your name and password with your current password; a new email address requires Google confirmation."
+      button: "Confirm with Google now"
+      save_once: "No current password is required for this save. The Google confirmation becomes invalid afterwards."
+      email_mismatch: "must match the email address Google just verified"
+      email_confirmation_required: "can only be changed after a new Google confirmation while Google is connected"
+    errors:
+      invalid: "Google sign-in could not be verified securely. Please try again."
+      email_conflict: "An account already exists for this email address. Sign in with your password first, then connect Google to your account."
+      email_mismatch: "The Google account uses a different email address, so it was not connected."
+      identity_conflict: "This Google account is already connected to another Listen2Me account."
+      already_connected: "A different Google account is already connected to this account."
+      failure: "Google sign-in was cancelled or could not be completed."

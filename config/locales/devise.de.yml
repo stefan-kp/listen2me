@@ -61,7 +61,7 @@ de:
       updated_but_not_signed_in: "Ihre Daten wurden aktualisiert. Da sich Ihr Passwort geändert hat, müssen Sie sich erneut anmelden."
       new:
         sign_up: "Konto erstellen"
-        eyebrow: "Deine persönliche Demo"
+        eyebrow: "Dein persönliches Listen2Me"
         intro: "Lege ein eigenes Konto an. Danach führt dich Listen2Me in drei kurzen Schritten durch die Einrichtung."
         first_name: "Vorname"
         first_name_placeholder: "Vorname"

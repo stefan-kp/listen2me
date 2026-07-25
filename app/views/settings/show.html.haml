@@ -9,7 +9,11 @@
 
   = render "devise/shared/error_messages", resource: current_user
 
-  .l2m-settings-shell{data: { controller: "tabs" }}
+  .l2m-settings-shell{
+    data: {
+      controller: "tabs",
+      tabs_initial_value: @active_settings_section
+    }}
     %nav.l2m-settings-tabs{role: "tablist", "aria-label": t(".sections")}
       = link_to "#profile",
         id: "settings-profile-tab",
@@ -64,6 +68,7 @@
         %p.l2m-settings-copy= t(".about_description")
 
         = form_with model: current_user, url: settings_path, id: "profile-settings-form", class: "l2m-settings-form" do |f|
+          = hidden_field_tag :settings_section, "profile"
           .l2m-field
             = f.label :description, t(".description_label")
             = f.text_area :description,
@@ -92,6 +97,7 @@
         %p.l2m-settings-copy= t(".device_description")
 
         = form_with model: current_user, url: settings_path, id: "voice-settings-form", class: "l2m-settings-form" do |f|
+          = hidden_field_tag :settings_section, "voice-device"
           %fieldset.l2m-profile-choice
             %legend= t(".voice_provider_label")
             %p= t(".voice_provider_help")
@@ -199,6 +205,7 @@
         %p.l2m-settings-copy= t(".llm_settings_description")
 
         = form_with model: current_user, url: settings_path, id: "ai-settings-form", class: "l2m-settings-form" do |f|
+          = hidden_field_tag :settings_section, "system"
           %fieldset.l2m-profile-choice
             %legend= t(".model_profile_label")
             %p= t(".model_profile_help")
@@ -236,9 +243,14 @@
           = button_to generate_summary_settings_path,
             method: :post,
             class: "l2m-button l2m-button-secondary",
+            disabled: !@summary_available,
+            "aria-describedby": ("summary-unavailable" unless @summary_available),
             data: { controller: "loading-button", loading_button_text_value: t(".generating_summary"), turbo_submits_with: "" } do
             = heroicon "arrow-path", options: { class: "h-5 w-5", "data-loading-button-target": "icon", "aria-hidden": "true" }
             %span{data: { loading_button_target: "label" }}= t(".generate_summary")
+
+        - unless @summary_available
+          %p#summary-unavailable.l2m-empty-state= t(".summary_unavailable")
 
         - if current_user.conversation_summary.present?
           .l2m-summary-card
@@ -264,6 +276,23 @@
           %span
             %strong= [current_user.first_name, current_user.last_name].compact.join(" ")
             %small= current_user.email
+
+        .l2m-settings-divider
+
+        .l2m-settings-subsection
+          %div
+            %h3= t("google_auth.settings.title")
+            %p.l2m-settings-copy
+              = current_user.google_connected? ? t("google_auth.settings.connected") : t("google_auth.settings.not_connected")
+          - if User.google_oauth_configured?
+            = button_to user_google_oauth2_omniauth_authorize_path(origin: settings_path(locale: I18n.locale, settings_section: "account")),
+              method: :post,
+              class: "l2m-button l2m-button-secondary",
+              form: { data: { turbo: false } } do
+              = heroicon "arrow-path", options: { class: "h-5 w-5", "aria-hidden": "true" }
+              %span= t(current_user.google_connected? ? "google_auth.settings.confirm" : "google_auth.settings.connect")
+          - else
+            %p.l2m-settings-note= t("google_auth.settings.unavailable")
 
         .l2m-account-actions
           = link_to edit_user_registration_path, class: "l2m-button l2m-button-secondary" do

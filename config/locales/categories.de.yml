@@ -1,0 +1,92 @@
+de:
+  category_management:
+    common:
+      back: "Zurück zu den Kategorien"
+      cancel: "Abbrechen"
+    index:
+      eyebrow: "Deine schnellen Sätze"
+      title: "Kategorien verwalten"
+      intro: "Ordne deine vorbereiteten Sätze so, dass du sie im richtigen Moment schnell findest."
+      category_count:
+        zero: "Noch keine Kategorien"
+        one: "Eine Kategorie"
+        other: "%{count} Kategorien"
+      summary_hint: "Jede Kategorie gehört nur zu deinem Konto."
+      new_category: "Neue Kategorie"
+      categories_list: "Deine Kategorien"
+      sentences_count:
+        zero: "Noch keine Sätze"
+        one: "Ein gespeicherter Satz"
+        other: "%{count} gespeicherte Sätze"
+      actions_label: "Aktionen für %{name}"
+      open_sentences: "Sätze"
+      edit: "Bearbeiten"
+      delete: "Löschen"
+      confirm_delete:
+        zero: "Möchtest du die Kategorie „%{name}“ wirklich löschen?"
+        one: "Möchtest du die Kategorie „%{name}“ und den darin gespeicherten Satz wirklich löschen? Das kann nicht rückgängig gemacht werden."
+        other: "Möchtest du die Kategorie „%{name}“ und die %{count} darin gespeicherten Sätze wirklich löschen? Das kann nicht rückgängig gemacht werden."
+      empty_title: "Lege deine erste Kategorie an"
+      empty_description: "Mit Kategorien findest du wichtige Sätze schneller. Du kannst jederzeit weitere Bereiche ergänzen."
+      empty_action: "Erste Kategorie erstellen"
+    new:
+      eyebrow: "Neuer Bereich"
+      title: "Kategorie erstellen"
+      intro: "Wähle einen kurzen Namen und ein gut erkennbares Symbol."
+    edit:
+      eyebrow: "Kategorie anpassen"
+      title: "Kategorie bearbeiten"
+      intro: "Ändere den Namen oder das Symbol von „%{name}“. Die gespeicherten Sätze bleiben erhalten."
+    form:
+      name_label: "Name"
+      name_placeholder: "Zum Beispiel Familie oder Getränke"
+      name_help: "Ein kurzer, eindeutiger Name lässt sich schneller erfassen."
+      icon_label: "Symbol auswählen"
+      icon_help: "Das Symbol hilft dir, die Kategorie auch ohne langes Lesen wiederzufinden. Ein bisheriges Symbol kannst du behalten oder durch eines aus der neuen Auswahl ersetzen."
+      current_icon: "Bisheriges Symbol"
+      error_heading:
+        one: "Bitte korrigiere den markierten Fehler."
+        other: "Bitte korrigiere die %{count} markierten Fehler."
+      submit:
+        create: "Kategorie erstellen"
+        update: "Änderungen speichern"
+    create:
+      success: "Die Kategorie „%{name}“ wurde erstellt."
+    update:
+      success: "Die Kategorie „%{name}“ wurde gespeichert."
+    destroy:
+      success:
+        zero: "Die Kategorie „%{name}“ wurde gelöscht."
+        one: "Die Kategorie „%{name}“ und ein Satz wurden gelöscht."
+        other: "Die Kategorie „%{name}“ und %{count} Sätze wurden gelöscht."
+      failure: "Die Kategorie „%{name}“ konnte nicht gelöscht werden. Bitte versuche es erneut."
+    icons:
+      home: "Grundbedarf"
+      cake: "Essen"
+      beaker: "Getränke"
+      heart: "Gesundheit"
+      exclamation-circle: "Wichtig"
+      sparkles: "Pflege"
+      face-smile: "Gefühle"
+      hand-raised: "Hilfe"
+      bell-alert: "Notfall"
+      user-group: "Menschen"
+      sun: "Tag"
+      moon: "Ruhe"
+      musical-note: "Freizeit"
+      arrow-path: "Bewegung"
+      fire: "Temperatur"
+      star: "Favoriten"
+  activerecord:
+    models:
+      category: "Kategorie"
+    attributes:
+      category:
+        name: "Name"
+        icon_name: "Symbol"
+    errors:
+      models:
+        category:
+          attributes:
+            icon_name:
+              inclusion: "ist nicht verfügbar"

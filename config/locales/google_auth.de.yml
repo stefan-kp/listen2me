@@ -1,0 +1,31 @@
+de:
+  google_auth:
+    navigation: "Alternative Anmeldung"
+    or: "Oder"
+    button: "Mit Google fortfahren"
+    success:
+      signed_in: "Du bist jetzt mit Google angemeldet."
+      linked: "Dein Google-Konto wurde sicher verbunden."
+      confirmed: "Deine Identität wurde mit Google bestätigt. Du kannst deine Kontodaten jetzt einmalig ändern."
+    settings:
+      title: "Google-Anmeldung"
+      connected: "Google ist mit diesem Konto verbunden. Du kannst Google auch verwenden, um sensible Kontoänderungen zu bestätigen."
+      not_connected: "Google ist noch nicht verbunden. Die Verknüpfung ist nur nach deiner ausdrücklichen Bestätigung möglich."
+      connect: "Google verbinden"
+      confirm: "Mit Google bestätigen"
+      unavailable: "Die Google-Anmeldung ist auf diesem Server derzeit nicht eingerichtet. Die Passwort-Anmeldung bleibt verfügbar."
+    reauthentication:
+      active: "Google hat deine Identität bestätigt. Diese Bestätigung gilt fünf Minuten und wird beim Speichern einmalig verbraucht."
+      required: "Bestätige dich kurz mit deinem verbundenen Google-Konto. Danach kannst du Name, E-Mail-Adresse oder Passwort ohne das bisherige Passwort ändern."
+      unavailable: "Google kann derzeit nicht erneut bestätigt werden. Name und Passwort kannst du mit deinem aktuellen Passwort ändern; eine neue E-Mail-Adresse braucht eine Google-Bestätigung."
+      button: "Jetzt mit Google bestätigen"
+      save_once: "Für dieses Speichern ist kein aktuelles Passwort nötig. Die Google-Bestätigung wird danach ungültig."
+      email_mismatch: "muss mit der E-Mail-Adresse übereinstimmen, die Google gerade bestätigt hat"
+      email_confirmation_required: "kann bei einem verbundenen Google-Konto erst nach einer neuen Google-Bestätigung geändert werden"
+    errors:
+      invalid: "Die Google-Anmeldung konnte nicht sicher bestätigt werden. Bitte versuche es erneut."
+      email_conflict: "Für diese E-Mail-Adresse besteht bereits ein Konto. Melde dich zuerst mit deinem Passwort an und verbinde Google anschließend mit deinem Konto."
+      email_mismatch: "Das Google-Konto verwendet eine andere E-Mail-Adresse und wurde deshalb nicht verbunden."
+      identity_conflict: "Dieses Google-Konto ist bereits mit einem anderen Listen2Me-Konto verbunden."
+      already_connected: "Mit diesem Konto ist bereits ein anderes Google-Konto verbunden."
+      failure: "Die Google-Anmeldung wurde abgebrochen oder konnte nicht abgeschlossen werden."

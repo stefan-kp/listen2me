@@ -42,6 +42,7 @@ class SettingsAndAuthenticationTest < ActionDispatch::IntegrationTest
     original_voice_key = @user.elevenlabs_api_key
 
     patch settings_path(locale: :de), params: {
+      settings_section: "system",
       user: {
         description: "Kurze Angaben für passende Vorschläge.",
         suggestion_model_profile: "cheap",
@@ -52,7 +53,7 @@ class SettingsAndAuthenticationTest < ActionDispatch::IntegrationTest
       }
     }
 
-    assert_redirected_to root_path(locale: :de)
+    assert_redirected_to settings_path(locale: :de, settings_section: "system")
     @user.reload
     assert_equal "Kurze Angaben für passende Vorschläge.", @user.description
     assert_equal "cheap", @user.suggestion_model_profile
@@ -65,11 +66,27 @@ class SettingsAndAuthenticationTest < ActionDispatch::IntegrationTest
     sign_in @user
 
     patch settings_path(locale: :de), params: {
+      settings_section: "system",
       user: { suggestion_model_profile: "provider/model-name" }
     }
 
     assert_response :unprocessable_entity
     assert_equal "fast", @user.reload.suggestion_model_profile
+    assert_select ".l2m-settings-shell[data-tabs-initial-value='system']", count: 1
+  end
+
+  test "settings use a safe server-side fallback for direct section links" do
+    sign_in @user
+
+    get settings_path(locale: :de, settings_section: "account")
+
+    assert_response :success
+    assert_select ".l2m-settings-shell[data-tabs-initial-value='account']", count: 1
+
+    get settings_path(locale: :de, settings_section: "unknown")
+
+    assert_response :success
+    assert_select ".l2m-settings-shell[data-tabs-initial-value='profile']", count: 1
   end
 
   test "password recovery uses the localized accessible auth shell" do

@@ -9,6 +9,26 @@
 
   .l2m-account-layout
     .l2m-settings-panel
+      - if resource.google_connected?
+        .l2m-settings-note
+          = heroicon "shield-check", options: { class: "h-5 w-5", "aria-hidden": "true" }
+          %span
+            - if google_reauthentication_active?
+              = t("google_auth.reauthentication.active")
+            - elsif User.google_oauth_configured?
+              = t("google_auth.reauthentication.required")
+            - else
+              = t("google_auth.reauthentication.unavailable")
+
+        - if User.google_oauth_configured? && !google_reauthentication_active?
+          = button_to t("google_auth.reauthentication.button"),
+            user_google_oauth2_omniauth_authorize_path(origin: edit_user_registration_path(locale: I18n.locale)),
+            method: :post,
+            class: "l2m-button l2m-button-secondary",
+            form: { data: { turbo: false } }
+
+        .l2m-settings-divider
+
       = form_for resource,
         as: resource_name,
         url: registration_path(resource_name),
@@ -59,15 +79,20 @@
             autocomplete: "new-password",
             class: "l2m-input"
 
-        .l2m-field
-          = f.label :current_password, t(".current_password")
-          = f.password_field :current_password,
-            autocomplete: "current-password",
-            class: "l2m-input"
-          %small= t(".current_password_help")
+        - if resource.google_connected? && google_reauthentication_active?
+          %p.l2m-settings-note
+            = heroicon "check-circle", options: { class: "h-5 w-5", "aria-hidden": "true" }
+            %span= t("google_auth.reauthentication.save_once")
+        - else
+          .l2m-field
+            = f.label :current_password, t(".current_password")
+            = f.password_field :current_password,
+              autocomplete: "current-password",
+              class: "l2m-input"
+            %small= t(".current_password_help")
 
         .l2m-settings-actions
-          = link_to t(".back"), settings_path(anchor: "account"), class: "l2m-button l2m-button-secondary"
+          = link_to t(".back"), settings_path(settings_section: "account"), class: "l2m-button l2m-button-secondary"
           = f.submit t(".submit"), class: "l2m-button l2m-button-dark"
 
     %aside.l2m-danger-card{"aria-labelledby": "delete-account-title"}

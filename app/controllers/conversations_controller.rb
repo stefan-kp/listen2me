@@ -74,6 +74,21 @@ class ConversationsController < ApplicationController
     @conversations = current_user.conversations
                                .includes(:messages, initial_sentence: :category)
                                .order(created_at: :desc)
+
+    @conversation_history_items = @conversations.map do |conversation|
+      messages = conversation.messages.sort_by { |message| [ message.created_at, message.id ] }
+      first_message = messages.find { |message| message.content.present? }
+      last_message = messages.reverse.find { |message| message.content.present? }
+
+      {
+        conversation: conversation,
+        title: conversation.initial_sentence&.content.presence || first_message&.content.presence,
+        last_message: last_message,
+        message_count: messages.size,
+        last_activity_at: last_message&.created_at || conversation.updated_at || conversation.created_at,
+        category: conversation.initial_sentence&.category
+      }
+    end.sort_by { |item| item.fetch(:last_activity_at) }.reverse
   end
 
   private
