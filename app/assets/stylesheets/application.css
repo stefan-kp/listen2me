@@ -1075,6 +1075,14 @@
   pointer-events: none;
 }
 
+.l2m-suggestion-list.is-waiting {
+  opacity: 0.62;
+}
+
+.l2m-suggestion-list.is-waiting .l2m-suggestion-button {
+  cursor: not-allowed;
+}
+
 .l2m-category-tabs {
   display: flex;
   gap: 8px;
@@ -1314,6 +1322,19 @@
 .l2m-listen-indicator.is-active {
   background: #17a179;
   box-shadow: 0 0 0 2px #17a179, 0 0 0 7px rgba(23, 161, 121, 0.14);
+  animation: l2m-listening-pulse 1.35s ease-in-out infinite;
+}
+
+@keyframes l2m-listening-pulse {
+  50% {
+    box-shadow: 0 0 0 2px #17a179, 0 0 0 12px rgba(23, 161, 121, 0.04);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .l2m-listen-indicator.is-active {
+    animation: none;
+  }
 }
 
 .l2m-listen-card > div {

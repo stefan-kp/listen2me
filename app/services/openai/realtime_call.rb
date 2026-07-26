@@ -7,6 +7,7 @@ module OpenAI
   class RealtimeCall
     ENDPOINT = URI("https://api.openai.com/v1/realtime/calls")
     DEFAULT_MODEL = "gpt-realtime-2.1-mini"
+    DEFAULT_TRANSCRIPTION_MODEL = "gpt-4o-mini-transcribe"
 
     Result = Data.define(:status, :body) do
       def success?
@@ -95,7 +96,7 @@ module OpenAI
         audio: {
           input: {
             transcription: {
-              model: "gpt-4o-mini-transcribe",
+              model: ENV.fetch("OPENAI_TRANSCRIPTION_MODEL", DEFAULT_TRANSCRIPTION_MODEL),
               language: language_code
             },
             turn_detection: {
@@ -111,9 +112,9 @@ module OpenAI
 
     def session_instructions
       if language_code == "de"
-        "Du unterstützt eine Person, die Text als Stimme verwendet. Höre dem Gespräch zu. Antworte nie automatisch. Wenn Antwortvorschläge angefordert werden, formuliere sie kurz und immer aus Sicht der Listen2Me nutzenden Person."
+        "Transkribiere ausschließlich die reale Stimme des Gegenübers. Erzeuge keine Antwort, sprich nicht und spiele keine Assistenzperson."
       else
-        "You support a person who uses text as their voice. Listen to the conversation. Never answer automatically. When reply suggestions are requested, keep them short and always write from the Listen2Me user's perspective."
+        "Transcribe only the real voice of the other person. Do not answer, speak, or impersonate an assistant."
       end
     end
 

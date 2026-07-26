@@ -4,10 +4,9 @@ class MessagesController < ApplicationController
   def create
     @conversation = current_user.conversations.find(params[:conversation_id])
     content = params[:content].to_s.strip
-    return head :unprocessable_entity if content.blank? || content.length > 240
-
     role = params[:role].to_s
     return head :unprocessable_entity unless Message.roles.key?(role)
+    return head :unprocessable_entity if content.blank? || content.length > Message.content_limit_for(role)
 
     @message = @conversation.messages.create!(
       content: content,

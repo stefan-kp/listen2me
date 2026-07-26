@@ -3,7 +3,7 @@ require "test_helper"
 class OpenAI::RealtimeCallTest < ActiveSupport::TestCase
   FakeResponse = Data.define(:code, :body)
 
-  test "builds a text-only realtime session without exposing identifying data" do
+  test "builds a realtime session limited to input transcription without exposing identifying data" do
     user = users(:default_user)
     captured_request = nil
     transport = lambda do |request|
@@ -34,6 +34,9 @@ class OpenAI::RealtimeCallTest < ActiveSupport::TestCase
     assert_equal false, session.dig("audio", "input", "turn_detection", "interrupt_response")
     assert_equal "auto", session.dig("audio", "input", "turn_detection", "eagerness")
     assert_equal "de", session.dig("audio", "input", "transcription", "language")
+    assert_equal ENV.fetch("OPENAI_TRANSCRIPTION_MODEL", "gpt-4o-mini-transcribe"),
+      session.dig("audio", "input", "transcription", "model")
+    assert_includes session.fetch("instructions"), "keine Antwort"
     assert_includes captured_request.body, "v=0\r\no=browser"
   end
 

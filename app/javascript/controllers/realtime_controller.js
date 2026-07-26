@@ -1,8 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 
-const SUGGESTION_TOOL_NAME = "show_reply_suggestions"
 const MAX_SESSION_MILLISECONDS = 5 * 60 * 1000
-const MAX_SUGGESTION_REQUESTS = 40
 
 export default class extends Controller {
   static targets = ["status", "detail", "button"]
@@ -11,41 +9,46 @@ export default class extends Controller {
     available: Boolean,
     conversationId: Number,
     callUrlTemplate: String,
-    history: Array,
-    suggestionPrompt: String,
     standardStatus: { type: String, default: "Standardmodus" },
     standardDetail: { type: String, default: "Browsererkennung mit sicherem Fallback." },
-    connectingStatus: { type: String, default: "Live-KI verbindet …" },
-    connectingDetail: { type: String, default: "Mikrofon und schnelle Vorschläge werden vorbereitet." },
-    liveStatus: { type: String, default: "Live-KI aktiv" },
-    liveDetail: { type: String, default: "Das Gespräch wird laufend berücksichtigt." },
+    connectingStatus: { type: String, default: "Live-Transkription verbindet …" },
+    connectingDetail: { type: String, default: "Die bessere Spracherkennung wird vorbereitet." },
+    liveStatus: { type: String, default: "Live-Transkription bereit" },
+    liveDetail: { type: String, default: "Nach deiner Antwort wird die reale Stimme des Gegenübers transkribiert." },
     unavailableStatus: { type: String, default: "Standardmodus aktiv" },
-    unavailableDetail: { type: String, default: "Live-KI war nicht erreichbar. Die normale Erkennung läuft weiter." },
-    startLabel: { type: String, default: "Live-KI testen" },
-    stopLabel: { type: String, default: "Live-KI beenden" }
+    unavailableDetail: { type: String, default: "Live-Transkription war nicht erreichbar. Die normale Erkennung läuft weiter." },
+    startLabel: { type: String, default: "Live-Transkription starten" },
+    stopLabel: { type: String, default: "Live-Transkription beenden" }
   }
 
   connect() {
     this.active = false
     this.connecting = false
     this.userPaused = false
-    this.generation = 0
+    this.awaitingPartner = false
+    this.transcribing = false
+    this.partialTranscript = ""
     this.seenTranscriptItems = new Set()
     this.conversationWaiter = null
     this.connectionController = null
     this.connectionTimer = null
     this.sessionTimer = null
-    this.suggestionRequests = 0
     this.pauseForSpeech = this.pauseForSpeech.bind(this)
     this.resumeAfterSpeech = this.resumeAfterSpeech.bind(this)
+    this.finishSpeech = this.finishSpeech.bind(this)
+    this.failSpeech = this.failSpeech.bind(this)
     window.addEventListener("speech:pauseRecording", this.pauseForSpeech)
     window.addEventListener("speech:resumeRecording", this.resumeAfterSpeech)
+    window.addEventListener("speech:finished", this.finishSpeech)
+    window.addEventListener("speech:failed", this.failSpeech)
     this.renderStandard()
   }
 
   disconnect() {
     window.removeEventListener("speech:pauseRecording", this.pauseForSpeech)
     window.removeEventListener("speech:resumeRecording", this.resumeAfterSpeech)
+    window.removeEventListener("speech:finished", this.finishSpeech)
+    window.removeEventListener("speech:failed", this.failSpeech)
     this.cleanup({ notify: false })
   }
 
@@ -73,14 +76,22 @@ export default class extends Controller {
     this.buttonTarget.disabled = true
 
     try {
-      this.stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      this.stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true
+        },
+        video: false
+      })
+      this.microphoneTrack = this.stream.getAudioTracks()[0]
+      if (this.microphoneTrack) this.microphoneTrack.enabled = false
       const conversationId = await this.ensureConversation()
       this.connectionController = new AbortController()
       this.connectionTimer = window.setTimeout(() => {
         this.connectionController?.abort()
         this.handleConnectionLoss()
       }, 10_000)
-      this.microphoneTrack = this.stream.getAudioTracks()[0]
       this.peerConnection = new RTCPeerConnection()
       this.microphoneTrack && this.peerConnection.addTrack(this.microphoneTrack, this.stream)
 
@@ -131,39 +142,47 @@ export default class extends Controller {
     this.clearConversationWaiter()
   }
 
-  messageSaved(event) {
-    if (!this.active || this.dataChannel?.readyState !== "open") return
-
-    const { text, role, source } = event.detail || {}
-    if (source !== "realtime") {
-      this.send({
-        type: "conversation.item.create",
-        item: {
-          type: "message",
-          role: "user",
-          content: [{
-            type: "input_text",
-            text: `[${role === "speaker" ? "speaker" : "partner"}] ${text}`
-          }]
-        }
-      })
-    }
-
-    this.requestSuggestions()
-  }
-
   listeningChanged(event) {
     this.userPaused = event.detail?.paused === true
+    if (this.userPaused) {
+      this.awaitingPartner = false
+      this.transcribing = false
+    } else if (event.detail?.listening === true) {
+      this.awaitingPartner = true
+      this.transcribing = false
+      this.partialTranscript = ""
+    }
     this.updateMicrophone()
   }
 
   pauseForSpeech() {
-    if (!this.active || !this.microphoneTrack) return
-    this.microphoneTrack.enabled = false
+    if (!this.active && !this.connecting) return
+
+    this.awaitingPartner = false
+    this.transcribing = false
+    this.partialTranscript = ""
+    this.updateMicrophone()
   }
 
   resumeAfterSpeech() {
-    if (!this.active || !this.microphoneTrack) return
+    this.updateMicrophone()
+  }
+
+  finishSpeech() {
+    if ((!this.active && !this.connecting) || this.userPaused) return
+
+    this.awaitingPartner = true
+    this.transcribing = false
+    this.partialTranscript = ""
+    this.updateMicrophone()
+  }
+
+  failSpeech() {
+    if (!this.active && !this.connecting) return
+
+    this.awaitingPartner = false
+    this.transcribing = false
+    this.partialTranscript = ""
     this.updateMicrophone()
   }
 
@@ -175,100 +194,76 @@ export default class extends Controller {
       return
     }
 
-    if (event.type === "conversation.item.input_audio_transcription.completed") {
+    if (event.type === "input_audio_buffer.speech_started") {
+      this.receiveSpeechStarted()
+    } else if (event.type === "input_audio_buffer.speech_stopped") {
+      this.receiveSpeechStopped()
+    } else if (event.type === "conversation.item.input_audio_transcription.delta") {
+      this.receiveTranscriptDelta(event)
+    } else if (event.type === "conversation.item.input_audio_transcription.completed") {
       this.receiveTranscript(event)
-    } else if (event.type === "response.done") {
-      this.receiveSuggestions(event)
+    } else if (event.type === "conversation.item.input_audio_transcription.failed") {
+      this.retryPartnerTurn()
     } else if (event.type === "error") {
       this.handleConnectionLoss()
     }
   }
 
+  receiveSpeechStarted() {
+    if (!this.awaitingPartner) return
+
+    this.transcribing = false
+    this.dispatch("speech-started")
+  }
+
+  receiveSpeechStopped() {
+    if (!this.awaitingPartner) return
+
+    this.transcribing = true
+    this.updateMicrophone()
+    this.dispatch("transcribing")
+  }
+
+  receiveTranscriptDelta(event) {
+    if (!this.awaitingPartner) return
+
+    this.partialTranscript += String(event.delta || "")
+    const text = this.partialTranscript.trim()
+    if (text) this.dispatch("partial", { detail: { text } })
+  }
+
   receiveTranscript(event) {
     const itemId = String(event.item_id || "")
     const text = String(event.transcript || "").trim()
-    if (!itemId || !text || this.seenTranscriptItems.has(itemId)) return
+    if (!this.awaitingPartner || (itemId && this.seenTranscriptItems.has(itemId))) return
 
-    this.seenTranscriptItems.add(itemId)
-    this.dispatch("transcript", { detail: { text, source: "realtime" } })
-  }
-
-  requestSuggestions() {
-    if (this.suggestionRequests >= MAX_SUGGESTION_REQUESTS) {
-      this.cleanup()
-      this.renderStandard()
+    if (!text) {
+      this.retryPartnerTurn()
       return
     }
 
-    this.suggestionRequests += 1
-    const generation = ++this.generation
-    this.send({
-      type: "response.create",
-      response: {
-        conversation: "none",
-        metadata: {
-          purpose: "listen2me_suggestions",
-          generation: String(generation)
-        },
-        output_modalities: ["text"],
-        instructions: this.suggestionPromptValue,
-        max_output_tokens: 240,
-        tools: [{
-          type: "function",
-          name: SUGGESTION_TOOL_NAME,
-          description: "Show exactly three short possible replies for the Listen2Me user.",
-          parameters: {
-            type: "object",
-            properties: {
-              suggestions: {
-                type: "array",
-                minItems: 3,
-                maxItems: 3,
-                items: { type: "string", maxLength: 140 }
-              }
-            },
-            required: ["suggestions"],
-            additionalProperties: false
-          }
-        }],
-        tool_choice: {
-          type: "function",
-          name: SUGGESTION_TOOL_NAME
-        }
-      }
-    })
+    if (itemId) this.seenTranscriptItems.add(itemId)
+    this.awaitingPartner = false
+    this.transcribing = false
+    this.partialTranscript = ""
+    this.updateMicrophone()
+    this.dispatch("transcript", { detail: { text, source: "realtime" } })
   }
 
-  receiveSuggestions(event) {
-    const response = event.response
-    if (
-      response?.status !== "completed" ||
-      response.metadata?.purpose !== "listen2me_suggestions" ||
-      Number(response.metadata?.generation) !== this.generation
-    ) return
+  retryPartnerTurn() {
+    if (!this.awaitingPartner) return
 
-    const toolCall = Array.from(response.output || []).find((item) =>
-      item.type === "function_call" && item.name === SUGGESTION_TOOL_NAME
-    )
-    let parsed
-    try {
-      parsed = JSON.parse(toolCall?.arguments || "{}")
-    } catch (_error) {
-      parsed = {}
-    }
-
-    const suggestions = this.normalizeSuggestions(parsed.suggestions)
-    this.dispatch("suggestions", { detail: { suggestions } })
+    this.transcribing = false
+    this.partialTranscript = ""
+    this.updateMicrophone()
+    this.dispatch("retry")
   }
 
-  normalizeSuggestions(suggestions) {
-    const normalized = Array.from(suggestions || [])
-      .map((suggestion) => String(suggestion || "").trim())
-      .filter(Boolean)
-      .filter((suggestion, index, all) => all.indexOf(suggestion) === index)
-      .slice(0, 3)
-
-    return normalized.length === 3 ? normalized : []
+  stopPartnerTurn() {
+    this.awaitingPartner = false
+    this.transcribing = false
+    this.partialTranscript = ""
+    this.updateMicrophone()
   }
 
   markReady() {
@@ -277,39 +272,18 @@ export default class extends Controller {
     window.clearTimeout(this.connectionTimer)
     this.connectionTimer = null
     this.connectionController = null
-    this.suggestionRequests = 0
     this.sessionTimer = window.setTimeout(() => {
       this.cleanup()
       this.renderStandard()
     }, MAX_SESSION_MILLISECONDS)
-    this.seedHistory()
     this.active = true
     this.connecting = false
+    this.transcribing = false
     this.updateMicrophone()
     this.renderState(this.liveStatusValue, this.liveDetailValue)
     this.buttonTarget.disabled = false
     this.buttonTarget.textContent = this.stopLabelValue
     this.dispatch("ready")
-  }
-
-  seedHistory() {
-    this.historyValue.slice(-20).forEach((entry) => {
-      const text = String(entry?.text || "").trim()
-      const role = entry?.role === "speaker" ? "speaker" : "partner"
-      if (!text) return
-
-      this.send({
-        type: "conversation.item.create",
-        item: {
-          type: "message",
-          role: "user",
-          content: [{
-            type: "input_text",
-            text: `[${role}] ${text}`
-          }]
-        }
-      })
-    })
   }
 
   handleConnectionLoss() {
@@ -323,6 +297,9 @@ export default class extends Controller {
     const shouldNotify = notify && (this.active || this.connecting)
     this.active = false
     this.connecting = false
+    this.awaitingPartner = false
+    this.transcribing = false
+    this.partialTranscript = ""
     this.cancelConversationWaiter()
     window.clearTimeout(this.connectionTimer)
     this.connectionTimer = null
@@ -372,7 +349,9 @@ export default class extends Controller {
   }
 
   updateMicrophone() {
-    if (this.microphoneTrack) this.microphoneTrack.enabled = !this.userPaused
+    if (this.microphoneTrack) {
+      this.microphoneTrack.enabled = this.active && this.awaitingPartner && !this.transcribing && !this.userPaused
+    }
   }
 
   renderStandard() {
@@ -391,12 +370,6 @@ export default class extends Controller {
 
   callUrl(id) {
     return this.callUrlTemplateValue.replace("__ID__", String(id))
-  }
-
-  send(payload) {
-    if (this.dataChannel?.readyState === "open") {
-      this.dataChannel.send(JSON.stringify(payload))
-    }
   }
 
   csrfToken() {

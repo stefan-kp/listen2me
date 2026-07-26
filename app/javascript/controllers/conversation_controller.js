@@ -29,6 +29,7 @@ export default class extends Controller {
     preparingStatus: { type: String, default: "Gespräch wird vorbereitet …" },
     activeStatus: { type: String, default: "Gespräch aktiv" },
     speakingStatus: { type: String, default: "Antwort wird gesprochen …" },
+    waitingStatus: { type: String, default: "Jetzt spricht dein Gegenüber …" },
     suggestionsStatus: { type: String, default: "Neue Vorschläge werden vorbereitet …" },
     setupError: { type: String, default: "Das Gespräch konnte nicht gestartet werden. Bitte lade die Seite erneut." },
     saveError: { type: String, default: "Der Beitrag konnte nicht gespeichert werden. Du kannst ihn erneut versuchen." },
@@ -43,6 +44,8 @@ export default class extends Controller {
     this.suggestionTimer = null
     this.suggestionGeneration = 0
     this.realtimeActive = false
+    this.speaking = false
+    this.waitingForPartner = false
     this.handleModeChange = this.handleModeChange.bind(this)
     window.addEventListener("speech-mode:changed", this.handleModeChange)
 
@@ -109,8 +112,9 @@ export default class extends Controller {
     const content = String(text || "").trim()
     if (!content) return
 
-    const source = event.type === "realtime:transcript" ? "realtime" : "manual"
-    const saved = await this.postMessage(content, "partner", source)
+    if (!event.detail?.source) this.dispatch("partner-manual")
+    this.prepareSuggestions()
+    const saved = await this.postMessage(content, "partner")
     if (saved && this.hasPartnerInputTarget && this.partnerInputTarget.value.trim() === content) {
       this.partnerInputTarget.value = ""
     }
@@ -142,31 +146,37 @@ export default class extends Controller {
   }
 
   async speakAndSave(text) {
+    if (this.speaking) return false
+
+    this.speaking = true
     this.clearError()
     this.setStatus(this.speakingStatusValue)
 
     try {
       await speakText(text)
     } catch (error) {
+      this.speaking = false
       if (isSpeechCancellation(error)) return false
 
       this.showError(this.speechErrorValue)
       return false
     }
 
-    const saved = await this.postMessage(text, "speaker", "interface")
+    this.waitForPartner()
+    const saved = await this.postMessage(text, "speaker")
+    this.speaking = false
     if (saved && this.inputTarget.value.trim() === text) this.inputTarget.value = ""
     return saved
   }
 
-  postMessage(text, role, source) {
-    const persist = () => this.persistMessage(text, role, source)
+  postMessage(text, role) {
+    const persist = () => this.persistMessage(text, role)
     const result = this.messageQueue.then(persist, persist)
     this.messageQueue = result.then(() => undefined, () => undefined)
     return result
   }
 
-  async persistMessage(text, role, source) {
+  async persistMessage(text, role) {
     this.clearError()
 
     try {
@@ -184,30 +194,20 @@ export default class extends Controller {
 
       if (!response.ok) throw new Error(`HTTP ${response.status}`)
       this.appendMessage(text, role)
-      if (this.realtimeActive) {
-        this.suggestionsTarget.classList.add("is-loading")
-        this.setStatus(this.suggestionsStatusValue)
-        this.dispatch("message-saved", {
-          detail: { text, role, source }
-        })
-      } else {
-        this.refreshSuggestions()
-      }
+      if (role === "partner") this.refreshSuggestions()
       return true
     } catch (_error) {
+      if (role === "partner") this.restoreSuggestions()
       this.showError(this.saveErrorValue)
       return false
     }
   }
 
   refreshSuggestions() {
-    if (this.realtimeActive) return
-
     const generation = ++this.suggestionGeneration
     window.clearTimeout(this.suggestionTimer)
     this.suggestionRequest?.abort()
-    this.suggestionsTarget.classList.add("is-loading")
-    this.setStatus(this.suggestionsStatusValue)
+    this.prepareSuggestions()
     this.suggestionTimer = window.setTimeout(() => this.fetchSuggestions(generation), 300)
   }
 
@@ -250,6 +250,8 @@ export default class extends Controller {
     const focusedIndex = currentButtons.indexOf(document.activeElement)
 
     this.suggestionsTarget.replaceChildren()
+    this.waitingForPartner = false
+    this.suggestionsTarget.classList.remove("is-loading", "is-waiting")
     const buttons = items.map((suggestion) => {
       const button = document.createElement("button")
       const copy = document.createElement("span")
@@ -280,27 +282,35 @@ export default class extends Controller {
 
   enableRealtime() {
     this.realtimeActive = true
-    window.clearTimeout(this.suggestionTimer)
-    this.suggestionRequest?.abort()
-    this.suggestionRequest = null
-    this.suggestionsTarget.classList.remove("is-loading")
     this.setStatus(this.activeStatusValue)
   }
 
   disableRealtime() {
-    const wasActive = this.realtimeActive
     this.realtimeActive = false
-    if (wasActive && this.hasConversationIdValue && this.conversationIdValue > 0) {
-      this.refreshSuggestions()
-    }
   }
 
-  receiveRealtimeSuggestions(event) {
-    if (!this.realtimeActive) return
-
-    this.renderSuggestions(event.detail?.suggestions)
+  waitForPartner() {
+    this.waitingForPartner = true
     this.suggestionsTarget.classList.remove("is-loading")
-    this.setStatus(this.activeStatusValue)
+    this.suggestionsTarget.classList.add("is-waiting")
+    this.suggestionsTarget.querySelectorAll("button").forEach((button) => {
+      button.disabled = true
+    })
+    this.setStatus(this.waitingStatusValue)
+  }
+
+  prepareSuggestions() {
+    this.waitingForPartner = false
+    this.suggestionsTarget.classList.remove("is-waiting")
+    this.suggestionsTarget.classList.add("is-loading")
+    this.setStatus(this.suggestionsStatusValue)
+  }
+
+  restoreSuggestions() {
+    this.suggestionsTarget.classList.remove("is-loading", "is-waiting")
+    this.suggestionsTarget.querySelectorAll("button").forEach((button) => {
+      button.disabled = false
+    })
   }
 
   appendMessage(text, role) {

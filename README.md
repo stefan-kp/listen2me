@@ -131,14 +131,17 @@ signed in before Google can be linked to it.
 
 The first sign-in opens a short onboarding flow. The regular conversation mode
 works without external services. If `OPENAI_API_KEY` is configured on the
-server, the conversation screen additionally offers an experimental,
-user-initiated Realtime mode; if it cannot connect, the normal flow remains
-available. This key is not stored in a user account and is never sent to the
-browser. The default is OpenAI's faster `gpt-realtime-2.1-mini` model with low reasoning
-effort for lower interaction latency; it can be overridden with
-`OPENAI_REALTIME_MODEL`.
-Normal Live AI sessions end after five minutes or 40 suggestion requests to
-keep the public demo bounded; users can explicitly start another session.
+server, the conversation screen additionally offers user-initiated live
+transcription over WebRTC; if it cannot connect, the browser recognizer and
+manual text input remain available. The microphone track is enabled only after
+the Listen2Me user's spoken answer and is disabled again when the other
+person's utterance ends. Realtime never generates or speaks an answer; the
+final transcript is stored as a partner message and passed to the same
+server-side LiteLLM suggestion flow as manual input. The OpenAI key is not
+stored in a user account and is never sent to the browser. Override the
+Realtime and transcription models with `OPENAI_REALTIME_MODEL` and
+`OPENAI_TRANSCRIPTION_MODEL`. Live transcription sessions end after five
+minutes; users can explicitly start another session.
 
 That's it! The application will automatically:
 - Set up the database

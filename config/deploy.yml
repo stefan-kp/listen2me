@@ -50,6 +50,7 @@ env:
     OPENAI_TTS_MODEL: gpt-4o-mini-tts
     OPENAI_TTS_VOICE: marin
     OPENAI_REALTIME_MODEL: gpt-realtime-2.1-mini
+    OPENAI_TRANSCRIPTION_MODEL: gpt-4o-mini-transcribe
     CARTESIA_TTS_MODEL: sonic-3.5
     CARTESIA_DAILY_CHARACTER_LIMIT: 500
     ELEVENLABS_TTS_MODEL: eleven_flash_v2_5

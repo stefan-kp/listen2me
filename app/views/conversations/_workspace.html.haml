@@ -4,7 +4,6 @@
 - normalized_suggestions = Array(@suggestions).filter_map { |suggestion| suggestion.respond_to?(:[]) ? (suggestion["content"] || suggestion[:content]) : suggestion.to_s.presence }.first(3)
 - normalized_suggestions = default_suggestions unless normalized_suggestions.length == 3
 - realtime_available = OpenAI::RealtimeCall.configured?
-- realtime_history = Array(@messages).last(20).map { |message| { role: message.role, text: message.content } }
 - refresh_suggestions_on_connect = conversation_id.present? && Array(@messages).any?
 
 .l2m-page.l2m-conversation-page{
@@ -12,6 +11,7 @@
     controller: "conversation realtime audio-recorder",
     action: [
       "audio-recorder:transcript->conversation#receivePartner",
+      "audio-recorder:transcript->realtime#stopPartnerTurn",
       "realtime:prepare->conversation#prepareRealtime",
       "conversation:ready->realtime#conversationReady",
       "realtime:ready->conversation#enableRealtime",
@@ -19,8 +19,13 @@
       "realtime:fallback->conversation#disableRealtime",
       "realtime:fallback->audio-recorder#resumeAfterRealtime",
       "realtime:transcript->conversation#receivePartner",
-      "realtime:suggestions->conversation#receiveRealtimeSuggestions",
-      "conversation:message-saved->realtime#messageSaved",
+      "realtime:transcript->audio-recorder#partnerReceived",
+      "realtime:partial->audio-recorder#receivePartial",
+      "realtime:speech-started->audio-recorder#partnerSpeechStarted",
+      "realtime:transcribing->audio-recorder#transcribing",
+      "realtime:retry->audio-recorder#retryPartnerTurn",
+      "conversation:partner-manual->audio-recorder#stopPartnerTurn",
+      "conversation:partner-manual->realtime#stopPartnerTurn",
       "audio-recorder:listening->realtime#listeningChanged"
     ].join(" "),
     conversation_conversation_id_value: conversation_id,
@@ -39,13 +44,16 @@
     conversation_preparing_status_value: t(".preparing_status", default: "Gespräch wird vorbereitet …"),
     conversation_active_status_value: t(".active_label", default: "Gespräch aktiv"),
     conversation_speaking_status_value: t(".speaking_status", default: "Antwort wird gesprochen …"),
+    conversation_waiting_status_value: t(".waiting_status", default: "Jetzt spricht dein Gegenüber …"),
     conversation_suggestions_status_value: t(".suggestions_status", default: "Neue Vorschläge werden vorbereitet …"),
     conversation_setup_error_value: t(".setup_error", default: "Das Gespräch konnte nicht gestartet werden. Bitte lade die Seite erneut."),
     conversation_save_error_value: t(".save_error", default: "Der Beitrag konnte nicht gespeichert werden. Du kannst ihn erneut versuchen."),
     conversation_speech_error_value: t(".speech_error", default: "Die Sprachausgabe ist in diesem Browser nicht verfügbar."),
-    audio_recorder_active_status_value: t(".active_label", default: "Gespräch aktiv"),
+    audio_recorder_listening_status_value: t(".listening_status", default: "Hört dem Gegenüber zu"),
     audio_recorder_ready_status_value: t(".preparing", default: "Gespräch bereit"),
+    audio_recorder_transcribing_status_value: t(".transcribing_status", default: "Sprache wird erkannt …"),
     audio_recorder_stopped_status_value: t(".listening_stopped", default: "Zuhören pausiert"),
+    audio_recorder_ready_detail_value: t(".ready_detail", default: "Nach deiner gesprochenen Antwort öffnet sich das Mikrofon automatisch."),
     audio_recorder_included_detail_value: t(".partner_included", default: "Das Gegenüber wird berücksichtigt."),
     audio_recorder_unavailable_detail_value: t(".microphone_unavailable", default: "Mikrofon nicht verfügbar. Partnertext kann unten eingegeben werden."),
     audio_recorder_recognized_detail_value: t(".recognized", default: "Beitrag erkannt."),
@@ -53,13 +61,14 @@
     audio_recorder_interrupted_detail_value: t(".interrupted", default: "Zuhören wurde unterbrochen. Neuer Versuch …"),
     audio_recorder_paused_detail_value: t(".paused", default: "Zuhören pausiert während der Sprachausgabe."),
     audio_recorder_user_paused_detail_value: t(".user_paused", default: "Das Mikrofon ist pausiert."),
+    audio_recorder_retry_detail_value: t(".retry_listening", default: "Keine Aussage erkannt. Das Mikrofon hört weiter zu."),
+    audio_recorder_start_label_value: t(".start_listening", default: "Jetzt zuhören"),
     audio_recorder_pause_label_value: t(".pause_microphone", default: "Mikrofon pausieren"),
     audio_recorder_resume_label_value: t(".resume_microphone", default: "Mikrofon wieder einschalten"),
+    audio_recorder_transcribing_label_value: t(".transcribing_label", default: "Wird transkribiert …"),
     realtime_available_value: realtime_available,
     realtime_conversation_id_value: conversation_id,
     realtime_call_url_template_value: conversation_realtime_call_path(conversation_id: "__ID__"),
-    realtime_history_value: realtime_history.to_json,
-    realtime_suggestion_prompt_value: t(".realtime_suggestion_prompt"),
     realtime_standard_status_value: t(".standard_status"),
     realtime_standard_detail_value: t(".standard_detail"),
     realtime_connecting_status_value: t(".realtime_connecting"),
@@ -84,7 +93,7 @@
     %div
       %p.l2m-eyebrow= t(".eyebrow", default: "Gesprächsmodus")
       %h1#conversation-title= t(".headline", default: "Zuhören. Vorschlagen. Du entscheidest.")
-      %p.l2m-lead= t(".lead", default: "In diesem Modus wird das Gegenüber automatisch einbezogen. Du entscheidest, welche Antwort gesprochen wird.")
+      %p.l2m-lead= t(".lead", default: "Nach deiner gesprochenen Antwort öffnet sich das Mikrofon für das reale Gegenüber. Dessen Aussage wird transkribiert und für neue Vorschläge verwendet.")
     .l2m-listen-card
       %span.l2m-listen-indicator{data: { audio_recorder_target: "indicator" }, "aria-hidden": "true"}
       %div
@@ -98,7 +107,7 @@
         %small{
           "aria-live": "off",
           data: { audio_recorder_target: "detail" }}
-          = t(".partner_included", default: "Das Gegenüber wird berücksichtigt.")
+          = t(".ready_detail", default: "Nach deiner gesprochenen Antwort öffnet sich das Mikrofon automatisch.")
         %span.sr-only{
           role: "status",
           "aria-live": "polite",
@@ -112,7 +121,7 @@
           action: "click->audio-recorder#toggle",
           audio_recorder_target: "toggle"
         }}
-        = t(".pause_microphone", default: "Mikrofon pausieren")
+        = t(".start_listening", default: "Jetzt zuhören")
 
   .l2m-realtime-control
     .l2m-realtime-copy
@@ -150,7 +159,7 @@
         - if @messages.present?
           = render partial: "messages/message", collection: @messages
         - else
-          %p.l2m-empty-state= t(".waiting", default: "Das Gespräch ist bereit. Sprich mit deinem Gegenüber oder gib den Beitrag unten als Text ein.")
+          %p.l2m-empty-state= t(".waiting", default: "Wähle eine Antwort oder schreibe selbst. Sobald sie gesprochen wurde, hört Listen2Me dem Gegenüber zu.")
 
       %details.l2m-partner-fallback{data: { audio_recorder_target: "manualFallback" }}
         %summary= t(".manual_partner", default: "Beitrag des Gegenübers eingeben")
@@ -159,11 +168,11 @@
           .l2m-inline-composer
             %input#partner-message{
               type: "text",
-              maxlength: 240,
+              maxlength: Message::PARTNER_CONTENT_LIMIT,
               placeholder: t(".partner_placeholder", default: "Zum Beispiel: Möchtest du etwas trinken?"),
               data: { conversation_target: "partnerInput" }}
             %button.l2m-button.l2m-button-secondary{type: "submit"}= t(".add", default: "Übernehmen")
-      %p.l2m-privacy-note= t(".storage_note", default: "Beiträge werden in deinem Konto gespeichert. Nach jedem gespeicherten Beitrag können Inhalte für neue Vorschläge an den serverseitigen KI-Dienst gesendet werden. Bei aktiver Live-KI wird zusätzlich Mikrofon-Audio an den konfigurierten Realtime-Dienst übertragen.")
+      %p.l2m-privacy-note= t(".storage_note", default: "Beiträge werden in deinem Konto gespeichert. Nach einer erkannten Aussage können Inhalte für neue Vorschläge an den serverseitigen KI-Dienst gesendet werden. Im Standardmodus verarbeitet die Spracherkennung deines Browsers das Mikrofon und kann dabei einen Online-Dienst des Browseranbieters verwenden. Bei aktiver Live-Transkription wird Mikrofon-Audio nur während des Antwortfensters des Gegenübers an OpenAI übertragen; Audio wird nicht in Listen2Me gespeichert.")
 
     %aside.l2m-suggestion-card{"aria-labelledby": "suggestion-title"}
       .l2m-card-heading

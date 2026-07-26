@@ -49,7 +49,18 @@ class CommunicationFlowTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", text: "Zuhören. Vorschlagen. Du entscheidest."
     assert_select "[data-controller~='audio-recorder']"
+    assert_select "[data-action*='audio-recorder:transcript->realtime#stopPartnerTurn']"
+    assert_select "[data-action*='realtime:transcript->conversation#receivePartner']"
+    assert_select "[data-action*='realtime:transcript->audio-recorder#partnerReceived']"
+    assert_select "[data-action*='realtime:partial->audio-recorder#receivePartial']"
+    assert_select "[data-action*='realtime:retry->audio-recorder#retryPartnerTurn']"
+    assert_select "[data-action*='conversation:partner-manual->audio-recorder#stopPartnerTurn']"
+    assert_select "[data-action*='conversation:partner-manual->realtime#stopPartnerTurn']"
+    assert_select "[data-audio-recorder-ready-detail-value*='gesprochenen Antwort']"
+    assert_select ".l2m-listen-toggle", text: "Jetzt zuhören"
     assert_not_includes response.body, @user.elevenlabs_api_key
+    assert_not_includes response.body, "realtime:suggestions"
+    assert_not_includes response.body, "conversation:message-saved"
 
     workspace = Nokogiri::HTML(response.body).at_css("[data-conversation-fallback-suggestions-value]")
     assert_equal 3, JSON.parse(workspace["data-conversation-fallback-suggestions-value"]).size
@@ -108,6 +119,26 @@ class CommunicationFlowTest < ActionDispatch::IntegrationTest
 
       post conversation_messages_path(conversation_id: conversation.id),
         params: { content: oversized_text, role: "speaker" },
+        as: :json
+      assert_response :unprocessable_entity
+    end
+  end
+
+  test "a transcribed partner message can be longer than a spoken answer" do
+    conversation = @user.conversations.create!
+    longer_partner_text = "M" * (Message::SPEAKER_CONTENT_LIMIT + 1)
+    oversized_partner_text = "M" * (Message::PARTNER_CONTENT_LIMIT + 1)
+
+    assert_difference "Message.count", 1 do
+      post conversation_messages_path(conversation_id: conversation.id),
+        params: { content: longer_partner_text, role: "partner" },
+        as: :json
+      assert_response :created
+    end
+
+    assert_no_difference "Message.count" do
+      post conversation_messages_path(conversation_id: conversation.id),
+        params: { content: oversized_partner_text, role: "partner" },
         as: :json
       assert_response :unprocessable_entity
     end

@@ -1,48 +1,66 @@
 import { Controller } from "@hotwired/stimulus"
 
+const FINAL_TRANSCRIPT_PAUSE_MILLISECONDS = 900
+
 export default class extends Controller {
   static targets = ["indicator", "status", "detail", "manualFallback", "toggle"]
   static values = {
-    activeStatus: { type: String, default: "Gespräch aktiv" },
-    readyStatus: { type: String, default: "Gespräch bereit" },
+    listeningStatus: { type: String, default: "Hört dem Gegenüber zu" },
+    readyStatus: { type: String, default: "Bereit für deine Antwort" },
+    transcribingStatus: { type: String, default: "Sprache wird erkannt …" },
     stoppedStatus: { type: String, default: "Zuhören pausiert" },
-    includedDetail: { type: String, default: "Das Gegenüber wird berücksichtigt." },
-    unavailableDetail: { type: String, default: "Mikrofon nicht verfügbar. Partnertext kann unten eingegeben werden." },
-    recognizedDetail: { type: String, default: "Beitrag erkannt." },
+    readyDetail: { type: String, default: "Nach deiner gesprochenen Antwort öffnet sich das Mikrofon automatisch." },
+    includedDetail: { type: String, default: "Das Mikrofon ist offen. Jetzt spricht dein Gegenüber." },
+    unavailableDetail: { type: String, default: "Mikrofon nicht verfügbar. Der Beitrag kann unten als Text eingegeben werden." },
+    recognizedDetail: { type: String, default: "Aussage erkannt. Neue Vorschläge werden vorbereitet." },
     listeningPrefix: { type: String, default: "Hört zu:" },
     interruptedDetail: { type: String, default: "Zuhören wurde unterbrochen. Neuer Versuch …" },
-    pausedDetail: { type: String, default: "Zuhören pausiert während der Sprachausgabe." },
+    pausedDetail: { type: String, default: "Deine Antwort wird gesprochen. Danach öffnet sich das Mikrofon." },
     userPausedDetail: { type: String, default: "Das Mikrofon ist pausiert." },
-    pauseLabel: { type: String, default: "Mikrofon pausieren" },
-    resumeLabel: { type: String, default: "Mikrofon wieder einschalten" }
+    retryDetail: { type: String, default: "Keine Aussage erkannt. Das Mikrofon hört weiter zu." },
+    startLabel: { type: String, default: "Jetzt zuhören" },
+    pauseLabel: { type: String, default: "Zuhören pausieren" },
+    resumeLabel: { type: String, default: "Zuhören fortsetzen" },
+    transcribingLabel: { type: String, default: "Wird transkribiert …" }
   }
 
   connect() {
     this.state = "idle"
     this.isConnected = true
-    this.shouldListen = true
+    this.shouldListen = false
     this.userPaused = false
     this.pausedForSpeech = false
     this.realtimeActive = false
+    this.microphoneUnavailable = false
     this.restartTimer = null
+    this.finalTranscriptTimer = null
+    this.finalTranscriptParts = []
+    this.recognitionGeneration = 0
+    this.processingPartner = false
     this.dispatchedFinals = new Set()
     this.pauseForSpeech = this.pauseForSpeech.bind(this)
     this.resumeAfterSpeech = this.resumeAfterSpeech.bind(this)
+    this.finishSpeech = this.finishSpeech.bind(this)
+    this.failSpeech = this.failSpeech.bind(this)
 
     window.addEventListener("speech:pauseRecording", this.pauseForSpeech)
     window.addEventListener("speech:resumeRecording", this.resumeAfterSpeech)
+    window.addEventListener("speech:finished", this.finishSpeech)
+    window.addEventListener("speech:failed", this.failSpeech)
 
     this.setupSpeechRecognition()
-    this.updateToggle()
-    if (this.recognition) this.startRecording()
+    if (!this.microphoneUnavailable) this.setStandby()
   }
 
   disconnect() {
     this.isConnected = false
     this.shouldListen = false
     window.clearTimeout(this.restartTimer)
+    this.clearFinalTranscript()
     window.removeEventListener("speech:pauseRecording", this.pauseForSpeech)
     window.removeEventListener("speech:resumeRecording", this.resumeAfterSpeech)
+    window.removeEventListener("speech:finished", this.finishSpeech)
+    window.removeEventListener("speech:failed", this.failSpeech)
 
     if (this.recognition) {
       try {
@@ -65,12 +83,12 @@ export default class extends Controller {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
 
     if (!SpeechRecognition) {
-      this.shouldListen = false
-      this.userPaused = true
+      this.microphoneUnavailable = true
       this.setUnavailable(this.unavailableDetailValue)
       return
     }
 
+    this.microphoneUnavailable = false
     this.recognition = new SpeechRecognition()
     this.recognition.continuous = true
     this.recognition.interimResults = true
@@ -87,14 +105,15 @@ export default class extends Controller {
       }
 
       this.state = "listening"
-      this.dispatchedFinals.clear()
-      this.setActive(true)
-      this.setDetail(this.includedDetailValue)
+      this.recognitionGeneration += 1
+      this.setListening(true)
     }
 
     this.recognition.onresult = (event) => {
+      if (!this.shouldListen) return
+
       const interim = []
-      let recognizedFinal = false
+      const final = []
 
       for (let index = event.resultIndex; index < event.results.length; index += 1) {
         const result = event.results[index]
@@ -102,21 +121,22 @@ export default class extends Controller {
         if (!text) continue
 
         if (result.isFinal) {
-          const resultKey = `${index}:${text}`
+          const resultKey = `${this.recognitionGeneration}:${index}:${text}`
           if (this.dispatchedFinals.has(resultKey)) continue
 
           this.dispatchedFinals.add(resultKey)
-          recognizedFinal = true
-          this.dispatch("transcript", { detail: { text } })
+          final.push(text)
         } else {
           interim.push(text)
         }
       }
 
-      if (interim.length > 0) {
-        this.setDetail(`${this.listeningPrefixValue} ${interim.join(" ")}`)
-      } else if (recognizedFinal) {
-        this.setDetail(this.recognizedDetailValue)
+      if (final.length > 0) this.finalTranscriptParts.push(...final)
+
+      const recognized = [...this.finalTranscriptParts, ...interim].join(" ").trim()
+      if (recognized) {
+        this.setDetail(`${this.listeningPrefixValue} ${recognized}`)
+        this.scheduleFinalTranscript()
       }
     }
 
@@ -125,7 +145,7 @@ export default class extends Controller {
 
       if (["not-allowed", "service-not-allowed", "audio-capture"].includes(event.error)) {
         this.shouldListen = false
-        this.userPaused = true
+        this.microphoneUnavailable = true
         this.setUnavailable(this.unavailableDetailValue)
       } else if (event.error !== "aborted" && event.error !== "no-speech") {
         this.setDetail(this.interruptedDetailValue)
@@ -136,7 +156,7 @@ export default class extends Controller {
       if (!this.isConnected) return
 
       this.state = "idle"
-      this.setActive(false)
+      this.setIndicator(false)
 
       if (this.shouldListen && !this.userPaused && !this.pausedForSpeech) {
         window.clearTimeout(this.restartTimer)
@@ -156,6 +176,9 @@ export default class extends Controller {
     ) return
 
     this.state = "starting"
+    this.setStatus(this.listeningStatusValue)
+    this.setDetail(this.includedDetailValue)
+    this.updateToggle()
 
     try {
       this.recognition.start()
@@ -168,7 +191,7 @@ export default class extends Controller {
     window.clearTimeout(this.restartTimer)
 
     if (!this.recognition || !["starting", "listening"].includes(this.state)) {
-      this.setActive(false)
+      this.setIndicator(false)
       return
     }
 
@@ -178,99 +201,223 @@ export default class extends Controller {
     } catch (_error) {
       this.state = "idle"
     }
-    this.setActive(false)
+    this.setIndicator(false)
   }
 
   pauseForSpeech() {
     this.pausedForSpeech = true
-    if (this.realtimeActive) {
-      this.setActive(false)
-      if (!this.userPaused) this.setDetail(this.pausedDetailValue)
-      return
-    }
-
+    this.shouldListen = false
+    this.processingPartner = false
+    this.clearFinalTranscript()
     this.stopRecording()
+    this.setStatus(this.readyStatusValue)
     if (!this.userPaused) this.setDetail(this.pausedDetailValue)
+    this.updateToggle()
   }
 
   resumeAfterSpeech() {
     this.pausedForSpeech = false
+  }
+
+  finishSpeech() {
+    this.pausedForSpeech = false
+    if (!this.userPaused) this.beginPartnerTurn()
+  }
+
+  failSpeech() {
+    this.pausedForSpeech = false
+    this.shouldListen = false
+    this.processingPartner = false
+    this.clearFinalTranscript()
+    if (!this.userPaused) this.setStandby()
+  }
+
+  beginPartnerTurn() {
+    if (!this.isConnected || this.userPaused) return
+
+    this.clearFinalTranscript()
+    this.dispatchedFinals.clear()
+    this.processingPartner = false
+    this.shouldListen = true
+    this.microphoneUnavailable = false
+    this.setStatus(this.listeningStatusValue)
+    this.setDetail(this.includedDetailValue)
+    this.updateToggle()
+
     if (this.realtimeActive) {
-      this.setActive(!this.userPaused)
-      if (!this.userPaused) this.setDetail(this.includedDetailValue)
+      this.setListening(true)
+      this.dispatch("listening", { detail: { paused: false, listening: true } })
       return
     }
 
-    if (!this.shouldListen || this.userPaused) return
+    if (!this.recognition) this.setupSpeechRecognition()
+    if (!this.recognition) return
 
     this.startRecording()
+  }
+
+  completePartnerTurn(text) {
+    const content = String(text || "").trim()
+    if (!content || !this.shouldListen) return
+
+    this.shouldListen = false
+    this.processingPartner = false
+    this.clearFinalTranscript()
+    this.stopRecording()
+    this.setStatus(this.transcribingStatusValue)
+    this.setDetail(this.recognizedDetailValue)
+    this.updateToggle()
+    this.dispatch("transcript", { detail: { text: content, source: "browser" } })
+  }
+
+  receivePartial(event) {
+    if (!this.realtimeActive || !this.shouldListen) return
+
+    const text = String(event.detail?.text || "").trim()
+    if (text) this.setDetail(`${this.listeningPrefixValue} ${text}`)
+  }
+
+  partnerSpeechStarted() {
+    if (!this.realtimeActive || !this.shouldListen) return
+
+    this.setListening(true)
+  }
+
+  transcribing() {
+    if (!this.realtimeActive || !this.shouldListen) return
+
+    this.processingPartner = true
+    this.setIndicator(false)
+    this.setStatus(this.transcribingStatusValue)
+    this.updateToggle()
+  }
+
+  partnerReceived() {
+    if (!this.realtimeActive) return
+
+    this.shouldListen = false
+    this.processingPartner = false
+    this.setIndicator(false)
+    this.setStatus(this.transcribingStatusValue)
+    this.setDetail(this.recognizedDetailValue)
+    this.updateToggle()
   }
 
   toggle(event) {
     event.preventDefault()
 
-    if (this.realtimeActive) {
-      this.userPaused = !this.userPaused
-      this.shouldListen = !this.userPaused
-      this.setActive(!this.userPaused)
-      this.setDetail(this.userPaused ? this.userPausedDetailValue : this.includedDetailValue)
+    if (this.shouldListen && !this.userPaused) {
+      this.userPaused = true
+      this.shouldListen = false
+      this.processingPartner = false
+      this.clearFinalTranscript()
+      this.stopRecording()
+      this.setStatus(this.stoppedStatusValue)
+      this.setDetail(this.userPausedDetailValue)
       this.updateToggle()
-      this.dispatch("listening", { detail: { paused: this.userPaused } })
+      this.dispatch("listening", { detail: { paused: true, listening: false } })
       return
     }
 
-    if (this.userPaused || !this.shouldListen) {
-      this.userPaused = false
-      this.shouldListen = true
-      this.setDetail(this.includedDetailValue)
-      if (!this.recognition) this.setupSpeechRecognition()
-      this.updateToggle()
-      this.startRecording()
-    } else {
-      this.userPaused = true
-      this.shouldListen = false
-      this.stopRecording()
-      this.setDetail(this.userPausedDetailValue)
-      this.updateToggle()
-    }
+    this.userPaused = false
+    this.beginPartnerTurn()
   }
 
   suspendForRealtime() {
+    const continueListening = this.shouldListen && !this.userPaused
     this.realtimeActive = true
-    this.shouldListen = false
     this.stopRecording()
-    this.setActive(!this.userPaused)
-    this.setDetail(this.userPaused ? this.userPausedDetailValue : this.includedDetailValue)
+    this.shouldListen = continueListening
+
+    if (continueListening) {
+      this.setListening(true)
+      this.dispatch("listening", { detail: { paused: false, listening: true } })
+    } else {
+      this.setStandby()
+    }
   }
 
   resumeAfterRealtime() {
     if (!this.realtimeActive) return
 
+    const continueListening = this.shouldListen && !this.userPaused
     this.realtimeActive = false
-    if (this.userPaused) return
-
-    this.shouldListen = true
-    this.startRecording()
+    if (continueListening) {
+      if (!this.recognition) this.setupSpeechRecognition()
+      this.startRecording()
+    } else if (!this.userPaused) {
+      this.setStandby()
+    }
   }
 
   retry(event) {
     event.preventDefault()
     this.userPaused = false
-    this.shouldListen = true
     this.pausedForSpeech = false
+    this.microphoneUnavailable = false
     if (!this.recognition) this.setupSpeechRecognition()
-    this.updateToggle()
-    this.startRecording()
+    this.beginPartnerTurn()
   }
 
-  setActive(active) {
+  retryPartnerTurn() {
+    if (!this.realtimeActive || !this.shouldListen) return
+
+    this.processingPartner = false
+    this.setListening(true)
+    this.setDetail(this.retryDetailValue)
+    this.updateToggle()
+  }
+
+  stopPartnerTurn() {
+    this.shouldListen = false
+    this.processingPartner = false
+    this.clearFinalTranscript()
+    this.stopRecording()
+    this.setIndicator(false)
+    this.setStatus(this.transcribingStatusValue)
+    this.setDetail(this.recognizedDetailValue)
+    this.updateToggle()
+  }
+
+  scheduleFinalTranscript() {
+    window.clearTimeout(this.finalTranscriptTimer)
+    this.finalTranscriptTimer = window.setTimeout(() => {
+      const transcript = this.finalTranscriptParts.join(" ").trim()
+      this.finalTranscriptTimer = null
+      if (transcript) this.completePartnerTurn(transcript)
+    }, FINAL_TRANSCRIPT_PAUSE_MILLISECONDS)
+  }
+
+  clearFinalTranscript() {
+    window.clearTimeout(this.finalTranscriptTimer)
+    this.finalTranscriptTimer = null
+    this.finalTranscriptParts = []
+  }
+
+  setStandby() {
+    this.shouldListen = false
+    this.processingPartner = false
+    this.setIndicator(false)
+    this.setStatus(this.readyStatusValue)
+    this.setDetail(this.readyDetailValue)
+    this.updateToggle()
+  }
+
+  setListening(active) {
+    this.setIndicator(active)
+    this.setStatus(active ? this.listeningStatusValue : this.readyStatusValue)
+    if (active) this.setDetail(this.includedDetailValue)
+  }
+
+  setIndicator(active) {
     this.indicatorTargets.forEach((indicator) => {
       indicator.classList.toggle("is-active", active)
     })
+  }
+
+  setStatus(message) {
     this.statusTargets.forEach((status) => {
-      status.textContent = active
-        ? this.activeStatusValue
-        : (this.userPaused ? this.stoppedStatusValue : this.readyStatusValue)
+      status.textContent = message
     })
   }
 
@@ -281,7 +428,11 @@ export default class extends Controller {
   }
 
   setUnavailable(message) {
-    this.setActive(false)
+    this.shouldListen = false
+    this.processingPartner = false
+    this.clearFinalTranscript()
+    this.setIndicator(false)
+    this.setStatus(this.readyStatusValue)
     this.setDetail(message)
     this.manualFallbackTargets.forEach((element) => {
       element.hidden = false
@@ -292,9 +443,19 @@ export default class extends Controller {
 
   updateToggle() {
     this.toggleTargets.forEach((button) => {
-      const paused = this.userPaused || !this.shouldListen
-      button.setAttribute("aria-pressed", String(paused))
-      button.textContent = paused ? this.resumeLabelValue : this.pauseLabelValue
+      const listening = this.shouldListen && !this.userPaused
+      button.disabled = this.processingPartner || (this.microphoneUnavailable && !this.realtimeActive)
+      button.setAttribute("aria-pressed", String(listening && !this.processingPartner))
+
+      if (this.processingPartner) {
+        button.textContent = this.transcribingLabelValue
+      } else if (listening) {
+        button.textContent = this.pauseLabelValue
+      } else if (this.userPaused) {
+        button.textContent = this.resumeLabelValue
+      } else {
+        button.textContent = this.startLabelValue
+      }
     })
   }
 }
