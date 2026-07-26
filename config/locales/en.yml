@@ -38,10 +38,11 @@ en:
       enter_text_aria: "Enter text to be spoken"
       select_category_aria: "Select category for the text"
       speak_button_aria: "Speak the entered text"
-
-    conversation_form:
-      <<: *text_form_en
-      new_conversation_form: "Start new conversation"
+      just_spoken: "Just spoken"
+      repeat: "Repeat"
+      edit: "Edit"
+      direct_hint: "Sentence cards speak immediately."
+      draft_hint: "Sentence cards are copied here first."
 
     index:
       <<: *text_form_en
@@ -52,9 +53,39 @@ en:
       categories_list: "List of available categories"
       category_link: "Go to category %{name} with %{count} uses"
       frequent_sentences_list: "List of frequently used sentences"
+      starter_kicker: "Getting started"
+      starter_sentences: "Suggested sentences"
+      starter_sentences_list: "List of suggested sentences"
       frequent_sentences: "Frequently used sentences"
       frequent_sentences_description: "List of most frequently used sentences"
       confirm_delete: "Do you really want to delete this sentence?"
+      eyebrow: "Communicate"
+      headline: "What would you like to say?"
+      own_mode_hint: "Here you compose your own sentences. The other person is not included."
+      one_tap: "1 tap"
+      one_tap_title: "Answers that speak immediately"
+      help_note: "“Help” only speaks the sentence and does not trigger an emergency call."
+      "yes": "Yes"
+      "no": "No"
+      stop: "Stop"
+      help_sentence: "I need help"
+      help: "Help"
+      speak_immediately: "Speak %{text} immediately"
+      contextual: "Continue with context"
+      next_sentence: "You could say this next"
+      new_topic: "New topic"
+      three_suggestions: "Three short suggestions are ready."
+      quick_sentences: "Quick sentences"
+      quick_access: "Quick access"
+      quick_access_list: "List of frequently used and suggested sentences"
+      no_sentences: "No sentences are available yet."
+      history: "History"
+      recently_spoken: "Recently spoken"
+      recent_empty: "Your spoken sentences will appear here."
+      conversation_promo_label: "Conversation"
+      conversation_promo_title: "Include the other person"
+      conversation_promo_copy: "In Conversation, Listen2Me also considers what the other person says."
+      start_conversation: "Start conversation"
 
     category:
       <<: *text_form_en
@@ -81,91 +112,104 @@ en:
       usage_count: "Usage count"
       category_label: "Category: %{name}"
       delete_sentence: "Delete sentence: %{text}"
+      delete_confirmation: "Do you really want to delete the sentence “%{text}”? This cannot be undone."
       speak_sentence: "Speak sentence: %{text}"
+      draft_sentence: "Write sentence first: %{text}"
+      direct_action: "Speak now"
+      draft_action: "Write first"
+
+    interaction:
+      speaking: "Speaking …"
+      ready: "Ready"
+      unavailable: "Speech output is not available in this browser."
+      save_error: "The sentence was spoken but could not be saved."
+      spoken_at: "Spoken at"
+      direct_suggestion_label: "speak immediately"
+      draft_suggestion_label: "write first"
+      default_followups:
+        - "That works for me."
+        - "One moment, please."
+        - "I would like to add something."
+      followup_rules:
+        - terms: ["thirsty", "drink", "water"]
+          suggestions: ["Water, please.", "Just a small sip.", "Please put it here."]
+        - terms: ["help"]
+          suggestions: ["Please come over for a moment.", "I will show you what I need.", "Please help me stand up."]
+        - terms: ["pain", "hurts"]
+          suggestions: ["It hurts here.", "Please wait a moment.", "I would like to sit differently."]
+        - terms: ["tired", "rest"]
+          suggestions: ["Please be a little quieter.", "Please leave me alone for a moment.", "Please wake me later."]
+        - terms: ["toilet", "bathroom"]
+          suggestions: ["Please come with me.", "I need help with that.", "Please wait outside the door."]
+        - terms: ["hungry", "food", "eat"]
+          suggestions: ["Something small, please.", "I will tell you what I feel like eating.", "Later, please."]
 
   languages:
     german: "German"
     english: "English"
 
+  onboarding:
+    show:
+      title: "Getting started"
+      home: "Listen2Me – Getting started"
+      setup_label: "Personal setup"
+      eyebrow: "Three short steps"
+      headline: "Hello %{name}, let’s get Listen2Me ready."
+      lead: "Choose how the interface should respond. You can change everything later."
+      step: "Step %{current} of %{total}"
+      progress: "Setup progress"
+      benefit_fast: "Fast answers with one tap"
+      benefit_control: "You decide what is spoken"
+      benefit_private: "Audio checks are not stored"
+      language_title: "Which language should the interface use?"
+      language_copy: "This choice controls menus, guidance, and default suggestions."
+      german_description: "Deutsche Oberfläche und Vorschläge"
+      english_description: "English interface and suggestions"
+      mode_title: "What should happen when you tap a sentence card?"
+      mode_copy: "Speaking immediately is fastest for short answers. Write first lets you edit every sentence."
+      direct_title: "Speak immediately"
+      direct_description: "One tap speaks the sentence directly."
+      draft_title: "Write first"
+      draft_description: "One tap copies the sentence into the text field."
+      recommended: "Recommended for fast communication"
+      ready_title: "One quick check – then you are ready"
+      ready_copy: "These checks are optional. Speech output uses the preconfigured voice; no microphone recording is stored."
+      voice_test_title: "Speech output"
+      voice_test_copy: "Checks the preconfigured voice and its browser fallback."
+      microphone_test_title: "Microphone"
+      microphone_test_copy: "Checks permission for Conversation mode."
+      test: "Test"
+      testing: "Running check …"
+      test_sentence: "Listen2Me is ready."
+      voice_success: "Speech output works."
+      voice_success_openai: "The OpenAI voice works."
+      voice_success_browser: "The browser voice works."
+      voice_success_cartesia: "The Cartesia voice works."
+      voice_success_elevenlabs: "The ElevenLabs voice works."
+      voice_error: "Speech output is not available on this device."
+      microphone_success: "The microphone is ready. Nothing was recorded or stored."
+      microphone_error: "The microphone is unavailable. Text input still works."
+      description_label: "What should suggestions know about you? (optional)"
+      description_placeholder: "For example: Please use short sentences. I like tea."
+      description_help: "Only add details that help create better reply suggestions."
+      privacy_note: "Only sentences you explicitly choose to speak may be sent to the configured voice provider. Cloud voices are AI-generated; standard phrases and the browser fallback work without suggestion AI."
+      back: "Back"
+      next: "Continue"
+      finish: "Finish setup"
+      skip: "Skip and start now"
+      save_error: "Your choices could not be saved yet."
+    update:
+      completed: "Listen2Me is ready."
+
   suggestions:
     system_prompt: |
-      You are a language assistant communicating with a patient who is unable to speak. Your task is to provide meaningful suggestions for communication word-finding. The output should be in JSON format to adapt the response suggestions.
-      You always generate suggestions for the patient. This means, put yourself in their position and think about what they would say next.
-
-      # Details
-
-      - The patient can type responses that you will process
-      - As a language assistant, you should provide context-related suggestions for possible answers
-      - When the patient talks about a topic, like food, make appropriate suggestions (e.g., "I would like a pizza" or "I would like some bread")
-      - The response suggestions should always be in the same JSON format: an array with a list of messages, each containing a "content" attribute
-      - I will give you both the patient's responses/questions and the messages of a third person in the room. These have the role "Patient". And I will give you the messages of a third person in the room. These have the role "Visitor".
-      - The last message of the patient/visitor is always at the end of the conversation. This gives you the important information for the suggestions. The previous messages are important for the context.
-      - I will give you also a description of the patient (user_description), which contains important context information
-      - I will give you also the conversation summary (summary), which contains important context information
-      - I will give you also the category of the sentence (category), which contains important context information
-      # Steps
-
-      1. Process the patient's input
-      2. Identify the context of communication (e.g., topics like food, drinks, activities)
-      3. Create context-related response suggestions
-      4. Structure the suggestions in JSON format
-
-      # Output Format
-
-      The output must be in JSON format and always an array with at least 4 objects:
-
-      ```json
-      {
-        "response": [
-          {
-              "content": "[Suggestion1]"
-          },
-          {
-              "content": "[Suggestion2]"
-          }
-      ]
-      ```
-
-      # Examples
-
-      ## Example 1
-
-      ### Input
-      Patient enters "I'm hungry"
-
-      ### Output
-      ```json
-      [
-          {
-              "content": "I would like a pizza"
-          },
-          {
-              "content": "I would like some bread"
-          }
-      ]
-      ```
-
-      ## Example 2
-
-      ### Input
-      Patient says "I want something to drink"
-
-      ### Output
-      ```json
-      [
-          {
-              "content": "I would like a glass of water"
-          },
-          {
-              "content": "I would like some juice"
-          }
-      ]
-      ```
-
-      # Notes
-
-      - Ensure relevance and appropriateness of suggestions in relation to the given context
-      - The JSON output structure should be strictly maintained
+      You support a person who uses text as their voice.
+      Produce exactly three short, natural next sentences from their point of view.
+      "speaker" means this person and "partner" means the other person.
+      Prioritize last_message; context, category, user_description, and summary are supporting context only.
+      Do not invent personal or medical facts. Each sentence must stand alone, be unique, and contain at most 160 characters.
+      Return only JSON without explanations or Markdown:
+      {"response":[{"content":"…"},{"content":"…"},{"content":"…"}]}
 
   activerecord:
     errors:
@@ -191,12 +235,74 @@ en:
         password_confirmation: "Password Confirmation"
 
   messages:
-    form:
-      enter_message: "Enter message..."
-      speak: "Speak"
-      send: "Send"
+    message:
+      you: "You"
+      partner: "Other person"
 
   conversations:
+    workspace:
+      back: "Back"
+      eyebrow: "Conversation mode"
+      headline: "Listen. Suggest. You decide."
+      lead: "After your answer has been spoken, the microphone opens for the real person opposite you. Their words are transcribed and used for new suggestions."
+      active_label: "Conversation active"
+      preparing: "Ready for your answer"
+      listening_status: "Listening to the other person"
+      transcribing_status: "Recognizing speech …"
+      ready_detail: "The microphone opens automatically after your spoken answer."
+      partner_included: "The microphone is open. The other person can speak now."
+      active: "Active"
+      conversation: "Conversation"
+      live_history: "Live transcript"
+      messages_list: "Conversation messages"
+      waiting: "Choose an answer or write your own. Once it has been spoken, Listen2Me listens to the other person."
+      manual_partner: "Enter the other person's message"
+      partner_label: "What did the other person say?"
+      partner_placeholder: "For example: Would you like something to drink?"
+      add: "Add"
+      reply_suggestions: "Reply suggestions"
+      what_reply: "What would you like to answer?"
+      immediate: "Now"
+      your_answer: "Your answer"
+      answer_placeholder: "Choose a suggestion or write your own …"
+      speak_answer: "Speak answer"
+      you: "You"
+      partner: "Other person"
+      write: "Write"
+      direct_help: "One tap speaks the answer immediately. You can switch to “Write first” above."
+      draft_help: "One tap copies the answer to the text field so you can edit and speak it."
+      preparing_status: "Preparing conversation …"
+      speaking_status: "Speaking answer …"
+      waiting_status: "The other person can speak now …"
+      suggestions_status: "Preparing new suggestions …"
+      setup_error: "The conversation could not be started. Please reload the page."
+      save_error: "The message could not be saved. You can try again."
+      speech_error: "Speech output is not available in this browser."
+      microphone_unavailable: "Microphone unavailable. You can enter the other person's text below."
+      recognized: "Statement recognized. Preparing new suggestions."
+      listening_prefix: "Listening:"
+      interrupted: "Listening was interrupted. Trying again …"
+      paused: "Your answer is being spoken. The microphone opens afterwards."
+      listening_stopped: "Listening paused"
+      user_paused: "The microphone is paused."
+      retry_listening: "No speech was recognized. The microphone is listening again."
+      start_listening: "Listen now"
+      pause_microphone: "Pause listening"
+      resume_microphone: "Resume listening"
+      transcribing_label: "Transcribing …"
+      storage_note: "Messages are stored in your account. After a statement is recognized, content may be sent to the server-configured AI service for new suggestions. In standard mode, your browser's speech recognition processes the microphone and may use an online service from the browser vendor. With live transcription active, microphone audio is sent to OpenAI only during the other person's reply window; Listen2Me does not store the audio."
+      standard_status: "Standard mode"
+      standard_detail: "Browser recognition with text entry as a fallback."
+      realtime_connecting: "Connecting live transcription …"
+      realtime_connecting_detail: "Preparing improved speech recognition."
+      realtime_live: "Live transcription ready"
+      realtime_live_detail: "After your answer, the real other person's voice is transcribed."
+      realtime_unavailable: "Standard mode active"
+      realtime_unavailable_detail: "Live transcription was unavailable. Normal recognition continues."
+      realtime_start: "Start live transcription"
+      realtime_stop: "Stop live transcription"
+      realtime_setup: "Set up live transcription"
+      realtime_not_configured: "Live transcription is not configured on this server yet."
     show:
       conversation: "Conversation"
       back_to_home: "Back to Home"
@@ -226,29 +332,89 @@ en:
   settings:
     show:
       title: "Settings"
+      eyebrow: "Your Listen2Me"
+      intro: "Adapt the interface, devices, and reply suggestions to your communication."
+      sections: "Settings sections"
       about_me: "About Me"
-      system: "System"
-      about_settings: "About Me Settings"
-      description_placeholder: "Tell us about yourself, your preferences, and any important information that should be considered during conversations..."
-      voice_settings: "Voice Settings"
-      voice_settings_description: "The ElevenLabs integration is optional. If no API credentials are entered, the browser's speech synthesis will be used automatically. However, ElevenLabs offers more natural speech quality."
-      llm_settings: "AI Settings"
+      device: "Voice & device"
+      system: "Suggestions"
+      account: "Account"
+      personal: "Personal context"
+      about_settings: "What should Listen2Me know about you?"
+      about_description: "These optional details help make reply suggestions more relevant and personal."
+      description_label: "Helpful context for suggestions"
+      description_placeholder: "For example: Please use short sentences. I like tea and address my family by their first names."
+      description_help: "Only add information that is genuinely helpful for your communication."
       save: "Save Changes"
+      device_kicker: "Check your browser"
+      device_title: "Do speech and microphone work?"
+      device_description: "Checks only run after you click. A cloud voice receives only the test sentence; no microphone recording is stored or uploaded."
+      voice_provider_label: "Voice for speech output"
+      voice_provider_help: "OpenAI is the preferred cloud voice. Availability only confirms that a key is present; the speech test checks the live service. If it fails, the browser voice takes over."
+      provider_openai: "OpenAI voice"
+      provider_openai_description: "A natural, clear cloud voice with fast output for German and English sentences."
+      provider_browser: "Device voice"
+      provider_browser_description: "Free and without cloud speech output. Quality depends on the device and browser."
+      provider_cartesia: "Cartesia"
+      provider_cartesia_description: "A very fast alternative voice. A small daily character limit protects the free allowance."
+      provider_elevenlabs: "ElevenLabs"
+      provider_elevenlabs_description: "An alternative voice for direct comparison, intentionally limited to a few tests."
+      provider_recommended: "Recommended"
+      provider_always_available: "Always available"
+      provider_limited: "Daily limit active"
+      provider_unavailable: "Not configured"
+      voice_provider_privacy: "Cloud voices receive only the sentence you explicitly choose to speak. The voice is AI-generated. Provider keys stay exclusively on the Listen2Me server."
+      save_voice: "Save voice"
+      voice_test_title: "Speech output"
+      voice_test_copy: "Plays a short test sentence using the voice selected above."
+      microphone_test_title: "Microphone"
+      microphone_test_copy: "Checks permission for Conversation mode."
+      test: "Test"
+      testing: "Running check …"
+      test_sentence: "Listen2Me is ready."
+      voice_success: "Speech output works."
+      voice_success_openai: "The OpenAI voice works."
+      voice_success_browser: "The browser voice works."
+      voice_success_cartesia: "The Cartesia voice works."
+      voice_success_elevenlabs: "The ElevenLabs voice works."
+      voice_error: "Speech output is not available on this device."
+      microphone_success: "The microphone is ready. Nothing was recorded or stored."
+      microphone_error: "The microphone is unavailable. Text input still works."
+      personal_voice_later: "The free browser voice remains available if a service fails. A personal cloned voice can later be added through an eligible provider voice."
+      ai_kicker: "Reply suggestions"
+      llm_settings: "Choose speed or economy"
+      llm_settings_description: "Choose faster or more economical use. The Listen2Me server handles the technical model selection."
+      model_profile_label: "AI suggestion profile"
+      model_profile_help: "Both profiles only provide text suggestions. Nothing is spoken automatically."
+      model_profile_fast: "Fast"
+      model_profile_fast_description: "Prioritizes low response time for fluid conversations."
+      model_profile_cheap: "Economical"
+      model_profile_cheap_description: "Prioritizes lower cost for tests and less time-sensitive use."
+      recommended: "Recommended for conversations"
+      proxy_explanation: "Suggestions are generated securely through the Listen2Me server. If it is unavailable, three standard suggestions remain available."
+      save_ai: "Save suggestion profile"
       conversation_summary: "Conversation Analysis"
-      conversation_summary_explanation: "The conversation analysis helps the AI better understand your preferences and communication patterns. It analyzes your past conversations to provide more personalized suggestions. It's recommended to update this analysis periodically as your conversations grow."
+      conversation_summary_explanation: "Creates a summary from previous conversations for more relevant suggestions. If AI is unavailable, the existing summary remains unchanged."
       generate_summary: "Generate Summary"
+      summary_unavailable: "Once a conversation contains messages, you can create an analysis here."
       last_generated: "Last generated: %{time}"
       no_summary: "No conversation summary generated yet"
       generating_summary: "Generating..."
+      account_kicker: "Access"
+      account_title: "Manage account"
+      account_description: "Change your name, email address, or password—or sign out on this device."
+      edit_account: "Edit account details"
+      sign_out: "Sign out"
     update:
       updated: "Settings updated successfully"
     generate_summary:
+      no_conversations: "An analysis needs at least one conversation with a message."
       prompt:
         intro: "Please analyze these conversations and extract key information about the participants."
-        user_section: "The user/patient"
+        user_section: "The speaker"
         user_points: |
           - Personal preferences
-          - Medical conditions or needs
+          - Important needs or routines
           - Daily routines or habits
           - Important relationships or contacts
           - Frequently discussed topics
@@ -257,9 +423,9 @@ en:
           - Names or identifiers used
           - Roles or relationships to the user
           - Communication patterns
-        privacy_note: "Only include information that was explicitly mentioned in the conversations. Maintain privacy by excluding sensitive medical details."
+        privacy_note: "Only include information that was explicitly mentioned in the conversations. Exclude sensitive personal details that are not needed for better suggestions."
       success: "Conversation summary was successfully generated"
-      error: "Error generating summary: %{message}"
+      error: "The conversation analysis could not be created. Please try again later."
       errors:
         unsupported_provider: "Unsupported LLM provider: %{provider}"
 
@@ -272,7 +438,20 @@ en:
       home: "Home"
       speeches: "Speech output"
       conversations: "Conversations"
+      conversation_mode: "Conversation"
       sign_in: "Sign in"
+      on_tap: "When tapped"
+      card_behavior: "Sentence card behavior"
+      direct: "Speak immediately"
+      direct_short: "Speak"
+      draft: "Write first"
+      draft_short: "Write"
+      direct_status: "Sentence cards speak immediately."
+      draft_status: "Sentence cards are copied to the text field first."
+      settings: "Profile and settings"
+      settings_short: "Settings"
+    bottom_navigation:
+      mobile_navigation: "Mobile main navigation"
     flash_messages:
       close_message: "Close message"
       success_message: "Success message"
@@ -293,6 +472,42 @@ en:
       new_text: "Alt + N: Enter new text"
 
   categories:
+    default_names:
+      basic_needs: "Basic Needs"
+      food: "Food"
+      drinks: "Drinks"
+      health: "Health"
+      pain: "Pain"
+      bathroom: "Bathroom"
+      emotions: "Emotions"
+      help: "Help"
+      emergency: "Emergency"
+      family: "Family"
+      daily_care: "Daily Care"
+      rest: "Rest"
+      entertainment: "Entertainment"
+      movement: "Movement"
+      temperature: "Temperature"
+
+    index:
+      title: "Manage Categories"
+      new_category: "New Category"
+      categories_list: "List of categories"
+      sentences_count:
+        zero: "No sentences"
+        one: "1 sentence"
+        other: "%{count} sentences"
+      edit_category: "Edit category '%{name}'"
+      confirm_delete: "Do you really want to delete the category '%{name}'? Its %{count} sentences will also be deleted."
+      delete_category: "Delete category '%{name}'"
+      no_categories: "No categories available"
+    create:
+      category_created: "Category was created"
+    destroy:
+      category_deleted: "Category was deleted"
+      cannot_delete_with_sentences:
+        one: "The category cannot be deleted because it still contains one sentence"
+        other: "The category cannot be deleted because it still contains %{count} sentences"
     new:
       title: "Create New Category"
       back_to_categories: "Back to Categories"
@@ -322,17 +537,16 @@ en:
 
   suggestion_service:
     summary_prompt: |
-      You are a speech assistant communicating with a patient who is unable to speak. Your task is to extract meaningful information about the patient.
-      This information will then be used for the speech assistant's suggestions, so it's important that you extract the information accurately and completely.
+      You are a communication assistant. Extract only helpful, explicitly stated information about the person who uses text as their voice.
+      This information will later be used to create more relevant suggestions.
       
       Please analyze these conversations and create a detailed summary in markdown format.
       The summary should be in the same language as the conversations.
       
       Structure the information as follows:
 
-      1. The User/Patient:
+      1. The Speaker:
       - Personal preferences
-      - Medical needs, especially required medications
       - Daily routines or habits
       - Important relationships or contacts
       - Frequently discussed topics
@@ -346,7 +560,7 @@ en:
       - Family and friends
 
       Only include information explicitly mentioned in the conversations.
-      Maintain privacy by excluding sensitive medical details.
+      Maintain privacy by excluding sensitive personal details that are not needed for better suggestions.
       Use markdown formatting for better readability (headers, lists, emphasis).
     errors:
       unsupported_provider: "Unsupported LLM provider: %{provider}"

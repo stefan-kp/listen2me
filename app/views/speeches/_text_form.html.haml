@@ -1,21 +1,52 @@
-= form_with url: speeches_path, 
-  method: :post, 
-  class: "mt-4", 
-  data: { turbo_frame: "_top",controller: "speech",speech_voice_id_value: current_user.elevenlabs_voice_id,speech_api_key_value: current_user.elevenlabs_api_key } do |f|
-  .form-group
-    = f.label :content, t('.own_text'), class: "form-label"
-    = f.text_area :content,class: "form-textarea",rows: 3,placeholder: t('.enter_text'),required: true,"aria-label": t('.enter_text_aria'), data: { speech_target: "input" }
+= form_with url: speeches_path, method: :post, class: "l2m-composer", data: { turbo: false } do |f|
+  = f.label :content, t(".own_text"), class: "l2m-composer-label"
+  .l2m-composer-box
+    .l2m-spoken-complete{
+      hidden: true,
+      tabindex: -1,
+      data: { communicator_target: "completed" },
+      "aria-live": "polite"}
+      %span.l2m-complete-check{"aria-hidden": "true"} ✓
+      .l2m-complete-copy
+        %span= t(".just_spoken", default: "Gerade gesprochen")
+        %strong{data: { communicator_target: "completedText" }}
+        %small{data: { communicator_target: "completedTime" }}
+      .l2m-complete-actions
+        %button.l2m-button.l2m-button-secondary{
+          type: "button",
+          data: { action: "click->communicator#repeatLast" }}
+          = t(".repeat", default: "Noch einmal")
+        %button.l2m-text-link{
+          type: "button",
+          data: { action: "click->communicator#editLast" }}
+          = t(".edit", default: "Ändern")
 
-  .form-group
-    = f.label :category_id, t('.select_category'), class: "form-label"
-    = f.select :category_id,
-      Category.all.map { |c| [c.name, c.id] },
-      { selected: @category.try(:id) },
-      { class: "form-select" }
+    .l2m-composer-entry{data: { communicator_target: "composerEntry" }}
+      = f.text_area :content,
+        rows: 3,
+        maxlength: 240,
+        placeholder: t(".enter_text"),
+        required: true,
+        "aria-label": t(".enter_text_aria"),
+        data: { communicator_target: "input" }
 
-  .flex.justify-end.mt-4
-    = f.button class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500",
-      type: "button",
-      data: { action: "click->speech#speakAndSubmit" } do
-      = heroicon "speaker-wave", options: { class: "h-5 w-5 mr-2", "aria-hidden": "true" }
-      = t('.speak') 
+      - if @categories.present?
+        = f.hidden_field :category_id, value: @category&.id || @categories.first&.id
+
+      .l2m-composer-footer
+        %span.l2m-mode-hint{
+          data: {
+            communicator_target: "modeHint",
+            direct_text: t(".direct_hint", default: "Satzkarten sprechen sofort."),
+            draft_text: t(".draft_hint", default: "Satzkarten landen zuerst hier.")
+          }}
+        = f.button class: "l2m-speak-button",
+          type: "button",
+          data: { action: "click->communicator#speakComposer", communicator_save_url_param: speeches_path } do
+          %span.l2m-speak-wave{"aria-hidden": "true"}
+            %i
+            %i
+            %i
+            %i
+          = t(".speak")
+  %span.sr-only{role: "status", "aria-live": "polite", data: { communicator_target: "status" }}

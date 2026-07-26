@@ -11,10 +11,13 @@ class CreateLanguages < ActiveRecord::Migration[7.1]
 
     reversible do |dir|
       dir.up do
-        Language.create!([
-          { name: 'Deutsch', code: 'de' },
-          { name: 'English', code: 'en' }
-        ])
+        execute <<~SQL
+          INSERT INTO languages (name, code, created_at, updated_at)
+          VALUES
+            ('Deutsch', 'de', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+            ('English', 'en', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+          ON CONFLICT (code) DO NOTHING
+        SQL
       end
     end
   end

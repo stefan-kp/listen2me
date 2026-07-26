@@ -1,25 +1,57 @@
-= form_with model: category, class: "space-y-6 w-full max-w-2xl mx-auto" do |f|
-  .space-y-4
-    .form-group
-      = f.label :name, t('.name'), class: "form-label"
-      = f.text_field :name,
-        class: "form-input",
-        required: true,
-        placeholder: t('.name_placeholder')
+- submit_action = category.new_record? ? "create" : "update"
+- legacy_icon_name = category.legacy_icon_name
+- icon_names = legacy_icon_name ? [legacy_icon_name, *Category::ICONS] : Category::ICONS
 
-    .form-group
-      = f.label :icon_name, t('.icon_name'), class: "block text-sm font-medium text-gray-700 mb-2"
-      .max-h-64.overflow-y-auto.rounded-lg.border.border-gray-200.p-4
-        .grid.grid-cols-4.gap-4{data: { controller: "icon-selector" }}
-          - Category::ICONS.each do |icon_name|
-            .icon-option
-              = f.radio_button :icon_name, icon_name, class: "sr-only peer", required: true, id: "category_icon_name_#{icon_name}"
-              = f.label "icon_name_#{icon_name}", class: "flex flex-col items-center p-2 rounded-lg border cursor-pointer hover:bg-gray-50 peer-checked:border-indigo-600 peer-checked:bg-indigo-50" do
-                = heroicon icon_name, options: { class: "h-8 w-8 text-gray-500 peer-checked:text-indigo-600" }
-                %span.mt-1.text-xs.text-gray-500.truncate.w-full.text-center= icon_name.titleize
+= form_with model: category,
+  url: (category.new_record? ? categories_path : category_path(id: category.id)),
+  class: "l2m-category-form" do |f|
+  - if category.errors.any?
+    .l2m-form-error{role: "alert", data: { turbo_cache: "false" }}
+      = heroicon "exclamation-circle", options: { class: "l2m-category-error-icon", "aria-hidden": "true" }
+      %div
+        %h2= t("category_management.form.error_heading", count: category.errors.count)
+        %ul
+          - category.errors.full_messages.each do |message|
+            %li= message
 
-  .flex.justify-end.gap-3.pt-4.border-t
-    = link_to t('categories.common.cancel'), categories_path,
-      class: "px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-500"
-    = f.submit t(".submit.#{category.new_record? ? 'create' : 'update'}"),
-      class: "inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" 
+  .l2m-field
+    = f.label :name, t("category_management.form.name_label")
+    = f.text_field :name,
+      class: "l2m-input",
+      required: true,
+      maxlength: 60,
+      autofocus: true,
+      autocomplete: "off",
+      placeholder: t("category_management.form.name_placeholder"),
+      "aria-invalid": category.errors[:name].any?,
+      "aria-describedby": "category-name-help"
+    %small#category-name-help= t("category_management.form.name_help")
+
+  %fieldset.l2m-category-icon-fieldset{
+    "aria-describedby": "category-icon-help",
+    "aria-invalid": category.errors[:icon_name].any?.to_s}
+    %legend= t("category_management.form.icon_label")
+    %p#category-icon-help= t("category_management.form.icon_help")
+
+    .l2m-category-icon-grid
+      - icon_names.each do |icon_name|
+        .l2m-category-icon-option
+          = f.radio_button :icon_name,
+            icon_name,
+            class: "l2m-category-icon-radio",
+            required: true,
+            id: "category_icon_name_#{icon_name}"
+          = f.label "icon_name_#{icon_name}", class: "l2m-category-icon-choice" do
+            = heroicon icon_name, options: { class: "l2m-category-choice-icon", "aria-hidden": "true" }
+            %span
+              - if icon_name == legacy_icon_name
+                = t("category_management.form.current_icon")
+              - else
+                = t("category_management.icons.#{icon_name}")
+
+  .l2m-category-form-actions
+    = link_to t("category_management.common.cancel"),
+      categories_path,
+      class: "l2m-button l2m-button-secondary"
+    = f.submit t("category_management.form.submit.#{submit_action}"),
+      class: "l2m-button l2m-button-dark"

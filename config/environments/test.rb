@@ -1,3 +1,7 @@
+# frozen_string_literal: true
+
+require_relative "../active_record_encryption"
+
 # The test environment is used exclusively to run your application's
 # test suite. You never need to work with it otherwise. Remember that
 # your test database is "scratch space" for the test suite and is wiped
@@ -8,6 +12,9 @@ Rails.application.configure do
 
   # While tests run files are not watched, reloading is not necessary.
   config.enable_reloading = false
+
+  Listen2meEncryption.configure(config, environment: :test)
+  config.active_record.encryption.encrypt_fixtures = true
 
   # Eager loading loads your entire application. When running a single test locally,
   # this is usually not necessary, and can slow down your test suite. However, it's

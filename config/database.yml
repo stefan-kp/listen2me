@@ -1,0 +1,31 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5) %>
+
+development:
+  <<: *default
+  database: listen2me_development
+
+test:
+  <<: *default
+  database: listen2me_test
+
+production:
+  primary: &primary_production
+    <<: *default
+    database: listen2me_production
+    username: listen2me
+    password: <%= ENV["LISTEN2ME_DATABASE_PASSWORD"] %>
+  cache:
+    <<: *primary_production
+    database: listen2me_production_cache
+    migrations_paths: db/cache_migrate
+  queue:
+    <<: *primary_production
+    database: listen2me_production_queue
+    migrations_paths: db/queue_migrate
+  cable:
+    <<: *primary_production
+    database: listen2me_production_cable
+    migrations_paths: db/cable_migrate

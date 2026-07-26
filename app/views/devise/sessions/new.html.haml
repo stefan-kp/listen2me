@@ -1,30 +1,37 @@
-.min-h-screen.flex.items-center.justify-center.bg-gray-50.py-12.px-4.sm:px-6.lg:px-8
-  .max-w-md.w-full.space-y-8
-    .text-center
-      %h2.mt-6.text-3xl.font-bold.text-gray-900= t('.sign_in')
+- content_for :title, t(".sign_in")
 
-    = form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "mt-8 space-y-6" }) do |f|
-      .rounded-md.shadow-sm.-space-y-px
-        .mb-4
-          = f.label :email, class: "sr-only"
-          = f.email_field :email, autofocus: true, autocomplete: "email", 
-            class: "appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm",
-            placeholder: "Email"
+.l2m-auth-page{"aria-labelledby": "sign-in-title"}
+  .l2m-auth-card
+    .l2m-auth-heading
+      %p.l2m-eyebrow= t(".eyebrow")
+      %h1#sign-in-title= t(".sign_in")
+      %p= t(".intro")
 
-        .mb-4
-          = f.label :password, class: "sr-only"
-          = f.password_field :password, autocomplete: "current-password",
-            class: "appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm",
-            placeholder: t('.password')
+    = form_for resource,
+      as: resource_name,
+      url: session_path(resource_name),
+      html: { class: "l2m-auth-form" } do |f|
+      .l2m-field
+        = f.label :email, t(".email")
+        = f.email_field :email,
+          autofocus: true,
+          autocomplete: "email",
+          class: "l2m-input",
+          placeholder: t(".email_placeholder")
 
-        - if devise_mapping.rememberable?
-          .flex.items-center
-            = f.check_box :remember_me, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-            = f.label :remember_me, class: "ml-2 block text-sm text-gray-900"
+      .l2m-field
+        = f.label :password, t(".password")
+        = f.password_field :password,
+          autocomplete: "current-password",
+          class: "l2m-input",
+          placeholder: t(".password_placeholder")
 
-      .mt-6
-        = f.submit t('.sign_in'),
-          class: "group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+      - if devise_mapping.rememberable?
+        = f.label :remember_me, class: "l2m-checkbox-row" do
+          = f.check_box :remember_me
+          %span= t(".remember_me")
 
-    .mt-6
-      = render "devise/shared/links" 
+      = f.submit t(".sign_in"), class: "l2m-button l2m-button-dark"
+
+    = render "devise/shared/google_auth"
+    = render "devise/shared/links"

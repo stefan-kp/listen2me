@@ -1,0 +1,26 @@
+- content_for :title, t(".title")
+
+.l2m-auth-page{"aria-labelledby": "forgot-password-title"}
+  .l2m-auth-card
+    .l2m-auth-heading
+      %p.l2m-eyebrow= t(".eyebrow")
+      %h1#forgot-password-title= t(".title")
+      %p= t(".intro")
+
+    = form_for resource,
+      as: resource_name,
+      url: password_path(resource_name),
+      html: { method: :post, class: "l2m-auth-form" } do |f|
+      = render "devise/shared/error_messages", resource: resource
+
+      .l2m-field
+        = f.label :email, t(".email")
+        = f.email_field :email,
+          autofocus: true,
+          autocomplete: "email",
+          class: "l2m-input",
+          placeholder: t(".email_placeholder")
+
+      = f.submit t(".submit"), class: "l2m-button l2m-button-dark"
+
+    = render "devise/shared/links"

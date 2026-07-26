@@ -1,10 +1,15 @@
+# frozen_string_literal: true
+
 require "active_support/core_ext/integer/time"
+require_relative "../active_record_encryption"
 
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
   # Make code changes take effect immediately without server restart.
   config.enable_reloading = true
+
+  Listen2meEncryption.configure(config, environment: :development)
 
   # Do not eager load code on boot.
   config.eager_load = false

@@ -6,3 +6,10 @@ one:
   user_id: 1
   category_id: 1
   language: en
+
+other_users_sentence:
+  content: "Private Nachricht des anderen Benutzers"
+  usage_count: 7
+  user_id: 2
+  category_id: 5
+  language: de

@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  select(event) {
+  select(_event) {
     this.element.querySelectorAll('.icon-option').forEach(option => {
       const label = option.querySelector('label')
       const icon = option.querySelector('svg')
@@ -17,4 +17,4 @@ export default class extends Controller {
       }
     })
   }
-} 
+}

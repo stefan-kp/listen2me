@@ -1,32 +1,32 @@
-.group.relative.flex.items-center.justify-between.p-4.hover:bg-gray-50{
-  id: dom_id(sentence),
-  "aria-labelledby": "sentence-#{sentence.id}-content",
-  role: "listitem"}
-  = form_with url: conversations_path, 
-    method: :post,
-    class: "flex-1",
-    data: { controller: "speech", speech_voice_id_value: current_user.elevenlabs_voice_id,speech_api_key_value: current_user.elevenlabs_api_key } do |f|
-    = f.hidden_field :sentence_id, value: sentence.id
-    = f.hidden_field :content, value: sentence.content, data: { speech_target: "input" }
-    
-    %button.w-full.text-left{
-      type: "button",
-      data: { action: "click->speech#speakAndSubmit" }}
-      %p.text-sm.font-medium.text-gray-900{id: "sentence-#{sentence.id}-content"}
-        = sentence.content
-      .mt-1.flex.items-center.gap-x-2.text-xs.text-gray-500
-        %span{"aria-label": t('.usage_count')}
-          = t('speeches.usage_count', count: sentence.usage_count)
-        - if sentence.category.present?
-          %span.inline-flex.items-center.rounded-md.bg-blue-50.px-2.py-1.text-xs.font-medium.text-blue-700.ring-1{ 
-            class: 'ring-inset ring-blue-700/10',
-            "aria-label": t('.category_label', name: sentence.category.name)}
-            = sentence.category.name
-
-  .flex.items-center
-    = button_to speech_path(sentence),
-      method: :delete,
-      class: "p-2 text-gray-400 hover:text-red-600 transition-colors opacity-0 group-hover:opacity-100",
-      form: { data: { turbo_confirm: t('speeches.index.confirm_delete') } },
-      "aria-label": t('.delete_sentence', text: sentence.content) do
-      = heroicon "trash", options: { class: "h-5 w-5", "aria-hidden": "true" } 
+- return_to = local_assigns.fetch(:return_to, "speeches")
+.l2m-phrase-card-wrap{id: dom_id(sentence), role: "listitem"}
+  %button.l2m-phrase-card{
+    type: "button",
+    data: {
+      action: "click->communicator#choosePhrase",
+      communicator_target: "card",
+      communicator_text_param: sentence.content,
+      communicator_track_url_param: speak_speech_path(id: sentence.id),
+      direct_label: t(".speak_sentence", text: sentence.content),
+      draft_label: t(".draft_sentence", text: sentence.content, default: "Satz zuerst schreiben: #{sentence.content}")
+    },
+    "aria-label": t(".speak_sentence", text: sentence.content)}
+    %span.l2m-phrase-content= sentence.content
+    %span.l2m-phrase-meta
+      - if sentence.category.present?
+        %span= display_category_name(sentence.category)
+      %small{
+        data: {
+          communicator_target: "modeHint",
+          direct_text: t(".direct_action", default: "Sofort sprechen"),
+          draft_text: t(".draft_action", default: "Erst schreiben")
+        }}
+        = t(".direct_action", default: "Sofort sprechen")
+  = button_to speech_path(id: sentence.id),
+    method: :delete,
+    params: { return_to: return_to },
+    class: "l2m-phrase-delete-button",
+    form: { class: "l2m-phrase-delete-form", data: { turbo_confirm: t(".delete_confirmation", text: sentence.content) } },
+    title: t(".delete_sentence", text: sentence.content),
+    "aria-label": t(".delete_sentence", text: sentence.content) do
+    = heroicon "trash", options: { class: "h-5 w-5", "aria-hidden": "true" }

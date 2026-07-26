@@ -8,16 +8,15 @@ export default class extends Controller {
 
   connect() {
     this.originalText = this.labelTarget.textContent
-    
-    // Listen for Turbo form submission events
-    document.addEventListener("turbo:submit-start", this.handleSubmitStart.bind(this))
-    document.addEventListener("turbo:submit-end", this.handleSubmitEnd.bind(this))
+    this.boundSubmitStart = this.handleSubmitStart.bind(this)
+    this.boundSubmitEnd = this.handleSubmitEnd.bind(this)
+    document.addEventListener("turbo:submit-start", this.boundSubmitStart)
+    document.addEventListener("turbo:submit-end", this.boundSubmitEnd)
   }
 
   disconnect() {
-    // Clean up event listeners
-    document.removeEventListener("turbo:submit-start", this.handleSubmitStart)
-    document.removeEventListener("turbo:submit-end", this.handleSubmitEnd)
+    document.removeEventListener("turbo:submit-start", this.boundSubmitStart)
+    document.removeEventListener("turbo:submit-end", this.boundSubmitEnd)
   }
 
   handleSubmitStart(event) {
@@ -45,4 +44,4 @@ export default class extends Controller {
     this.iconTarget.classList.remove("animate-spin")
     this.iconTarget.style.animationDuration = ""
   }
-} 
+}

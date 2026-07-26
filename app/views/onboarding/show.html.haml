@@ -1,0 +1,187 @@
+- content_for :onboarding, true
+- content_for :title, t(".title")
+
+.l2m-onboarding-shell{data: { controller: "onboarding device-check" }}
+  %header.l2m-onboarding-header
+    = link_to onboarding_path, class: "l2m-brand", "aria-label": t(".home") do
+      %span.l2m-brand-mark{"aria-hidden": "true"}
+        %i
+        %i
+        %i
+        %i
+      %span Listen2Me
+    %p= t(".setup_label")
+
+  .l2m-onboarding-layout
+    %aside.l2m-onboarding-intro
+      %p.l2m-eyebrow= t(".eyebrow")
+      %h1= t(".headline", name: current_user.first_name)
+      %p= t(".lead")
+
+      .l2m-onboarding-progress
+        %span{
+          data: {
+            onboarding_target: "progressLabel",
+            step_template: t(".step", current: "__CURRENT__", total: "__TOTAL__")
+          }}= t(".step", current: 1, total: 3)
+        .l2m-progress-track{
+          role: "progressbar",
+          "aria-label": t(".progress"),
+          "aria-valuemin": "1",
+          "aria-valuemax": "3",
+          "aria-valuenow": "1",
+          data: { onboarding_target: "progress" }}
+          %i{data: { onboarding_target: "progressBar" }}
+
+      %ul.l2m-onboarding-benefits
+        %li
+          = heroicon "bolt", options: { class: "h-5 w-5", "aria-hidden": "true" }
+          %span= t(".benefit_fast")
+        %li
+          = heroicon "adjustments-horizontal", options: { class: "h-5 w-5", "aria-hidden": "true" }
+          %span= t(".benefit_control")
+        %li
+          = heroicon "shield-check", options: { class: "h-5 w-5", "aria-hidden": "true" }
+          %span= t(".benefit_private")
+
+    .l2m-onboarding-card
+      = form_with model: current_user,
+        url: onboarding_path,
+        method: :patch,
+        data: { action: "submit->onboarding#persistPreferences" } do |f|
+        - if current_user.errors.any?
+          .l2m-onboarding-error{role: "alert"}
+            %strong= t(".save_error")
+            %ul
+              - current_user.errors.full_messages.each do |message|
+                %li= message
+
+        %fieldset.l2m-onboarding-panel{data: { onboarding_target: "panel" }}
+          %legend{tabindex: "-1"}
+            %span.l2m-step-number 1
+            = t(".language_title")
+          %p.l2m-panel-lead= t(".language_copy")
+
+          .l2m-choice-grid
+            = f.label :preferred_locale_de, class: "l2m-choice-card" do
+              = f.radio_button :preferred_locale, "de",
+                checked: current_user.preferred_locale == "de"
+              %span.l2m-choice-check{"aria-hidden": "true"} ✓
+              %strong Deutsch
+              %small= t(".german_description")
+
+            = f.label :preferred_locale_en, class: "l2m-choice-card" do
+              = f.radio_button :preferred_locale, "en",
+                checked: current_user.preferred_locale == "en"
+              %span.l2m-choice-check{"aria-hidden": "true"} ✓
+              %strong English
+              %small= t(".english_description")
+
+        %fieldset.l2m-onboarding-panel{data: { onboarding_target: "panel" }}
+          %legend{tabindex: "-1"}
+            %span.l2m-step-number 2
+            = t(".mode_title")
+          %p.l2m-panel-lead= t(".mode_copy")
+
+          .l2m-choice-grid
+            = f.label :preferred_speech_mode_direct, class: "l2m-choice-card" do
+              = f.radio_button :preferred_speech_mode, "direct",
+                checked: current_user.preferred_speech_mode == "direct"
+              %span.l2m-choice-check{"aria-hidden": "true"} ✓
+              = heroicon "speaker-wave", options: { class: "h-7 w-7", "aria-hidden": "true" }
+              %strong= t(".direct_title")
+              %small= t(".direct_description")
+              %em= t(".recommended")
+
+            = f.label :preferred_speech_mode_draft, class: "l2m-choice-card" do
+              = f.radio_button :preferred_speech_mode, "draft",
+                checked: current_user.preferred_speech_mode == "draft"
+              %span.l2m-choice-check{"aria-hidden": "true"} ✓
+              = heroicon "pencil-square", options: { class: "h-7 w-7", "aria-hidden": "true" }
+              %strong= t(".draft_title")
+              %small= t(".draft_description")
+
+        %fieldset.l2m-onboarding-panel{data: { onboarding_target: "panel" }}
+          %legend{tabindex: "-1"}
+            %span.l2m-step-number 3
+            = t(".ready_title")
+          %p.l2m-panel-lead= t(".ready_copy")
+
+          .l2m-audio-checks
+            .l2m-audio-check
+              %div
+                = heroicon "speaker-wave", options: { class: "h-6 w-6", "aria-hidden": "true" }
+                %span
+                  %strong= t(".voice_test_title")
+                  %small= t(".voice_test_copy")
+              %button.l2m-button.l2m-button-secondary{
+                type: "button",
+                data: { action: "click->device-check#testVoice" }}
+                = t(".test")
+
+            .l2m-audio-check
+              %div
+                = heroicon "microphone", options: { class: "h-6 w-6", "aria-hidden": "true" }
+                %span
+                  %strong= t(".microphone_test_title")
+                  %small= t(".microphone_test_copy")
+              %button.l2m-button.l2m-button-secondary{
+                type: "button",
+                data: { action: "click->device-check#testMicrophone" }}
+                = t(".test")
+
+          %p.l2m-audio-status{
+            role: "status",
+            "aria-live": "polite",
+            data: {
+              device_check_target: "status",
+              voice_success: t(".voice_success"),
+              voice_success_openai: t(".voice_success_openai"),
+              voice_success_browser: t(".voice_success_browser"),
+              voice_success_cartesia: t(".voice_success_cartesia"),
+              voice_success_elevenlabs: t(".voice_success_elevenlabs"),
+              voice_error: t(".voice_error"),
+              microphone_success: t(".microphone_success"),
+              microphone_error: t(".microphone_error"),
+              testing: t(".testing"),
+              test_sentence: t(".test_sentence")
+            }}
+
+          .l2m-onboarding-field
+            = f.label :description, t(".description_label")
+            = f.text_area :description,
+              rows: 3,
+              maxlength: 2000,
+              placeholder: t(".description_placeholder")
+            %small= t(".description_help")
+
+          %p.l2m-onboarding-note
+            = heroicon "information-circle", options: { class: "h-5 w-5", "aria-hidden": "true" }
+            %span= t(".privacy_note")
+
+        .l2m-onboarding-actions
+          %button.l2m-text-link{
+            type: "button",
+            data: {
+              action: "click->onboarding#back",
+              onboarding_target: "back"
+            }}
+            = t(".back")
+          %button.l2m-button.l2m-button-dark{
+            type: "button",
+            data: {
+              action: "click->onboarding#next",
+              onboarding_target: "next"
+            }}
+            = t(".next")
+            %span{"aria-hidden": "true"} →
+          = f.submit t(".finish"),
+            class: "l2m-button l2m-button-dark",
+            data: { onboarding_target: "submit" }
+
+        .l2m-onboarding-skip
+          = button_tag t(".skip"),
+            type: "submit",
+            name: "skip",
+            value: "1",
+            class: "l2m-text-link"

@@ -1,30 +1,84 @@
-.max-w-7xl.mx-auto.px-4.sm:px-6.lg:px-8.py-8{"aria-labelledby": "page-title"}
-  %h1#page-title.sr-only= t('.page_title')
+.l2m-page.l2m-speak-page{"aria-labelledby": "page-title"}
+  .l2m-view-heading
+    %div
+      %p.l2m-eyebrow= t(".eyebrow", default: "Kommunizieren")
+      %h1#page-title= t(".headline", default: "Was möchtest du sagen?")
+    %p.l2m-view-hint= t(".own_mode_hint", default: "Hier formulierst du eigene Sätze. Das Gegenüber wird nicht einbezogen.")
 
-  = turbo_frame_tag "text_form" do
-    = render 'text_form'
+  .l2m-one-tap-heading
+    %div
+      %span.l2m-one-tap-badge= t(".one_tap", default: "1 Tipp")
+      %h2= t(".one_tap_title", default: "Antworten, die sofort sprechen")
+    %small= t(".help_note", default: "„Hilfe“ spricht nur den Satz und löst keinen Notruf aus.")
 
-  .grid.grid-cols-1.gap-8.lg:grid-cols-3
-    %section.lg:col-span-2{"aria-labelledby": "categories-title"}
-      .flex.items-center.justify-between.mb-4
-        %h2#categories-title.text-lg.font-medium.text-gray-900
-          = link_to categories_path,
-            class: "group inline-flex items-center gap-2 text-gray-900 hover:text-indigo-600 transition-colors",
-            "aria-label": t('.manage_categories') do
-            = t('.categories')
-            = heroicon "cog-6-tooth", options: { class: "h-5 w-5 text-gray-400 group-hover:text-indigo-600 transition-colors" }
+  .l2m-urgent-strip{"aria-label": t(".one_tap_title", default: "Antworten, die sofort sprechen")}
+    - [[t(".yes", default: "Ja"), "check", "yes"], [t(".no", default: "Nein"), "x-mark", "no"], [t(".stop", default: "Stopp"), "stop", "stop"], [t(".help_sentence", default: "Ich brauche Hilfe"), "exclamation-triangle", "help"]].each do |text, icon, style|
+      %button{
+        type: "button",
+        class: "l2m-urgent-button is-#{style}",
+        data: {
+          action: "click->communicator#choosePhrase",
+          communicator_text_param: text,
+          communicator_urgent_param: true
+        },
+        "aria-label": t(".speak_immediately", text: text, default: "#{text} sofort sprechen")}
+        = heroicon icon, options: { class: "h-6 w-6", "aria-hidden": "true" }
+        %span= style == "help" ? t(".help", default: "Hilfe") : text
 
-      .grid.grid-cols-2.gap-4.sm:grid-cols-3.lg:grid-cols-4
-        - @categories.each do |category|
-          = link_to category_speech_path(category),
-            class: "flex flex-col items-center p-4 bg-white shadow sm:rounded-lg hover:shadow-md transition-shadow",
-            role: "button",
-            "aria-label": t('.category_link', name: category.name, count: category.usage_count) do
-            = heroicon category.icon_name, options: { class: "h-8 w-8 text-gray-500 mb-2", "aria-hidden": "true" }
-            %span.text-sm.font-medium.text-center= category.name
-            %span.text-xs.text-gray-500= t('speeches.usage_count', count: category.usage_count)
+  .l2m-communication-layout
+    .l2m-communication-main
+      = render "text_form"
 
-    %section.lg:col-span-1{"aria-labelledby": "frequent-title"}
-      %h2#frequent-title.text-lg.font-medium.text-gray-900.mb-4= t('.frequently_used')
-      #frequent_sentences.bg-white.shadow.sm:rounded-lg.divide-y.divide-gray-200{role: "list", "aria-label": t('.frequent_sentences')}
-        = render partial: 'sentence', collection: @frequent_sentences 
+      %section.l2m-followups{
+        hidden: true,
+        data: { communicator_target: "followups" },
+        "aria-labelledby": "followups-title"}
+        .l2m-section-heading
+          %div
+            %p.l2m-section-kicker= t(".contextual", default: "Kontextsensitiv weiter")
+            %h2#followups-title= t(".next_sentence", default: "Das könntest du als Nächstes sagen")
+          %button.l2m-button.l2m-button-secondary{
+            type: "button",
+            data: { action: "click->communicator#newTopic" }}
+            = t(".new_topic", default: "Neues Thema")
+        %p.l2m-live-status{role: "status", "aria-live": "polite"}
+          = t(".three_suggestions", default: "Drei kurze Vorschläge sind bereit.")
+        .l2m-suggestion-list{data: { communicator_target: "followupList" }}
+
+      %section.l2m-phrases-section{"aria-labelledby": "frequent-title"}
+        .l2m-section-heading
+          %div
+            %p.l2m-section-kicker= @featured_kicker
+            %h2#frequent-title= @featured_title
+          = link_to categories_path, class: "l2m-text-link" do
+            = t(".manage_categories")
+
+        .l2m-category-tabs{"aria-label": t(".categories")}
+          - @categories.each do |category|
+            = link_to category_speech_path(id: category.id), class: "l2m-category-tab" do
+              = heroicon category.icon_name, options: { class: "h-4 w-4", "aria-hidden": "true" }
+              %span= display_category_name(category)
+
+        #frequent_sentences.l2m-phrase-grid{role: "list", "aria-label": @featured_aria_label}
+          - if @featured_sentences.any?
+            = render partial: "sentence", collection: @featured_sentences
+          - else
+            %p.l2m-empty-state= t(".no_sentences", default: "Noch keine Sätze verfügbar.")
+
+    %aside.l2m-recent-panel{"aria-labelledby": "recent-title"}
+      .l2m-recent-heading
+        = heroicon "clock", options: { class: "h-6 w-6", "aria-hidden": "true" }
+        %div
+          %p.l2m-section-kicker= t(".history", default: "Verlauf")
+          %h2#recent-title= t(".recently_spoken", default: "Zuletzt gesprochen")
+      %p.l2m-empty-state{data: { communicator_target: "recentEmpty" }}
+        = t(".recent_empty", default: "Deine gesprochenen Sätze erscheinen hier.")
+      %ol.l2m-recent-list{data: { communicator_target: "recentList" }}
+
+      .l2m-conversation-promo
+        %span.l2m-promo-label= t(".conversation_promo_label", default: "Gespräch")
+        %h3= t(".conversation_promo_title", default: "Das Gegenüber einbeziehen")
+        %p= t(".conversation_promo_copy", default: "Im Gespräch berücksichtigt Listen2Me auch die Beiträge des Gegenübers.")
+        = link_to new_conversation_path, class: "l2m-button l2m-button-dark" do
+          = t(".start_conversation", default: "Gespräch starten")
+          %span{"aria-hidden": "true"} →

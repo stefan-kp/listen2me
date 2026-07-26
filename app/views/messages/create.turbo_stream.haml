@@ -1,8 +1,0 @@
-= turbo_stream.append "messages" do
-  = render "messages/message", message: @message
-= turbo_stream.update Message.new do
-  = render "messages/form", conversation: @conversation
-
-- if @suggestions.present?
-  = turbo_stream.update "suggestions" do
-    = render "messages/suggestions", suggestions: @suggestions 

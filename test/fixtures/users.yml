@@ -8,6 +8,24 @@ default_user:
   first_name: "Test"
   last_name: "User"
   encrypted_password: <%= User.new.send(:password_digest, 'password123') %>
+  elevenlabs_api_key: "current-user-secret"
+  elevenlabs_voice_id: "current-user-voice"
   llm_model: "gpt-4"
   llm_provider: "openai"
+  preferred_locale: "de"
+  preferred_speech_mode: "direct"
+  onboarding_completed_at: <%= 1.day.ago %>
 
+other_user:
+  id: 2
+  email: "other@example.com"
+  first_name: "Other"
+  last_name: "User"
+  encrypted_password: <%= User.new.send(:password_digest, 'password123') %>
+  elevenlabs_api_key: "other-user-secret"
+  elevenlabs_voice_id: "other-user-voice"
+  llm_model: "gpt-4"
+  llm_provider: "openai"
+  preferred_locale: "de"
+  preferred_speech_mode: "direct"
+  onboarding_completed_at: <%= 1.day.ago %>

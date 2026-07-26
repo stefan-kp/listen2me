@@ -1,1 +1,6 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+other_users_conversation:
+  user_id: 2
+  initial_sentence: other_users_sentence
+  active: true

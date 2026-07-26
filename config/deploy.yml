@@ -35,7 +35,27 @@ registry:
 env:
   secret:
     - RAILS_MASTER_KEY
+    - GOOGLE_CLIENT_ID
+    - GOOGLE_CLIENT_SECRET
+    - LITELLM_SECRET
+    - OPENAI_API_KEY
+    - CARTESIA_API_KEY
+    - ELEVENLABS_API_KEY
   clear:
+    APP_ORIGIN: https://app.example.com
+    LITELLM_HOST: http://litellm:4000
+    LITELLM_FAST_MODEL: fast
+    LITELLM_CHEAP_MODEL: cheap
+    LITELLM_TIMEOUT_SECONDS: 5
+    OPENAI_TTS_MODEL: gpt-4o-mini-tts
+    OPENAI_TTS_VOICE: marin
+    OPENAI_REALTIME_MODEL: gpt-realtime-2.1-mini
+    OPENAI_TRANSCRIPTION_MODEL: gpt-4o-mini-transcribe
+    CARTESIA_TTS_MODEL: sonic-3.5
+    CARTESIA_DAILY_CHARACTER_LIMIT: 500
+    ELEVENLABS_TTS_MODEL: eleven_flash_v2_5
+    ELEVENLABS_DAILY_CHARACTER_LIMIT: 300
+
     # Run the Solid Queue Supervisor inside the web server's Puma process to do jobs.
     # When you start using multiple servers, you should split out job processing to a dedicated machine.
     SOLID_QUEUE_IN_PUMA: true

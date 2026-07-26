@@ -8,5 +8,15 @@
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
 
-# Initialize default languages
-Language.init_languages
+[
+  { name: "Deutsch", code: "de" },
+  { name: "English", code: "en" }
+].each do |attributes|
+  language = Language.find_or_initialize_by(code: attributes.fetch(:code))
+  language.name = attributes.fetch(:name)
+  language.save!
+end
+
+User.find_each do |user|
+  DefaultContentInstaller.call(user: user)
+end

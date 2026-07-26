@@ -1,36 +1,61 @@
-.max-w-7xl.mx-auto.px-4.sm:px-6.lg:px-8.py-8{"aria-labelledby": "conversations-title"}
-  .flex.items-center.justify-between.mb-8
-    %h1#conversations-title.text-2xl.font-bold.text-gray-900= t('.title')
-    = link_to new_conversation_path, 
-      class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500", 
-      role: "button",
-      "aria-label": t('.new_conversation') do
-      = heroicon "plus", options: { class: "h-5 w-5 mr-2", "aria-hidden": "true" }
-      = t('.new_conversation')
+- content_for :title, t("conversation_history.index.page_title")
 
-  .bg-white.shadow.overflow-hidden.sm:rounded-lg
-    %ul.divide-y.divide-gray-200{role: "list", "aria-label": t('.conversations_list')}
-      - if @conversations.any?
-        - @conversations.each do |conversation|
-          %li
-            = link_to conversation_path(conversation), 
-              class: "block hover:bg-gray-50 transition-colors", 
-              role: "listitem",
-              "aria-label": t('.conversation_link', text: conversation.initial_sentence&.content) do
-              .px-4.py-4.sm:px-6
-                .flex.items-center.justify-between
-                  .flex.min-w-0.gap-x-4
-                    .min-w-0.flex-auto
-                      %p.text-sm.font-semibold.text-gray-900.truncate{"aria-label": t('.initial_sentence')}
-                        = conversation.initial_sentence&.content
-                      .mt-1.flex.items-center.gap-x-2.text-xs.text-gray-500
-                        %p{"aria-label": t('.message_count')}= t('.messages_count', count: conversation.messages.count)
-                        %p{"aria-label": t('.creation_date')}= t('.created_at', date: l(conversation.created_at, format: :short))
-                        - if conversation.initial_sentence.present?
-                          %span.inline-flex.items-center.rounded-md.bg-blue-50.px-2.py-1.text-xs.font-medium.text-blue-700.ring-1.ring-inset{ "class": "ring-blue-700/10","aria-label": t('.category')}
-                            = conversation.initial_sentence.category.name
-                  .shrink-0.self-start
-                    = heroicon "chevron-right", options: { class: "h-5 w-5 text-gray-400", "aria-hidden": "true" }
-      - else
-        %li.px-4.py-5.sm:px-6.text-center.text-gray-500{"aria-label": t('.no_conversations')}
-          = t('.no_conversations') 
+.l2m-page.l2m-history-page{"aria-labelledby": "conversation-history-title"}
+  .l2m-history-heading
+    %div
+      %p.l2m-eyebrow= t("conversation_history.index.eyebrow")
+      %h1#conversation-history-title= t("conversation_history.index.title")
+      %p.l2m-history-lead= t("conversation_history.index.intro")
+
+    = link_to new_conversation_path, class: "l2m-button l2m-history-new-button" do
+      = heroicon "plus", options: { class: "h-5 w-5", "aria-hidden": "true" }
+      %span= t("conversation_history.index.new_conversation")
+
+  - if @conversation_history_items.any?
+    .l2m-history-overview
+      %p= t("conversation_history.index.conversation_count", count: @conversation_history_items.size)
+      %p= t("conversation_history.index.resume_hint")
+
+    %ol.l2m-history-list{"aria-label": t("conversation_history.index.list_label")}
+      - @conversation_history_items.each do |item|
+        - conversation = item.fetch(:conversation)
+        - title = item[:title].presence || t("conversation_history.index.untitled", date: l(conversation.created_at, format: :short))
+        - last_message = item[:last_message]
+        - show_preview = last_message.present? && last_message.content != item[:title]
+        %li
+          = link_to conversation_path(id: conversation.id),
+            class: "l2m-history-card",
+            "aria-label": t("conversation_history.index.resume_named", title: truncate(title, length: 80)) do
+            %span.l2m-history-card-icon{"aria-hidden": "true"}
+              = heroicon "chat-bubble-left-right", options: { class: "h-6 w-6" }
+
+            .l2m-history-card-content
+              .l2m-history-title-row
+                %h2= truncate(title, length: 80)
+                - if item[:category].present?
+                  %span.l2m-history-category= display_category_name(item[:category])
+
+              - if show_preview
+                %p.l2m-history-preview
+                  %span.l2m-history-role= last_message.speaker? ? t("conversation_history.index.you") : t("conversation_history.index.partner")
+                  %span= truncate(last_message.content, length: 130)
+              - else
+                %p.l2m-history-preview.is-placeholder= t("conversation_history.index.ready_to_resume")
+
+              .l2m-history-meta
+                %span= t("conversation_history.index.messages_count", count: item.fetch(:message_count))
+                %time{datetime: item.fetch(:last_activity_at).iso8601}
+                  = t("conversation_history.index.last_activity", date: l(item.fetch(:last_activity_at), format: :short))
+
+            %span.l2m-history-resume{"aria-hidden": "true"}
+              %span= t("conversation_history.index.resume")
+              = heroicon "arrow-right", options: { class: "h-5 w-5" }
+  - else
+    .l2m-history-empty{"aria-labelledby": "conversation-history-empty-title"}
+      %span.l2m-history-empty-icon{"aria-hidden": "true"}
+        = heroicon "chat-bubble-left-right", options: { class: "h-8 w-8" }
+      %h2#conversation-history-empty-title= t("conversation_history.index.empty_title")
+      %p= t("conversation_history.index.empty_copy")
+      = link_to new_conversation_path, class: "l2m-button l2m-history-new-button" do
+        = heroicon "plus", options: { class: "h-5 w-5", "aria-hidden": "true" }
+        %span= t("conversation_history.index.empty_action")

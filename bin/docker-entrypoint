@@ -15,8 +15,6 @@ if [[ "$*" == *"rails"* ]] && ([[ "$*" == *"server"* ]] || [[ "$*" == *"thrust"*
   echo "Running database setup..."
   echo "Preparing database..."
   ./bin/rails db:prepare
-  echo "Loading seed data..."
-  ./bin/rails db:seed
 fi
 
 echo "Executing command: ${@}"

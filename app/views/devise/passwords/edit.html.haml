@@ -1,0 +1,36 @@
+- content_for :title, t(".title")
+
+.l2m-auth-page{"aria-labelledby": "change-password-title"}
+  .l2m-auth-card
+    .l2m-auth-heading
+      %p.l2m-eyebrow= t(".eyebrow")
+      %h1#change-password-title= t(".title")
+      %p= t(".intro")
+
+    = form_for resource,
+      as: resource_name,
+      url: password_path(resource_name),
+      html: { method: :put, class: "l2m-auth-form" } do |f|
+      = render "devise/shared/error_messages", resource: resource
+      = f.hidden_field :reset_password_token
+
+      .l2m-field
+        = f.label :password, t(".password")
+        = f.password_field :password,
+          autofocus: true,
+          autocomplete: "new-password",
+          class: "l2m-input",
+          placeholder: t(".password_placeholder")
+        - if @minimum_password_length
+          %small= t("devise.shared.minimum_password_length", count: @minimum_password_length)
+
+      .l2m-field
+        = f.label :password_confirmation, t(".password_confirmation")
+        = f.password_field :password_confirmation,
+          autocomplete: "new-password",
+          class: "l2m-input",
+          placeholder: t(".password_confirmation_placeholder")
+
+      = f.submit t(".submit"), class: "l2m-button l2m-button-dark"
+
+    = render "devise/shared/links"

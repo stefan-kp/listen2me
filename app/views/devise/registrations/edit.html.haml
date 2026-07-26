@@ -1,0 +1,106 @@
+- content_for :title, t(".title")
+
+.l2m-page.l2m-account-page{"aria-labelledby": "account-title"}
+  .l2m-view-heading
+    %div
+      %p.l2m-eyebrow= t(".eyebrow")
+      %h1#account-title= t(".title")
+    %p.l2m-view-hint= t(".intro")
+
+  .l2m-account-layout
+    .l2m-settings-panel
+      - if resource.google_connected?
+        .l2m-settings-note
+          = heroicon "shield-check", options: { class: "h-5 w-5", "aria-hidden": "true" }
+          %span
+            - if google_reauthentication_active?
+              = t("google_auth.reauthentication.active")
+            - elsif User.google_oauth_configured?
+              = t("google_auth.reauthentication.required")
+            - else
+              = t("google_auth.reauthentication.unavailable")
+
+        - if User.google_oauth_configured? && !google_reauthentication_active?
+          = button_to t("google_auth.reauthentication.button"),
+            user_google_oauth2_omniauth_authorize_path(origin: edit_user_registration_path(locale: I18n.locale)),
+            method: :post,
+            class: "l2m-button l2m-button-secondary",
+            form: { data: { turbo: false } }
+
+        .l2m-settings-divider
+
+      = form_for resource,
+        as: resource_name,
+        url: registration_path(resource_name),
+        html: { method: :put, class: "l2m-auth-form" } do |f|
+        = render "devise/shared/error_messages", resource: resource
+
+        .l2m-field-row
+          .l2m-field
+            = f.label :first_name, t(".first_name")
+            = f.text_field :first_name,
+              autofocus: true,
+              autocomplete: "given-name",
+              class: "l2m-input"
+
+          .l2m-field
+            = f.label :last_name, t(".last_name")
+            = f.text_field :last_name,
+              autocomplete: "family-name",
+              class: "l2m-input"
+
+        .l2m-field
+          = f.label :email, t(".email")
+          = f.email_field :email, autocomplete: "email", class: "l2m-input"
+
+        - if devise_mapping.confirmable? && resource.pending_reconfirmation?
+          %p.l2m-settings-note
+            = heroicon "information-circle", options: { class: "h-5 w-5", "aria-hidden": "true" }
+            %span= t(".pending_confirmation", email: resource.unconfirmed_email)
+
+        .l2m-settings-divider
+
+        %h2= t(".password_title")
+        %p.l2m-settings-copy= t(".password_intro")
+
+        .l2m-field
+          = f.label :password, t(".password")
+          = f.password_field :password,
+            autocomplete: "new-password",
+            class: "l2m-input"
+          %small
+            = t(".password_help")
+            - if @minimum_password_length
+              = " #{t('devise.shared.minimum_password_length', count: @minimum_password_length)}"
+
+        .l2m-field
+          = f.label :password_confirmation, t(".password_confirmation")
+          = f.password_field :password_confirmation,
+            autocomplete: "new-password",
+            class: "l2m-input"
+
+        - if resource.google_connected? && google_reauthentication_active?
+          %p.l2m-settings-note
+            = heroicon "check-circle", options: { class: "h-5 w-5", "aria-hidden": "true" }
+            %span= t("google_auth.reauthentication.save_once")
+        - else
+          .l2m-field
+            = f.label :current_password, t(".current_password")
+            = f.password_field :current_password,
+              autocomplete: "current-password",
+              class: "l2m-input"
+            %small= t(".current_password_help")
+
+        .l2m-settings-actions
+          = link_to t(".back"), settings_path(settings_section: "account"), class: "l2m-button l2m-button-secondary"
+          = f.submit t(".submit"), class: "l2m-button l2m-button-dark"
+
+    %aside.l2m-danger-card{"aria-labelledby": "delete-account-title"}
+      = heroicon "exclamation-triangle", options: { class: "h-7 w-7", "aria-hidden": "true" }
+      %h2#delete-account-title= t(".delete_title")
+      %p= t(".delete_description")
+      = button_to t(".delete_action"),
+        registration_path(resource_name),
+        method: :delete,
+        class: "l2m-button l2m-button-danger",
+        form: { data: { turbo_confirm: t(".delete_confirmation") } }

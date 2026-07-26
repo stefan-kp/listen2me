@@ -1,0 +1,92 @@
+en:
+  category_management:
+    common:
+      back: "Back to categories"
+      cancel: "Cancel"
+    index:
+      eyebrow: "Your quick phrases"
+      title: "Manage categories"
+      intro: "Organize your prepared phrases so you can find them quickly when you need them."
+      category_count:
+        zero: "No categories yet"
+        one: "One category"
+        other: "%{count} categories"
+      summary_hint: "Every category belongs only to your account."
+      new_category: "New category"
+      categories_list: "Your categories"
+      sentences_count:
+        zero: "No phrases yet"
+        one: "One saved phrase"
+        other: "%{count} saved phrases"
+      actions_label: "Actions for %{name}"
+      open_sentences: "Phrases"
+      edit: "Edit"
+      delete: "Delete"
+      confirm_delete:
+        zero: "Do you really want to delete the category “%{name}”?"
+        one: "Do you really want to delete the category “%{name}” and its saved phrase? This cannot be undone."
+        other: "Do you really want to delete the category “%{name}” and its %{count} saved phrases? This cannot be undone."
+      empty_title: "Create your first category"
+      empty_description: "Categories help you find important phrases faster. You can add more at any time."
+      empty_action: "Create first category"
+    new:
+      eyebrow: "New section"
+      title: "Create category"
+      intro: "Choose a short name and an easy-to-recognize symbol."
+    edit:
+      eyebrow: "Customize category"
+      title: "Edit category"
+      intro: "Change the name or symbol for “%{name}”. Your saved phrases will stay in place."
+    form:
+      name_label: "Name"
+      name_placeholder: "For example Family or Drinks"
+      name_help: "A short, distinct name is easier to scan."
+      icon_label: "Choose a symbol"
+      icon_help: "The symbol helps you recognize the category without having to read for long. You can keep an existing symbol or replace it with one from the new selection."
+      current_icon: "Current symbol"
+      error_heading:
+        one: "Please correct the highlighted error."
+        other: "Please correct the %{count} highlighted errors."
+      submit:
+        create: "Create category"
+        update: "Save changes"
+    create:
+      success: "The category “%{name}” was created."
+    update:
+      success: "The category “%{name}” was saved."
+    destroy:
+      success:
+        zero: "The category “%{name}” was deleted."
+        one: "The category “%{name}” and one phrase were deleted."
+        other: "The category “%{name}” and %{count} phrases were deleted."
+      failure: "The category “%{name}” could not be deleted. Please try again."
+    icons:
+      home: "Basic needs"
+      cake: "Food"
+      beaker: "Drinks"
+      heart: "Health"
+      exclamation-circle: "Important"
+      sparkles: "Care"
+      face-smile: "Feelings"
+      hand-raised: "Help"
+      bell-alert: "Emergency"
+      user-group: "People"
+      sun: "Day"
+      moon: "Rest"
+      musical-note: "Leisure"
+      arrow-path: "Movement"
+      fire: "Temperature"
+      star: "Favorites"
+  activerecord:
+    models:
+      category: "Category"
+    attributes:
+      category:
+        name: "Name"
+        icon_name: "Symbol"
+    errors:
+      models:
+        category:
+          attributes:
+            icon_name:
+              inclusion: "is not available"
