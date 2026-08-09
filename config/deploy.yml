@@ -2,7 +2,7 @@
 service: listen2me
 
 # Name of the container image.
-image: your-user/listen2me
+image: stefan-kp/listen2me
 
 # Deploy to these servers.
 servers:
@@ -23,9 +23,8 @@ proxy:
 
 # Credentials for your image host.
 registry:
-  # Specify the registry server, if you're not using Docker Hub
-  # server: registry.digitalocean.com / ghcr.io / ...
-  username: your-user
+  server: ghcr.io
+  username: stefan-kp
 
   # Always use an access token rather than real password when possible.
   password:
@@ -35,6 +34,7 @@ registry:
 env:
   secret:
     - RAILS_MASTER_KEY
+    - DATABASE_URL
     - GOOGLE_CLIENT_ID
     - GOOGLE_CLIENT_SECRET
     - LITELLM_SECRET
@@ -66,9 +66,8 @@ env:
     # Set number of cores available to the application on each server (default: 1).
     # WEB_CONCURRENCY: 2
 
-    # Match this to any external database server to configure Active Record correctly
-    # Use listen2me-db for a db accessory server on same machine via local kamal docker network.
-    # DB_HOST: 192.168.0.2
+    # DATABASE_URL is supplied as a secret and points all application, cache,
+    # queue, and cable tables at one PostgreSQL database.
 
     # Log everything from Rails
     # RAILS_LOG_LEVEL: debug

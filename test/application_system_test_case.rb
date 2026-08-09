@@ -1,12 +1,12 @@
 require "test_helper"
 
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
-  driven_by :selenium, using: :chrome, screen_size: [1400, 1400], options: {
+  driven_by :selenium, using: :chrome, screen_size: [ 1400, 1400 ], options: {
     browser: :chrome,
     options: Selenium::WebDriver::Chrome::Options.new.tap { |opts|
-      opts.add_argument('--headless')
-      opts.add_argument('--disable-gpu')
-      opts.add_argument('--no-sandbox')
+      opts.add_argument("--headless")
+      opts.add_argument("--disable-gpu")
+      opts.add_argument("--no-sandbox")
     }
   }
 

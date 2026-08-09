@@ -4,6 +4,7 @@ on:
   pull_request:
   push:
     branches: [ main ]
+    tags: [ "v*" ]
 
 jobs:
   scan_ruby:
@@ -99,3 +100,12 @@ jobs:
           name: screenshots
           path: ${{ github.workspace }}/tmp/screenshots
           if-no-files-found: ignore
+
+  container_image:
+    needs: [ scan_ruby, scan_js, lint, test ]
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/container-image.yml
+    with:
+      push: ${{ github.event_name == 'push' }}

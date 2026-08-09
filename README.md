@@ -98,10 +98,36 @@ store Google access or refresh tokens. A Google identity is keyed by Google's
 stable account ID, not by email address. An existing password account must be
 signed in before Google can be linked to it.
 
-![Category Overview](docs/sample1.png)
-![Conversation View](docs/sample2.png)
+## Current interface
+
+### Three-step onboarding
+
+![Listen2Me onboarding with language selection](docs/onboarding.jpg)
+
+### Speech output
+
+![Listen2Me speech output with quick answers and custom text](docs/speech-output.jpg)
+
+### Conversation mode
+
+![Listen2Me conversation mode with listening status and response suggestions](docs/conversation-mode.jpg)
 
 > **Note**: This project is currently in early development and is being developed in our free time. We aim to create a free, open-source tool for people who need this type of assistance. We warmly welcome anyone who would like to contribute to this meaningful project!
+
+## Container image
+
+After all CI checks pass, the `Container Image` workflow builds the production
+Dockerfile for pull requests, pushes to `main`, and version tags beginning with
+`v`. Pull requests are build-only. Main and version-tag builds publish an AMD64
+image to `ghcr.io/stefan-kp/listen2me` with `latest`, branch, semantic-version,
+short-SHA, and full commit-SHA tags. The full SHA tag supports Kamal deployments
+without rebuilding the image. The workflow can also be started manually, with
+publishing enabled by default. GitHub's repository token handles publishing; no
+separate registry token is needed by the workflow.
+
+For anonymous pulls, make the linked GHCR package public once in its package
+settings. Registry tags can be moved; deployments that require technical
+immutability should pin the image digest rather than relying on `latest`.
 
 ## Quick Start with Docker
 
@@ -160,6 +186,13 @@ derived from it unless the three dedicated variables
 `ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY`, and
 `ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT` are supplied. Dedicated,
 secret-managed values are recommended for production.
+
+Production uses one PostgreSQL database for application data, Solid Cache,
+Solid Queue, and Solid Cable. Set a single `DATABASE_URL`; `db:prepare` creates
+all required tables through the regular migration chain. If upgrading an
+already-running installation that used four databases, drain or migrate pending
+Solid Queue jobs before switching. Cache entries and transient Cable messages
+can normally be discarded, but queued work should not be silently abandoned.
 
 ### Stopping the Application
 ```bash
