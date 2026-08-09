@@ -180,19 +180,22 @@ That's it! The application will automatically:
 > is handled automatically through environment variables in docker-compose.yml - 
 > no manual database configuration is needed.
 
-For deployments, keep `SECRET_KEY_BASE` stable. Provider-key encryption is
-derived from it unless the three dedicated variables
+Deployments require `SECRET_KEY_BASE` as an environment variable, and the value
+has to stay the same for the life of the installation. Provider-key encryption
+derives from it unless the three dedicated variables
 `ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY`,
 `ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY`, and
-`ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT` are supplied. Dedicated,
+`ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT` are supplied; dedicated,
 secret-managed values are recommended for production.
+`config/active_record_encryption.rb` reads the environment variable directly,
+so `RAILS_MASTER_KEY` alone does not configure encryption.
 
 Production uses one PostgreSQL database for application data, Solid Cache,
-Solid Queue, and Solid Cable. Set a single `DATABASE_URL`; `db:prepare` creates
-all required tables through the regular migration chain. If upgrading an
-already-running installation that used four databases, drain or migrate pending
-Solid Queue jobs before switching. Cache entries and transient Cable messages
-can normally be discarded, but queued work should not be silently abandoned.
+Solid Queue, and Solid Cable. Host, database name, and credentials all come
+from `DATABASE_URL`; `config/database.yml` sets no `database`, `username`, or
+`password` keys, since those would win over the URL and pin the connection to a
+local socket. `db:prepare` creates all required tables through the regular
+migration chain.
 
 ### Stopping the Application
 ```bash

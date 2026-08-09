@@ -13,6 +13,6 @@ test:
 
 production:
   <<: *default
-  database: listen2me_production
-  username: listen2me
-  password: <%= ENV["LISTEN2ME_DATABASE_PASSWORD"] %>
+  # Host, database, and credentials come from DATABASE_URL. Setting them here
+  # as well would win over the URL and pin the connection to a local socket.
+  url: <%= ENV["DATABASE_URL"] %>
