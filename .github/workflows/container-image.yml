@@ -45,6 +45,18 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # Read from git, not github.event: head_commit is empty on workflow_dispatch
+      # and workflow_run, and github.sha can differ from the commit checked out.
+      - name: Read commit info
+        id: commit
+        run: |
+          subject=$(git log -1 --format=%s)
+          # " and # would be misparsed by the docker actions' list inputs
+          subject=${subject//\"/\'}
+          subject=${subject//#/}
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "subject=${subject:0:200}" >> "$GITHUB_OUTPUT"
+
       - name: Extract image metadata
         id: metadata
         uses: docker/metadata-action@v6
@@ -58,6 +70,9 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=sha,prefix=sha-
             type=sha,format=long,prefix=
+          labels: |
+            org.opencontainers.image.revision=${{ steps.commit.outputs.sha }}
+            org.opencontainers.image.description=${{ steps.commit.outputs.subject }}
 
       - name: Build and push image
         uses: docker/build-push-action@v7
@@ -67,5 +82,8 @@ jobs:
           push: ${{ inputs.push }}
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
+          annotations: |
+            index:org.opencontainers.image.revision=${{ steps.commit.outputs.sha }}
+            index:org.opencontainers.image.description=${{ steps.commit.outputs.subject }}
           cache-from: type=gha,scope=listen2me
           cache-to: type=gha,mode=max,scope=listen2me
