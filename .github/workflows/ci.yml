@@ -6,6 +6,12 @@ on:
     branches: [ main ]
     tags: [ "v*" ]
 
+# A newer push to the same branch or pull request cancels the running checks;
+# only the latest commit is tested.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   scan_ruby:
     runs-on: ubuntu-latest
