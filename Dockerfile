@@ -15,7 +15,15 @@ FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 WORKDIR /rails
 
 # Install base packages
-RUN apt-get update -qq && \
+# apt-get upgrade: Ruby patch tags are not rebuilt upstream once a newer patch
+# is out, so their Debian packages go stale; the weekly no-cache rebuild
+# (.github/workflows/container-image.yml) pulls the current security updates in.
+# The CI layer cache keeps this layer, so a new Debian fix only lands with
+# the weekly no-cache build. Bump APT_REFRESH to pull one in right away.
+ARG APT_REFRESH=2026-11-12
+RUN echo "apt refresh ${APT_REFRESH}" && \
+    apt-get update -qq && \
+    apt-get upgrade -y --no-install-recommends && \
     apt-get install --no-install-recommends -y curl libjemalloc2 libvips postgresql-client && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
