@@ -491,6 +491,7 @@ DEPENDENCIES
   bootsnap
   brakeman
   capybara
+  csv (~> 3.3)
   debug
   devise (~> 5.0.4)
   devise-i18n (~> 1.16)

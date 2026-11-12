@@ -70,6 +70,9 @@ gem "tailwindcss-rails", "~> 3.3.1"
 
 gem "langchainrb", "~> 0.19.3"
 
+# CSV import (default_content_installer, import rake tasks); not a default gem since Ruby 3.4
+gem "csv", "~> 3.3"
+
 gem "dotenv-rails", groups: [ :development, :test ]
 
 gem "devise", "~> 5.0.4"
