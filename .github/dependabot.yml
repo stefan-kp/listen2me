@@ -1,12 +1,16 @@
 version: 2
+# Version updates are off (open-pull-requests-limit: 0): Dependabot opens
+# pull requests only for security advisories (repo setting "Dependabot
+# security updates"), which ignore this limit. Saves the CI minutes that
+# daily version-bump PRs cost.
 updates:
 - package-ecosystem: bundler
   directory: "/"
   schedule:
-    interval: daily
-  open-pull-requests-limit: 10
+    interval: weekly
+  open-pull-requests-limit: 0
 - package-ecosystem: github-actions
   directory: "/"
   schedule:
-    interval: daily
-  open-pull-requests-limit: 10
+    interval: weekly
+  open-pull-requests-limit: 0
